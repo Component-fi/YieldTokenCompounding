@@ -2,7 +2,7 @@ import { Box, Link } from '@chakra-ui/layout';
 import React from 'react';
 import githubLogo from '../../images/Github/GitHub-Mark-64px.png';
 
-const GITHUB_REPO = "https://github.com/rahul-kothari/hack-money-ape";
+const GITHUB_REPO = "https://github.com/Component-fi/YieldTokenCompounding";
 
 export const Footer: React.FC<{}> = () => {
     return (
