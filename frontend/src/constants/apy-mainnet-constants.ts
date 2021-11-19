@@ -38,3 +38,7 @@ export const validCurveTokens = [
     "eurscrv",
 ]
 export const validCoingeckoTokens = Object.keys(COINGECKO_TOKEN_NAME_TRANSLATION);
+
+export const deployments = {
+    YieldTokenCompounding: "0x3df5229f24040cf0218969c2406b302744edc18b"
+}
