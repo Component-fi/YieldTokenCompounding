@@ -25,7 +25,6 @@ export const Modal = (props: Props) => {
 
     return (
         <ChakraModal
-            isCentered
             isOpen={isOpen}
             size="lg"
             onClose={()=>setIsOpen(false)}

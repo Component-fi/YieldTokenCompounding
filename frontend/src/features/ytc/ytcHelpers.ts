@@ -1,4 +1,5 @@
 import { BigNumber, BigNumberish, Contract, ethers, Signer } from "ethers";
+import { Provider } from "@ethersproject/providers";
 import YieldTokenCompounding from '../../artifacts/contracts/YieldTokenCompounding.sol/YieldTokenCompounding.json'
 import ITranche from '../../artifacts/contracts/element-finance/ITranche.sol/ITranche.json'
 import {ITranche as ITrancheType} from '../../hardhat/typechain/ITranche';
@@ -10,6 +11,7 @@ import { getTokenPrice } from "../prices";
 import { getUnderlyingTotal } from "../element/wrappedPositionAmount";
 import { getPrincipalTotal } from "../element/principalTotal";
 import { getYieldTotal } from "../element/yieldTotal";
+import { overrides } from "../../constants/apy-mainnet-constants";
 
 export interface YTCInput {
     baseTokenAddress: string;
@@ -74,7 +76,7 @@ export interface YTCParameters {
 // param elementAddresses, constant containing the deployment addresses of tokens vaults and pools
 // param signer, the signer of the transaction
 // Returns, YTC parameters, a ytc contract instance, the balancer pool, decimals for tokens, the name of the yield token ...etc
-export const getYTCParameters = async (userData: YTCInput, elementAddresses: ElementAddresses, signer: Signer): Promise<YTCParameters> => {
+export const getYTCParameters = async (userData: YTCInput, elementAddresses: ElementAddresses, signer: Signer | Provider): Promise<YTCParameters> => {
     const ytcAbi = YieldTokenCompounding.abi;
     const erc20Abi = ERC20.abi;
     const trancheAbi = ITranche.abi;
@@ -113,7 +115,7 @@ export const getYTCParameters = async (userData: YTCInput, elementAddresses: Ele
     const baseToken: ERC20Type = new ethers.Contract(baseTokenAddress, erc20Abi, signer) as ERC20Type;
     const baseTokenDecimals = ethers.BigNumber.from(await baseToken.decimals()).toNumber();
 
-    const baseTokenBalance = await baseToken.balanceOf(await signer.getAddress());
+    const baseTokenBalance = await baseToken.balanceOf(overrides.from);
     const amountCollateralDespositedAbsolute = ethers.utils.parseUnits(userData.amountCollateralDeposited.toString(), baseTokenDecimals);
 
     // if the suggested amount is greater than the total amount, return the total amount instead
@@ -208,7 +210,7 @@ export const getTokenNameByAddress = (address: string, tokens: {[name: string]: 
     return result && result[0]
 }
 
-const ethToBaseTokenRate = async (baseTokenName: string, elementAddresses: ElementAddresses, signer: Signer) => {
+const ethToBaseTokenRate = async (baseTokenName: string, elementAddresses: ElementAddresses, signer: Signer | Provider) => {
     const baseTokenPrice = await getTokenPrice(baseTokenName, elementAddresses, signer);
     const ethPrice =  await getTokenPrice("eth", elementAddresses, signer);
 

@@ -22,7 +22,7 @@ function App() {
 
   return (
     <div className="App">
-      <Symfoni autoInit={false} loadingComponent={<LoadingComponent/>}>
+      <Symfoni autoInit={true} loadingComponent={<LoadingComponent/>}>
           <Layout/>
       </Symfoni>
     </div>

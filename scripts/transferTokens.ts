@@ -1,7 +1,11 @@
+import { approveAllTokens } from "./helpers/approveAlltokens";
+import { approveAllBalancerPools } from "./helpers/approveBalancerPools";
 import { getAllTokens } from "./helpers/getTokens";
 
 async function main() {
-  await getAllTokens();
+  // await getAllTokens();
+  // await approveAllBalancerPools();
+  await approveAllTokens();
 }
 
 main()

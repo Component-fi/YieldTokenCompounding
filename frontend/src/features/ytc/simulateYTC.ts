@@ -3,6 +3,8 @@ import _ from "lodash";
 import { GAS_LIMITS } from "../../constants/gasLimits";
 import { ElementAddresses } from "../../types/manual/types";
 import { getYTCParameters, YTCInput, YTCOutput, YTCParameters } from "./ytcHelpers";
+import {overrides} from '../../constants/apy-mainnet-constants'
+import { Provider } from "@ethersproject/providers";
 
 const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
@@ -12,10 +14,11 @@ const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 // param userData, user input data for simulating the transaction
 // param signer, Signer of the transaction
 // returns YTCOutput, contains both input data, and the results fo the simulation, including yield exposure, gas fees, tokens spent, remaining tokens etc.
-export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate}: YTCParameters, userData: YTCInput, signer: Signer): Promise<YTCOutput> => {
+export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate}: YTCParameters, userData: YTCInput, signer: Signer | Provider): Promise<YTCOutput> => {
     // Call the method statically to calculate the estimated return
     // The last two arguments are to prevent slippage, but this isn't required as it is a simulation and cannot be frontrun
-    const returnedVals = await ytc.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX);
+    try{
+    const returnedVals = await ytc.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, overrides);
 
     // Estimate the required amount of gas, this is likely very imprecise
     // const gasAmountEstimate = await ytc.estimateGas.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0");
@@ -62,6 +65,10 @@ export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balan
         },
         inputs: userData,
     }
+    } catch (e) {
+        console.error(e);
+        throw new Error("failed");
+    }
 }
 
 // Runs the simulateYTC method for a range of compounds, rather than just one
@@ -70,7 +77,7 @@ export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balan
 // param compound Range, the lowest, and largest number of compounds for the simulation to execute
 // param signer, Signer of the transaction
 // Returns YTCOutput[], an array of yield token compounding outputs
-export const simulateYTCForCompoundRange = async (userData: YTCInput, constants: ElementAddresses, compoundRange: [number, number], signer: Signer): Promise<YTCOutput[]> => {
+export const simulateYTCForCompoundRange = async (userData: YTCInput, constants: ElementAddresses, compoundRange: [number, number], signer: Signer | Provider): Promise<YTCOutput[]> => {
 
     const yieldCalculationParameters = await getYTCParameters(userData, constants, signer);
 
@@ -114,7 +121,7 @@ export const getCompoundsFromTargetExposure = (fixedRate: number, targetExposure
 }
 
 //eslint-disable-next-line
-const gasLimitToEthGasFee = async (signer: ethers.Signer, gasAmountEstimate: ethers.BigNumber): Promise<number> => {
+const gasLimitToEthGasFee = async (signer: ethers.Signer | Provider, gasAmountEstimate: ethers.BigNumber): Promise<number> => {
     const {maxFeePerGas, maxPriorityFeePerGas} = await signer.getFeeData();
 
     if (!maxFeePerGas || !maxPriorityFeePerGas){

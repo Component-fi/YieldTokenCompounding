@@ -6,7 +6,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { getActiveTranches, getBalance } from "../../../../features/element";
-import { CurrentAddressContext, ERC20Context, SignerContext } from "../../../../hardhat/SymfoniContext";
+import { CurrentAddressContext, ERC20Context, ProviderContext } from "../../../../hardhat/SymfoniContext";
 import { elementAddressesAtom } from "../../../../recoil/element/atom";
 import { isSimulatingAtom, simulationResultsAtom } from "../../../../recoil/simulationResults/atom";
 import { Token, Tranche } from "../../../../types/manual/types";
@@ -42,7 +42,7 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
     const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
     const setIsSimulating = useRecoilState(isSimulatingAtom)[1];
     const elementAddresses = useRecoilValue(elementAddressesAtom);
-    const [signer] = useContext(SignerContext)
+    const [provider] = useContext(ProviderContext);
     const [balance, setBalance] = useState<number | undefined>(undefined);
     const [variableApy, setVariableApy] = useState<number | undefined>(undefined);
 
@@ -54,7 +54,8 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
                 !!values.trancheAddress &&
                 !!values.amount &&
                 !!ytcContractAddress &&
-                !!signer
+                (!!provider)
+
         ){
             const userData: YTCInput = {
                 baseTokenAddress: values.tokenAddress,
@@ -75,7 +76,7 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
                 compoundRange = [1, 3];
             }
             
-            simulateYTCForCompoundRange(userData, elementAddresses, compoundRange, signer).then(
+            simulateYTCForCompoundRange(userData, elementAddresses, compoundRange, provider).then(
                 (results) => {
                     setSimulationResults(() => {
                         return results;
