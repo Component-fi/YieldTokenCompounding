@@ -1,9 +1,8 @@
 import { Button, ButtonProps, Spinner } from "@chakra-ui/react";
-import { useContext } from "react";
 import { BalancerApproval, ERC20Approval } from "../../../../features/approval/Approval";
-import { YieldTokenCompoundingContext } from "../../../../hardhat/SymfoniContext";
 import { useRecoilValue } from 'recoil';
 import { isSimulatedSelector, isSimulatingAtom } from "../../../../recoil/simulationResults/atom";
+import {deployments} from '../../../../constants/apy-mainnet-constants';
 
 interface ApproveAndSimulateButtonProps {
     tokenAddress: string | undefined;
@@ -15,7 +14,6 @@ interface ApproveAndSimulateButtonProps {
 
 
 export const ApproveAndSimulateButton: React.FC<ApproveAndSimulateButtonProps & ButtonProps> = (props) => {
-    const ytc = useContext(YieldTokenCompoundingContext);
 
     const { tokenAddress, tokenName, trancheAddress, formErrors, amount, ...rest} = props;
 
@@ -26,7 +24,7 @@ export const ApproveAndSimulateButton: React.FC<ApproveAndSimulateButtonProps & 
         <ERC20Approval
             tokenAddress={tokenAddress}
             tokenName={tokenName}
-            approvalAddress={ytc.instance?.address}
+            approvalAddress={deployments.YieldTokenCompounding}
             amount={amount}
             {...rest}
         >

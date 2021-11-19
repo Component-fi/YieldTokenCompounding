@@ -6,7 +6,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { getActiveTranches, getBalance } from "../../../../features/element";
-import { CurrentAddressContext, ERC20Context, SignerContext, YieldTokenCompoundingContext } from "../../../../hardhat/SymfoniContext";
+import { CurrentAddressContext, ERC20Context, SignerContext } from "../../../../hardhat/SymfoniContext";
 import { elementAddressesAtom } from "../../../../recoil/element/atom";
 import { isSimulatingAtom, simulationResultsAtom } from "../../../../recoil/simulationResults/atom";
 import { Token, Tranche } from "../../../../types/manual/types";
@@ -21,6 +21,7 @@ import { TrancheDetails } from "./Tranche";
 import { TokenIcon } from "../../../Tokens/TokenIcon";
 import { InfoTooltip } from "../../../Reusable/Tooltip";
 import { AdvancedCollapsable } from "./Advanced";
+import { deployments } from "../../../../constants/apy-mainnet-constants";
 
 interface CalculateProps {
     tokens: Token[];
@@ -40,14 +41,13 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
 
     const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
     const setIsSimulating = useRecoilState(isSimulatingAtom)[1];
-    const ytc = useContext(YieldTokenCompoundingContext)
     const elementAddresses = useRecoilValue(elementAddressesAtom);
     const [signer] = useContext(SignerContext)
     const [balance, setBalance] = useState<number | undefined>(undefined);
     const [variableApy, setVariableApy] = useState<number | undefined>(undefined);
 
     const handleSubmit = (values: FormFields, formikHelpers: FormikHelpers<FormFields>) => {
-        const ytcContractAddress = ytc.instance?.address;
+        const ytcContractAddress = deployments.YieldTokenCompounding;
 
         if (
                 !!values.tokenAddress &&

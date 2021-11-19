@@ -5,6 +5,7 @@ import { ProviderContext, ERC20Context, CurrentAddressContext, YieldTokenCompoun
 import { BigNumber, ContractReceipt, utils, providers } from 'ethers';
 import { notificationAtom } from '../../recoil/notifications/atom';
 import { useRecoilState } from 'recoil';
+import { deployments } from '../../constants/apy-mainnet-constants';
 
 const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
@@ -170,7 +171,8 @@ interface BalancerApprovalProps {
 // An implementation of the approval button specifically for approving a balancer pool to use funds from the YTC contract
 export const BalancerApproval: React.FC<BalancerApprovalProps> = (props) => {
     const [provider] = useContext(ProviderContext);
-    const ytc = useContext(YieldTokenCompoundingContext);
+    const ytcContext = useContext(YieldTokenCompoundingContext);
+    const ytc = ytcContext.instance?.attach(deployments.YieldTokenCompounding)
 
     const { trancheAddress, children, ...rest} = props;
 
@@ -180,8 +182,8 @@ export const BalancerApproval: React.FC<BalancerApprovalProps> = (props) => {
 
     const handleCheckApproval = useCallback(
         async () => {
-            if(!!trancheAddress){
-                const allowance = await ytc.instance?.checkTranchePTAllowanceOnBalancer(trancheAddress)
+            if(!!trancheAddress && ytc){
+                const allowance = await ytc.checkTranchePTAllowanceOnBalancer(trancheAddress)
                 if (allowance?.eq(BigNumber.from(MAX_UINT_HEX))){
                     setIsApproved(true);
                 }
@@ -195,9 +197,9 @@ export const BalancerApproval: React.FC<BalancerApprovalProps> = (props) => {
 
     const handleApprove: () => Promise<ContractReceipt> = useCallback(
         async () => {
-            if (trancheAddress){
+            if (trancheAddress && ytc){
                 setIsLoading(true);
-                const tx = await ytc.instance?.approveTranchePTOnBalancer(trancheAddress);
+                const tx = await ytc.approveTranchePTOnBalancer(trancheAddress);
                 if (tx){
                     const receipt = await tx.wait();
                     handleCheckApproval()
