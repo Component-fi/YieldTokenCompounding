@@ -1,17 +1,18 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, Text, Flex } from '@chakra-ui/react'
-import { ProviderContext, CurrentAddressContext, SymfoniContext } from "../../hardhat/SymfoniContext";
+import { ProviderContext, CurrentAddressContext } from "../../hardhat/SymfoniContext";
 import { chainNameAtom } from '../../recoil/chain/atom';
 import { useRecoilState } from 'recoil';
+import { Modal } from './Modal';
 
 interface Props {
 }
 
 export const Wallet = (props: Props) => {
 
-    const [provider, setProvider] = useContext(ProviderContext);
+    const [isOpen, setIsOpen] = useState<boolean>(false)
+    const [provider] = useContext(ProviderContext);
     const [currentAddress] = useContext(CurrentAddressContext)
-    const {init} = useContext(SymfoniContext);
 
     const [chainName, setChainName] = useRecoilState(chainNameAtom);
 
@@ -28,13 +29,6 @@ export const Wallet = (props: Props) => {
         )
     }, [provider, setChainName])
 
-    const handleConnect = async () => {
-        init();
-    }
-
-    const handleDisconnect = () => {
-        setProvider(undefined);
-    }
 
     const shortenAddress = (address: string): string => {
         return address.slice(0, 6) + '....' + address.slice(-4)
@@ -42,6 +36,10 @@ export const Wallet = (props: Props) => {
 
     return (
         <div>
+            <Modal
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+            />
             {
                 !!provider ? 
                 <Flex
@@ -60,7 +58,7 @@ export const Wallet = (props: Props) => {
                         </Text>
                     </Flex>
                     <Button
-                        onClick={handleDisconnect}
+                        onClick={() => setIsOpen(true)}
                         fontSize={'sm'}
                         fontWeight={600}
                         color=""
@@ -73,7 +71,7 @@ export const Wallet = (props: Props) => {
                     </Button> 
                 </Flex> :
                 <Button
-                    onClick={handleConnect}
+                    onClick={() => setIsOpen(true)}
                     display={{  md: 'inline-flex' }}
                     fontSize={'sm'}
                     fontWeight={600}
