@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import {Button, Flex, Icon, Modal as ChakraModal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, Text} from '@chakra-ui/react';
+import {Button, Flex, Icon, Modal as ChakraModal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text} from '@chakra-ui/react';
 import { CurrentAddressContext, ProviderContext, SymfoniContext } from '../../hardhat/SymfoniContext';
 import Card from '../Reusable/Card';
 
@@ -30,6 +30,7 @@ export const Modal = (props: Props) => {
             size="lg"
             onClose={()=>setIsOpen(false)}
         >
+            <ModalOverlay/>
             <ModalContent
                 rounded="2xl"
             >
