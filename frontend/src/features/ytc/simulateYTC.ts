@@ -18,53 +18,53 @@ export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balan
     // Call the method statically to calculate the estimated return
     // The last two arguments are to prevent slippage, but this isn't required as it is a simulation and cannot be frontrun
     try{
-    const returnedVals = await ytc.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, overrides);
+        const returnedVals = await ytc.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, overrides);
 
-    // Estimate the required amount of gas, this is likely very imprecise
-    // const gasAmountEstimate = await ytc.estimateGas.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0");
-    // TODO this is using the mean of hardcoded gas estimations
-    const gasAmountEstimate = BigNumber.from(GAS_LIMITS[userData.numberOfCompounds])
+        // Estimate the required amount of gas, this is likely very imprecise
+        // const gasAmountEstimate = await ytc.estimateGas.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0");
+        // TODO this is using the mean of hardcoded gas estimations
+        const gasAmountEstimate = BigNumber.from(GAS_LIMITS[userData.numberOfCompounds])
 
-    const ethGasFees = await gasLimitToEthGasFee(signer, gasAmountEstimate);
+        const ethGasFees = await gasLimitToEthGasFee(signer, gasAmountEstimate);
 
-    const gasFeesInBaseToken = ethToBaseTokenRate * ethGasFees;
+        const gasFeesInBaseToken = ethToBaseTokenRate * ethGasFees;
 
-    // Convert the result to a number
-    const [ytExposureAbsolute, baseTokensSpentAbsolute]: BigNumber[] = returnedVals.map((val: any) => ethers.BigNumber.from(val));
+        // Convert the result to a number
+        const [ytExposureAbsolute, baseTokensSpentAbsolute]: BigNumber[] = returnedVals.map((val: any) => ethers.BigNumber.from(val));
 
 
-    const remainingTokensAbsolute = BigNumber.from(baseTokenAmountAbsolute).sub(BigNumber.from(baseTokensSpentAbsolute));
+        const remainingTokensAbsolute = BigNumber.from(baseTokenAmountAbsolute).sub(BigNumber.from(baseTokensSpentAbsolute));
 
-    const ytExposureNormalized = parseFloat(ethers.utils.formatUnits(ytExposureAbsolute, yieldTokenDecimals))
-    const remainingTokensNormalized = parseFloat(ethers.utils.formatUnits(remainingTokensAbsolute, baseTokenDecimals))
-    const baseTokensSpentNormalized = parseFloat(ethers.utils.formatUnits(baseTokensSpentAbsolute, baseTokenDecimals))
+        const ytExposureNormalized = parseFloat(ethers.utils.formatUnits(ytExposureAbsolute, yieldTokenDecimals))
+        const remainingTokensNormalized = parseFloat(ethers.utils.formatUnits(remainingTokensAbsolute, baseTokenDecimals))
+        const baseTokensSpentNormalized = parseFloat(ethers.utils.formatUnits(baseTokensSpentAbsolute, baseTokenDecimals))
 
-    return {
-        receivedTokens: {
-            yt: {
-                name: ytName,
-                amount: ytExposureNormalized,
+        return {
+            receivedTokens: {
+                yt: {
+                    name: ytName,
+                    amount: ytExposureNormalized,
+                },
+                baseTokens: {
+                    name: baseTokenName,
+                    amount: remainingTokensNormalized
+                }
             },
-            baseTokens: {
-                name: baseTokenName,
-                amount: remainingTokensNormalized
-            }
-        },
-        spentTokens: {
-            baseTokens: {
-                name: baseTokenName,
-                amount: baseTokensSpentNormalized
-            }
-        },
-        gas: {
-            eth: ethGasFees,
-            baseToken: gasFeesInBaseToken,
-        },
-        tranche: {
-            expiration: trancheExpiration,
-        },
-        inputs: userData,
-    }
+            spentTokens: {
+                baseTokens: {
+                    name: baseTokenName,
+                    amount: baseTokensSpentNormalized
+                }
+            },
+            gas: {
+                eth: ethGasFees,
+                baseToken: gasFeesInBaseToken,
+            },
+            tranche: {
+                expiration: trancheExpiration,
+            },
+            inputs: userData,
+        }
     } catch (e) {
         console.error(e);
         throw new Error("failed");
@@ -94,7 +94,16 @@ export const simulateYTCForCompoundRange = async (userData: YTCInput, constants:
         )
     })
 
-    return await Promise.all(promises)
+    const results = await Promise.allSettled(promises)
+
+    const fulfilledResults = results.filter(isFilled).map((result: PromiseFulfilledResult<YTCOutput>) => {
+        return result.value;
+    })
+
+    if (fulfilledResults.length === 0){
+        throw new Error("Simulation failed: no results")
+    }
+    return fulfilledResults;
 }
 
 // Takes the current discount price of a pt and the desired percentage exposure to Y tokens
@@ -134,3 +143,6 @@ const gasLimitToEthGasFee = async (signer: ethers.Signer | Provider, gasAmountEs
     
     return parseFloat(gasCostEth);
 }
+
+
+const isFilled = <T extends {}>(v: PromiseSettledResult<T>): v is PromiseFulfilledResult<T> => v.status === 'fulfilled';
