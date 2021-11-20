@@ -6,6 +6,7 @@ import goerliConstants from '../../constants/goerli-constants.json';
 import { tokenHolders } from '../../test/constants/tokenHolders';
 import { ContractReceipt } from '@ethersproject/contracts';
 import { ElementAddresses } from '../../frontend/src/types/manual/types';
+import { overrides } from '../../frontend/src/constants/apy-mainnet-constants';
 
 let constants: ElementAddresses;
 if (hre.network.name == "goerli"){
@@ -50,12 +51,16 @@ export const getTokens = async (largeHolderAddress: string, tokenName: string, a
     }
 
     // Create the transfer transaction
-    const transaction = await erc20Contract.transfer(signer.address, amountAbsolute);
+    const transaction = await erc20Contract.transfer(overrides.from, amountAbsolute);
     return transaction.wait()
 
 }
 
 export const getAllTokens = async (): Promise<(ContractReceipt | undefined)[]> => {
+  await hre.network.provider.send("hardhat_setBalance", [
+    overrides.from,
+    "0x1000000000000000",
+  ]);
   const promises = tokenHolders.map((entry) => {
     return getTokens(entry.largeHolderAddress, entry.tokenName, entry.amount)
   })

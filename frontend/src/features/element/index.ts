@@ -4,6 +4,7 @@ import { ERC20 } from '../../hardhat/typechain/ERC20';
 import { isTrancheActive } from '../ytc/ytcHelpers';
 import { ethers } from 'ethers';
 import { ONE_YEAR_IN_MILLISECONDS } from '../../constants/time';
+import { overrides } from '../../constants/apy-mainnet-constants';
 
 // This is for element api calls to get information on tokens, tranches, pools, etc..
 export const getTranches = async (tokenAddress: string, elementState: ElementAddresses): Promise<Tranche[]> => {
@@ -74,7 +75,7 @@ export const getBalance = async (currentAddress: string, contract: ERC20 | undef
     if (contract){
         const decimals = await contract.decimals();
 
-        const balanceAbsolute = await contract.balanceOf(currentAddress);
+        const balanceAbsolute = await contract.balanceOf(overrides.from);
         const balanceNormalized = ethers.utils.formatUnits(balanceAbsolute, decimals);
 
         return parseFloat(balanceNormalized);

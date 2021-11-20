@@ -8,13 +8,14 @@ import ERC20 from '../../artifacts/contracts/balancer-core-v2/lib/openzeppelin/E
 import IERC20Minter from '../../artifacts/contracts/curve/IERC20Minter.sol/IERC20Minter.json';
 import { getRelativePriceFromCoingecko } from "./coingecko";
 import { ElementAddresses } from "../../types/manual/types";
+import { Provider } from "@ethersproject/providers";
 
 export type CurveTokenName = (typeof validCurveTokens[number])
 export const isCurveToken = (x: any): x is CurveTokenName => {
     return validCurveTokens.includes(x);
 }
 
-export const getPriceOfCurveLP = async (tokenName: string, elementAddresses: ElementAddresses ,signer: Signer) => {
+export const getPriceOfCurveLP = async (tokenName: string, elementAddresses: ElementAddresses ,signer: Signer | Provider) => {
     const tokenAddress = elementAddresses.tokens[tokenName];
 
     if (!tokenAddress){
@@ -35,7 +36,7 @@ export const getPriceOfCurveLP = async (tokenName: string, elementAddresses: Ele
     return basePrice * virtualPrice;
 }
 
-const getBasePrice = async (tokenName: string, swapAddress: string, signer: Signer): Promise<number> => {
+const getBasePrice = async (tokenName: string, swapAddress: string, signer: Signer | Provider): Promise<number> => {
     let basePrice: number;
     let ethPrice;
     switch(tokenName){
@@ -67,7 +68,7 @@ const getBasePrice = async (tokenName: string, swapAddress: string, signer: Sign
     return basePrice;
 }
 
-const getCurveVirtualPrice = async (tokenAddress: string, signer: Signer): Promise<number> => {
+const getCurveVirtualPrice = async (tokenAddress: string, signer: Signer | Provider): Promise<number> => {
     // get the curve pool contract
     const curveAbi = ICurveFi.abi;
     // get the number of decimals
@@ -82,7 +83,7 @@ const getCurveVirtualPrice = async (tokenAddress: string, signer: Signer): Promi
     return virtualPriceNormalized;
 }
 
-const getTriCryptoPrice = async (tokenAddress: string, signer: Signer): Promise<number> => {
+const getTriCryptoPrice = async (tokenAddress: string, signer: Signer | Provider): Promise<number> => {
     const curveAbi = ICurveFi.abi;
 
     const curveContract = new Contract(tokenAddress, curveAbi, signer) as ICurveType;
@@ -111,7 +112,7 @@ const getTriCryptoPrice = async (tokenAddress: string, signer: Signer): Promise<
 
 // Some curve lp contracts are both the erc20 and the swap pool contract, some have this functionality separated
 // When there are two contracts the ERC20 token will have a minter variable that contains the address of the swap contract
-const getCurveSwapAddress = async (tokenAddress: string, signer: Signer): Promise<string> => {
+const getCurveSwapAddress = async (tokenAddress: string, signer: Signer | Provider): Promise<string> => {
     const erc20MinterAbi = IERC20Minter.abi;
 
     const erc20Contract = new Contract(tokenAddress, erc20MinterAbi, signer) as IERC20MinterType;
