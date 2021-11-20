@@ -87,7 +87,16 @@ export const simulateYTCForCompoundRange = async (userData: YTCInput, constants:
         )
     })
 
-    return await Promise.all(promises)
+    const results = await Promise.allSettled(promises)
+
+    const fulfilledResults = results.filter(isFilled).map((result: PromiseFulfilledResult<YTCOutput>) => {
+        return result.value;
+    })
+
+    if (fulfilledResults.length === 0){
+        throw new Error("Simulation failed: no results")
+    }
+    return fulfilledResults;
 }
 
 // Takes the current discount price of a pt and the desired percentage exposure to Y tokens
@@ -127,3 +136,6 @@ const gasLimitToEthGasFee = async (signer: ethers.Signer, gasAmountEstimate: eth
     
     return parseFloat(gasCostEth);
 }
+
+
+const isFilled = <T extends {}>(v: PromiseSettledResult<T>): v is PromiseFulfilledResult<T> => v.status === 'fulfilled';
