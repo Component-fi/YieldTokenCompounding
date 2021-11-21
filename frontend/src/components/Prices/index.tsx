@@ -45,7 +45,7 @@ interface YTPriceTagProps {
 }
 
 export const YTPriceTag: React.FC<YTPriceTagProps> = (props) => {
-    const {amount, baseTokenName, trancheAddress} = props;
+    const {baseTokenName, trancheAddress} = props;
 
     const [price, setPrice] = useState<number>(0);
     const [signer] = useContext(SignerContext);
