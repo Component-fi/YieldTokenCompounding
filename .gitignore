@@ -28,8 +28,6 @@ node_modules
 
 #Hardhat files
 cache
-frontend/src/artifacts
-frontend/src/hardhat/
 
 
 #VS Code
