@@ -182,7 +182,7 @@ export const BalancerApproval: React.FC<BalancerApprovalProps> = (props) => {
 
     const handleCheckApproval = useCallback(
         async () => {
-            if(!!trancheAddress && ytc){
+            if(trancheAddress && ytc){
                 const allowance = await ytc.checkTranchePTAllowanceOnBalancer(trancheAddress)
                 if (allowance?.eq(BigNumber.from(MAX_UINT_HEX))){
                     setIsApproved(true);
