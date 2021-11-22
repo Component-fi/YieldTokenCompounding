@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {Flex, Button, Collapse, Tabs, TabList, Tab, TabPanels, TabPanel, InputGroup, Input, InputRightAddon, Text} from '@chakra-ui/react'
+import {Flex, Button, Collapse, Tabs, TabList, Tab, TabPanels, TabPanel, InputGroup, Input, InputRightAddon, Text, FormLabel} from '@chakra-ui/react'
 import { useFormikContext } from "formik";
 import { useRecoilValue } from "recoil";
 import { trancheSelector } from "../../../../../recoil/trancheRates/atom";
@@ -17,16 +17,29 @@ export const AdvancedCollapsable: React.FC = () => {
         <Button variant="link" onClick={handleToggle} gridGap={2}>
             {show ? <ChevronDownIcon/> : <ChevronRightIcon/>}
             {show ? "Hide" : "Show"} Advanced Options
-            <InfoTooltip label="The simulator will by default run with 1-8 compounds. Advanced options allow you to change this by selecting either the number of compounds you want to simulate, or the percentage of your collateral you want to spend."/>
+            <InfoTooltip label="The simulator will by default run with 1-8 compounds. Advanced options allow you to change this by selecting either the number of compounds you want to simulate"/>
         </Button>
-        <Collapse in={show}>
-            <AdvancedForm/>
+        <Collapse in={show} >
+            <FormLabel
+                mt={3}
+                flexDir="row"
+                justify="center"
+                alignItems="center"
+            >
+                <Text
+                    textAlign="center"
+                >
+                    Number of Compounds
+                </Text>
+            </FormLabel>
+            <NumberCompoundsField/>
         </Collapse>
     </Flex>
 
 }
 
 
+// eslint-disable-next-line
 const AdvancedForm = () => {
     return <Flex flexDir="column" alignItems="center">
         <Tabs>
