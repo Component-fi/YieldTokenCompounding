@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import Layout from './components/Layout';
-import LoadingComponent from './components/LoadingComponent';
 import { Symfoni } from "./hardhat/SymfoniContext";
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { elementAddressesAtom } from './recoil/element/atom';
@@ -22,7 +21,7 @@ function App() {
 
   return (
     <div className="App">
-      <Symfoni autoInit={false} loadingComponent={<LoadingComponent/>}>
+      <Symfoni autoInit={true} loadingComponent={<Layout/>}>
           <Layout/>
       </Symfoni>
     </div>
