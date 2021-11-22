@@ -367,7 +367,7 @@ const Form: React.FC<FormProps> = (props) => {
                         alignItems="center"
                         gridGap={2}
                     >
-                        Collateral Amount
+                        Initial Input Amount
                         <InfoTooltip label="Yield Token Compounding requires collateral of the base token during the ytc transaction. Only a portion of these tokens will be spent, and the rest will be returned to you when the transaction is complete."/>
                     </Flex>
                 </FormLabel>
