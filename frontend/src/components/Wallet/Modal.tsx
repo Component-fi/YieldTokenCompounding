@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import {Button, Flex, Icon, Modal as ChakraModal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text} from '@chakra-ui/react';
 import { CurrentAddressContext, ProviderContext, SymfoniContext } from '../../hardhat/SymfoniContext';
 import Card from '../Reusable/Card';
+import { SignerContext } from '../../hardhat/SymfoniContext';
 
 interface Props {
     isOpen: boolean;
@@ -12,7 +13,8 @@ export const Modal = (props: Props) => {
     const {isOpen, setIsOpen} = props;
 
     const {init} = useContext(SymfoniContext);
-    const [provider, setProvider] = useContext(ProviderContext);
+    const setProvider = useContext(ProviderContext)[1];
+    const [signer, setSigner] = useContext(SignerContext);
     const [currentAddress] = useContext(CurrentAddressContext)
 
     const handleConnect = async () => {
@@ -21,6 +23,7 @@ export const Modal = (props: Props) => {
 
     const handleDisconnect = () => {
         setProvider(undefined);
+        setSigner(undefined);
     }
 
     return (
@@ -35,7 +38,7 @@ export const Modal = (props: Props) => {
                 rounded="2xl"
             >
                 <Card>
-                    {provider ? <Content title="Your Wallet">
+                    {signer ? <Content title="Your Wallet">
                         <Flex
                             flexDir="column"
                             gridGap={3}
