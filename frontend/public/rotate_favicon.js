@@ -4,11 +4,7 @@
 const INTERVAL_MS = 2000;
 
 var favicon_images = [
-    '/Icon C1.svg',
-    '/Icon C2.svg',
-    '/Icon C3.svg',
-    '/Icon C4.svg',
-    '/Icon C5.svg',
+    '/Icon_Color.svg',
 ],
 image_counter = 0; // To keep track of the current image
 
