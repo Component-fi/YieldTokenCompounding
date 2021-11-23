@@ -5,6 +5,7 @@ import {useRecoilValue} from 'recoil';
 import { getTokenPrice } from '../../features/prices';
 import { shortenNumber } from '../../utils/shortenNumber';
 import { getYTCSpotPrice } from '../../features/element/ytcSpot';
+import { Text } from '@chakra-ui/react';
 
 interface PriceFeedProps {
     price: number | undefined;
@@ -27,7 +28,7 @@ const PriceTag: React.FC<PriceFeedProps> = (props) => {
         }
 
     } else {
-        value = "0"
+        value = "$0"
     }
 
 
@@ -75,6 +76,7 @@ interface BaseTokenPriceTagProps {
 
 export const BaseTokenPriceTag: React.FC<BaseTokenPriceTagProps> = (props) => {
     const {amount, baseTokenName} = props;
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [price, setPrice] = useState<number>(0);
     const [signer] = useContext(SignerContext);
@@ -82,19 +84,26 @@ export const BaseTokenPriceTag: React.FC<BaseTokenPriceTagProps> = (props) => {
 
     useEffect(() => {
         if(baseTokenName){
+            setIsLoading(true);
             getTokenPrice(baseTokenName, elementAddresses, signer).then((value) => {
                 setPrice(value);
             }).catch((error) => {
                 console.error(error);
+            }).finally(() => {
+                setIsLoading(false)
             })
         }
     }, [baseTokenName, elementAddresses, signer])
 
 
     return (
-        <PriceTag
-            price={price}
-            amount={amount}
-        />
+        isLoading ?
+            <Text>
+                $?
+            </Text> :
+            <PriceTag
+                price={price}
+                amount={amount}
+            />
     )
 }
