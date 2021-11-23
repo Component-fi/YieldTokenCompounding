@@ -349,7 +349,6 @@ const Form: React.FC<FormProps> = (props) => {
             </Flex>
         </Card>
         <Card mt={5}>
-            {/* <Text fontSize="large" fontWeight="extrabold">Select Initial Collateral</Text> */}
             <Flex
                 id="amount-card"
                 p={2}
@@ -367,7 +366,7 @@ const Form: React.FC<FormProps> = (props) => {
                         alignItems="center"
                         gridGap={2}
                     >
-                        Collateral Amount
+                        Input Amount
                         <InfoTooltip label="Yield Token Compounding requires collateral of the base token during the ytc transaction. Only a portion of these tokens will be spent, and the rest will be returned to you when the transaction is complete."/>
                     </Flex>
                 </FormLabel>
