@@ -20,6 +20,7 @@ import { InfoTooltip } from "../../../Reusable/Tooltip";
 import copy from '../../../../constants/copy.json';
 import { trancheSelector } from "../../../../recoil/trancheRates/atom";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { InfoOutlineIcon } from '@chakra-ui/icons';
 
 export interface ApeProps {
     baseToken: {
@@ -162,6 +163,15 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
                                 baseTokenName={baseToken.name}
                             />
                         </Flex>
+                    </Flex>
+                    <Flex mx={{base:2, sm: 16}}>
+                        <ExposureBar
+                            // equivalent to baseTokensSpent
+                            tokensSpent={inputAmount - baseTokenAmount}
+                            trancheAddress={userData.trancheAddress}
+                            minimumYTokensReceived={minimumReturn}
+                            baseTokenName={baseToken.name}
+                        />
                     </Flex>
                     <ExecutionDetails 
                         slippageTolerance={slippageTolerance}
@@ -404,4 +414,90 @@ const SmallGearIcon = () => {
             <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
         </Icon>
     </Flex>
+}
+
+interface ExposureBarProps {
+    tokensSpent: number;
+    trancheAddress: string;
+    baseTokenName: string;
+    minimumYTokensReceived: number;
+}
+
+const ExposureBar: React.FC<ExposureBarProps> = (props) => {
+    const {minimumYTokensReceived, trancheAddress, tokensSpent} = props;
+
+    const trancheRate = useRecoilValue(trancheSelector(trancheAddress));
+
+    let minimumRedemptionBaseTokens;
+    let variableExposureTokens;
+    let minimumRedemptionPercentage;
+    let variableExposurePercentage;
+
+    if (trancheRate.accruedValue){
+        minimumRedemptionBaseTokens = minimumYTokensReceived * trancheRate.accruedValue;
+        variableExposureTokens = tokensSpent - minimumRedemptionBaseTokens;
+        minimumRedemptionPercentage = minimumRedemptionBaseTokens/tokensSpent * 100;
+        variableExposurePercentage = variableExposureTokens/tokensSpent * 100;
+    }
+    
+    if (minimumRedemptionBaseTokens && variableExposureTokens && minimumRedemptionPercentage && minimumRedemptionBaseTokens){
+        return <Flex flexDir="column" w="full">
+            <Flex flexDir="row" justify="space-between">
+                <Text fontSize="xs">Minimum Redemption</Text>
+                <Text fontSize="xs">Variable Rate Exposure</Text>
+            </Flex>
+            <Flex flexDir="row" w='full' h={8} align="center">
+                <Text fontSize={"xs"} mr={0.5}>
+                    {shortenNumber(minimumRedemptionBaseTokens)}
+                </Text>
+                <Tooltip label="The minimum that will be received when redeeming your yield tokens. The variable interest rate over the term will have no effect on this capital.">
+                    <Flex bgColor="green.400" w={`${minimumRedemptionPercentage}%`} justify="center" align="center" h="70%"
+                        _hover={{
+                            borderColor: "green.200",
+                            borderWidth: 2
+                        }}
+                        flexDir="row"
+                        justifyContent="start"
+                        alignItems="start"
+                        p={1}
+                    >
+                        <InfoOutlineIcon
+                            color="grey.400"
+                            w={2.5}
+                            h={2.5}
+                        />
+                    </Flex>
+                </Tooltip>
+                <Flex bgColor="black" h="full" w="0.5">
+                </Flex>
+                <Tooltip label="The amount of exposure you have to the variable interst rate. The higher the variable rate, the larger that this will be at redemption">
+                    <Flex bgColor="component.orange" w={`${variableExposurePercentage}%`} justify="center" align="center" h="70%"
+                        _hover={{
+                            borderColor: "yellow.400",
+                            borderWidth: 2
+                        }}
+                        flexDir="row"
+                        justifyContent="start"
+                        alignItems="start"
+                        p={1}
+                    >
+                        <InfoOutlineIcon
+                            color="grey.400"
+                            w={2.5}
+                            h={2.5}
+                        />
+                    </Flex>
+                </Tooltip>
+                <Text fontSize={"xs"} ml={0.5}>
+                    {shortenNumber(variableExposureTokens)}
+                    {/* <BaseTokenPriceTag
+                        amount={variableExposureTokens}
+                        baseTokenName={baseTokenName}
+                    /> */}
+                </Text>
+            </Flex>
+        </Flex>
+    } else {
+        return <></>
+    }
 }
