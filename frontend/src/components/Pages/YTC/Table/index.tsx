@@ -133,7 +133,7 @@ const ResultsTable: React.FC<TableProps> = (props) => {
                                     <Text>
                                         Tokens Spent
                                     </Text>
-                                    <InfoTooltip label="The number of base tokens that you would get back"/>
+                                    <InfoTooltip label="The number of base tokens that are consumed to purchase yTokens"/>
                                 </Flex>
                             </Th>
                             <Th isNumeric>
