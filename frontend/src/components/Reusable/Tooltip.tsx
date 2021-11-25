@@ -9,6 +9,10 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = (props) => {
     const {label} = props;
 
     return <Tooltip label={label}>
-        <InfoOutlineIcon/>
+        <InfoOutlineIcon
+            _hover={{
+                color: "component.blue"
+            }}
+        />
     </Tooltip>
 }
