@@ -4,6 +4,7 @@ import { ProviderContext, CurrentAddressContext } from "../../hardhat/SymfoniCon
 import { chainNameAtom } from '../../recoil/chain/atom';
 import { useRecoilState } from 'recoil';
 import { Modal } from './Modal';
+import { SignerContext } from '../../hardhat/SymfoniContext';
 
 interface Props {
 }
@@ -12,6 +13,7 @@ export const Wallet = (props: Props) => {
 
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [provider] = useContext(ProviderContext);
+    const [signer] = useContext(SignerContext)
     const [currentAddress] = useContext(CurrentAddressContext)
 
     const [chainName, setChainName] = useRecoilState(chainNameAtom);
@@ -41,7 +43,7 @@ export const Wallet = (props: Props) => {
                 setIsOpen={setIsOpen}
             />
             {
-                !!provider ? 
+                !!signer ? 
                 <Flex
                     justifyContent = "space-between"
                     alignItems = "center"
