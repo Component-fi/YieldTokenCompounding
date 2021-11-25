@@ -1,4 +1,4 @@
-import { Button, Spinner, Flex, FormLabel, Icon, Text, Tooltip } from "@chakra-ui/react";
+import { Button, Spinner, Flex, FormLabel, Icon, Text } from "@chakra-ui/react";
 import { YTCGain, YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { executeYieldTokenCompounding } from "../../../../features/ytc/executeYieldTokenCompounding";
 import { elementAddressesAtom } from "../../../../recoil/element/atom";
@@ -16,6 +16,8 @@ import { TokenResult } from "./TokenResult";
 import { DetailPane } from "../../../Reusable/DetailPane";
 import WalletSettings from "../../../Wallet/Settings";
 import { BaseTokenPriceTag, YTPriceTag } from "../../../Prices";
+import { InfoTooltip } from "../../../Reusable/Tooltip";
+import copy from '../../../../constants/copy.json';
 
 export interface ApeProps {
     baseToken: {
@@ -232,7 +234,16 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
             value={`${slippageTolerance}%`}
         />
         <DetailItem
-            name="Minimum YT Received:"
+            name={
+                <Flex flexDir="row" alignItems="center" gridGap={1}>
+                    <Text>
+                        Minimum YT Received
+                    </Text>
+                    <InfoTooltip
+                        label={copy.tooltips.minimum_yt_received}
+                    />
+                </Flex>
+            }
             value={
                 <Flex flexDir="row" gridGap={1}>
                     <Text>
@@ -247,7 +258,16 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
             }
         />
         <DetailItem
-            name="Expected Redemption:"
+            name={
+                <Flex flexDir="row" alignItems="center" gridGap={1}>
+                    <Text>
+                        Estimated Redemption
+                    </Text>
+                    <InfoTooltip
+                        label={copy.tooltips.estimated_redemption}
+                    />
+                </Flex>
+            }
             value={expectedReturn ? 
                 <Flex flexDir="row" gridGap={1}>
                     <Text>
@@ -275,7 +295,16 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
             }
         />
         <DetailItem
-            name="Expected Earned:"
+            name={
+                <Flex flexDir="row" alignItems="center" gridGap={1}>
+                    <Text>
+                        Estimated Gain
+                    </Text>
+                    <InfoTooltip
+                        label={copy.tooltips.estimated_gain_detail}
+                    />
+                </Flex>
+            }
             value={netGain ? 
                 <Flex
                     flexDir="row"
@@ -293,7 +322,16 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
             }
         />
         <DetailItem
-            name="Return on Investment:"
+            name={
+                <Flex flexDir="row" alignItems="center" gridGap={1}>
+                    <Text>
+                        Return on Investment
+                    </Text>
+                    <InfoTooltip
+                        label={copy.tooltips.roi}
+                    />
+                </Flex>
+            }
             value={roi ? 
                 <Text
                     color={(roi > 0 ? "green.600" : "red.500")}
@@ -302,23 +340,25 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                 </Text> : "?"
             }
         />
-        <Tooltip
-            label="Return on investment over the term annualized."
-        >
-            <div>
-                <DetailItem
-                    name="APR: "
-                    value={apr ? 
-                        <Text
-                            color={(apr > 0 ? "green.600" : "red.500")}
-                        >
-                            {shortenNumber(apr)}%
-                        </Text> : "?"
-                    }
-
-                />
-            </div>
-        </Tooltip>
+        <DetailItem
+            name={
+                <Flex flexDir="row" alignItems="center" gridGap={1}>
+                    <Text>
+                        APR
+                    </Text>
+                    <InfoTooltip
+                        label={copy.tooltips.apr}
+                    />
+                </Flex>
+            }
+            value={apr ? 
+                <Text
+                    color={(apr > 0 ? "green.600" : "red.500")}
+                >
+                    {shortenNumber(apr)}%
+                </Text> : "?"
+            }
+        />
     </DetailPane>
 }
 

@@ -8,6 +8,7 @@ import { ResultsTableRow } from './ResultsTableRow';
 import { InfoTooltip } from '../../../Reusable/Tooltip';
 import { predictedRateAtom } from '../../../../recoil/predictedRate/atom';
 import { trancheSelector } from '../../../../recoil/trancheRates/atom';
+import copy from '../../../../constants/copy.json';
 
 interface TableProps {
     onSelect: (index: number | undefined) => void;
@@ -69,7 +70,7 @@ const ResultsTable: React.FC<TableProps> = (props) => {
                             gridGap={2}
                         >
                             Estimated Variable Rate
-                            <InfoTooltip label="This has no effect on your transaction. Input the average APY that you expect from the vault over the course of the term. This ius used to estimate the expected gain for your position."/>
+                            <InfoTooltip label={copy.tooltips.estimated_variable_rate}/>
                         </Flex>
                     </FormLabel>
                     <InputGroup
@@ -108,7 +109,7 @@ const ResultsTable: React.FC<TableProps> = (props) => {
                         gridGap={2}
                     >
                         Number of Compounds
-                        <InfoTooltip label="Select the number of iterations you would like to execute. The more compounds the larger the yield token position."/>
+                        <InfoTooltip label={copy.tooltips.number_of_compounds}/>
                     </Flex>
                 </FormLabel>
                 <Table
@@ -125,7 +126,7 @@ const ResultsTable: React.FC<TableProps> = (props) => {
                                     <Text>
                                         Yield Tokens
                                     </Text>
-                                    <InfoTooltip label="The number of yTokens that you would receive"/>
+                                    <InfoTooltip label={copy.tooltips.yield_tokens}/>
                                 </Flex>
                             </Th>
                             <Th isNumeric>
@@ -133,15 +134,15 @@ const ResultsTable: React.FC<TableProps> = (props) => {
                                     <Text>
                                         Tokens Spent
                                     </Text>
-                                    <InfoTooltip label="The number of base tokens that are consumed to purchase yTokens"/>
+                                    <InfoTooltip label={copy.tooltips.tokens_spent}/>
                                 </Flex>
                             </Th>
                             <Th isNumeric>
                                 <Flex alignItems="center" gridGap={1}>
                                     <Text>
-                                        Expected Gain
+                                        Estimated Gain
                                     </Text>
-                                    <InfoTooltip label="This is the expected return by the end of the tranche term including gas costs.  This assumes that the current variable yield is the average variable yield over the course of the terms."/>
+                                    <InfoTooltip label={copy.tooltips.estimated_gain}/>
                                 </Flex>
                             </Th>
                         </Tr>
