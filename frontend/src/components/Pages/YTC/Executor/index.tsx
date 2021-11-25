@@ -18,6 +18,7 @@ import WalletSettings from "../../../Wallet/Settings";
 import { BaseTokenPriceTag, YTPriceTag } from "../../../Prices";
 import { InfoTooltip } from "../../../Reusable/Tooltip";
 import copy from '../../../../constants/copy.json';
+import { trancheSelector } from "../../../../recoil/trancheRates/atom";
 
 export interface ApeProps {
     baseToken: {
@@ -170,8 +171,8 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
                         apr={gain?.apr}
                         minimumReceived={minimumReturn}
                         expectedReturn={gain?.estimatedRedemption}
-                        trancheAddress={userData.trancheAddress}
                         baseTokenName={baseToken.name}
+                        trancheAddress={userData.trancheAddress}
                     />
                 </Flex>
             </Card>
@@ -195,15 +196,15 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
 
 
 interface ExecutionDetailsProps {
-    trancheAddress: string,
-    baseTokenName: string,
-    slippageTolerance: number,
-    minimumReceived: number,
-    expectedReturn?: number,
-    estimatedGas: number,
-    netGain?: number,
-    roi?: number, 
-    apr?: number,
+    slippageTolerance: number;
+    minimumReceived: number;
+    expectedReturn?: number;
+    estimatedGas: number;
+    netGain?: number;
+    roi?: number;
+    apr?: number;
+    baseTokenName: string;
+    trancheAddress: string;
 }
 
 const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
@@ -216,8 +217,10 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
         apr,
         expectedReturn,
         baseTokenName,
-        trancheAddress
+        trancheAddress,
     } = props;
+
+    const trancheRate = useRecoilValue(trancheSelector(trancheAddress));
 
     return <DetailPane
         mx={{base: 0, sm: 10}}
@@ -275,6 +278,29 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                     </Text>
                     (<BaseTokenPriceTag
                         amount={expectedReturn}
+                        baseTokenName={baseTokenName}
+                    />)
+                </Flex> : <Text>?</Text>
+            }
+        />
+        <DetailItem
+            name={
+                <Flex flexDir="row" alignItems="center" gridGap={1}>
+                    <Text>
+                        Minimum Redemption
+                    </Text>
+                    <InfoTooltip
+                        label={copy.tooltips.minimum_redemption}
+                    />
+                </Flex>
+            }
+            value={trancheRate.accruedValue ? 
+                <Flex flexDir="row" gridGap={1}>
+                    <Text>
+                        {shortenNumber(minimumReceived * trancheRate.accruedValue)}
+                    </Text>
+                    (<BaseTokenPriceTag
+                        amount={minimumReceived * trancheRate.accruedValue}
                         baseTokenName={baseTokenName}
                     />)
                 </Flex> : <Text>?</Text>
