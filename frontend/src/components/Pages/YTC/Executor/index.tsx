@@ -1,4 +1,4 @@
-import { Button, Spinner, Flex, FormLabel, Icon, Text } from "@chakra-ui/react";
+import { Button, Spinner, Flex, FormLabel, Icon, Text, Tooltip, Collapse } from "@chakra-ui/react";
 import { YTCGain, YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { executeYieldTokenCompounding } from "../../../../features/ytc/executeYieldTokenCompounding";
 import { elementAddressesAtom } from "../../../../recoil/element/atom";
@@ -19,6 +19,7 @@ import { BaseTokenPriceTag, YTPriceTag } from "../../../Prices";
 import { InfoTooltip } from "../../../Reusable/Tooltip";
 import copy from '../../../../constants/copy.json';
 import { trancheSelector } from "../../../../recoil/trancheRates/atom";
+import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
 export interface ApeProps {
     baseToken: {
@@ -114,7 +115,6 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
                             gridGap={2}
                         >
                             Review Your Transaction
-                            {/* <InfoTooltip label="This has no effect on your transaction. Input the average APY that you expect from the vault over the course of the term. This ius used to estimate the expected gain for your position."/> */}
                         </Flex>
                     </FormLabel>
                     <Flex
@@ -221,9 +221,12 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
     } = props;
 
     const trancheRate = useRecoilValue(trancheSelector(trancheAddress));
+    const [show, setShow] = useState<boolean>(false);
+
+    const handleToggle = () => setShow(!show);
 
     return <DetailPane
-        mx={{base: 0, sm: 10}}
+        mx={{base: 0, sm: 8}}
     >
         <DetailItem
             name={
@@ -235,90 +238,6 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                 </Flex>
                     }
             value={`${slippageTolerance}%`}
-        />
-        <DetailItem
-            name={
-                <Flex flexDir="row" alignItems="center" gridGap={1}>
-                    <Text>
-                        Minimum YT Received
-                    </Text>
-                    <InfoTooltip
-                        label={copy.tooltips.minimum_yt_received}
-                    />
-                </Flex>
-            }
-            value={
-                <Flex flexDir="row" gridGap={1}>
-                    <Text>
-                        {shortenNumber(minimumReceived)}
-                    </Text>
-                    (<YTPriceTag
-                        amount={expectedReturn}
-                        baseTokenName={baseTokenName}
-                        trancheAddress={trancheAddress}
-                    />)
-                </Flex>
-            }
-        />
-        <DetailItem
-            name={
-                <Flex flexDir="row" alignItems="center" gridGap={1}>
-                    <Text>
-                        Estimated Redemption
-                    </Text>
-                    <InfoTooltip
-                        label={copy.tooltips.estimated_redemption}
-                    />
-                </Flex>
-            }
-            value={expectedReturn ? 
-                <Flex flexDir="row" gridGap={1}>
-                    <Text>
-                        {shortenNumber(expectedReturn)}
-                    </Text>
-                    (<BaseTokenPriceTag
-                        amount={expectedReturn}
-                        baseTokenName={baseTokenName}
-                    />)
-                </Flex> : <Text>?</Text>
-            }
-        />
-        <DetailItem
-            name={
-                <Flex flexDir="row" alignItems="center" gridGap={1}>
-                    <Text>
-                        Minimum Redemption
-                    </Text>
-                    <InfoTooltip
-                        label={copy.tooltips.minimum_redemption}
-                    />
-                </Flex>
-            }
-            value={trancheRate.accruedValue ? 
-                <Flex flexDir="row" gridGap={1}>
-                    <Text>
-                        {shortenNumber(minimumReceived * trancheRate.accruedValue)}
-                    </Text>
-                    (<BaseTokenPriceTag
-                        amount={minimumReceived * trancheRate.accruedValue}
-                        baseTokenName={baseTokenName}
-                    />)
-                </Flex> : <Text>?</Text>
-            }
-        />
-        <DetailItem
-            name="Estimated Gas Cost:"
-            value={
-                <Flex flexDir="row" gridGap={1}>
-                    <Text>
-                        {shortenNumber(estimatedGas)} ETH
-                    </Text>
-                    (<BaseTokenPriceTag
-                        amount={estimatedGas}
-                        baseTokenName={"eth"}
-                    />)
-                </Flex>
-            }
         />
         <DetailItem
             name={
@@ -385,6 +304,96 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                 </Text> : "?"
             }
         />
+        <Button variant="link" onClick={handleToggle} gridGap={2}>
+            {show ? <ChevronDownIcon/> : <ChevronRightIcon/>}
+            {show ? "Hide" : "Show More"}
+        </Button>
+        <Collapse in={show}>
+            <DetailItem
+                name={
+                    <Flex flexDir="row" alignItems="center" gridGap={1}>
+                        <Text>
+                            Minimum YT Received
+                        </Text>
+                        <InfoTooltip
+                            label={copy.tooltips.minimum_yt_received}
+                        />
+                    </Flex>
+                }
+                value={
+                    <Flex flexDir="row" gridGap={1}>
+                        <Text>
+                            {shortenNumber(minimumReceived)}
+                        </Text>
+                        (<YTPriceTag
+                            amount={expectedReturn}
+                            baseTokenName={baseTokenName}
+                            trancheAddress={trancheAddress}
+                        />)
+                    </Flex>
+                }
+            />
+            <DetailItem
+                name={
+                    <Flex flexDir="row" alignItems="center" gridGap={1}>
+                        <Text>
+                            Estimated Redemption
+                        </Text>
+                        <InfoTooltip
+                            label={copy.tooltips.estimated_redemption}
+                        />
+                    </Flex>
+                }
+                value={expectedReturn ? 
+                    <Flex flexDir="row" gridGap={1}>
+                        <Text>
+                            {shortenNumber(expectedReturn)}
+                        </Text>
+                        (<BaseTokenPriceTag
+                            amount={expectedReturn}
+                            baseTokenName={baseTokenName}
+                        />)
+                    </Flex> : <Text>?</Text>
+                }
+            />
+            <DetailItem
+                name={
+                    <Flex flexDir="row" alignItems="center" gridGap={1}>
+                        <Text>
+                            Minimum Redemption
+                        </Text>
+                        <InfoTooltip
+                            label={copy.tooltips.minimum_redemption}
+                        />
+                    </Flex>
+                }
+                value={trancheRate.accruedValue ? 
+                    <Flex flexDir="row" gridGap={1}>
+                        <Text>
+                            {shortenNumber(minimumReceived * trancheRate.accruedValue)}
+                        </Text>
+                        (<BaseTokenPriceTag
+                            amount={minimumReceived * trancheRate.accruedValue}
+                            baseTokenName={baseTokenName}
+                        />)
+                    </Flex> : <Text>?</Text>
+                }
+            />
+            <DetailItem
+                name="Estimated Gas Cost:"
+                value={
+                    <Flex flexDir="row" gridGap={1}>
+                        <Text>
+                            {shortenNumber(estimatedGas)} ETH
+                        </Text>
+                        (<BaseTokenPriceTag
+                            amount={estimatedGas}
+                            baseTokenName={"eth"}
+                        />)
+                    </Flex>
+                }
+            />
+        </Collapse>
     </DetailPane>
 }
 
