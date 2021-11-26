@@ -74,6 +74,9 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
             if (values.compounds === 1){
                 compoundRange = [1, 3];
             }
+            if (values.compounds >= 30){
+                compoundRange = [28, 30];
+            }
             
             simulateYTCForCompoundRange(userData, elementAddresses, compoundRange, signer).then(
                 (results) => {
@@ -118,14 +121,13 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
                 onSubmit={handleSubmit}
                 validationSchema={
                     Yup.object({
-                        amount: Yup.number()
+                        amount: Yup.number().nullable()
                             .min(0.0000000000000000001, 'Amount must be greater than 0')
                             .max((balance ? balance : 0), 'Insufficient balance')
                             .required('An amount of tokens is required'),
-                        // compounds: Yup.number()
-                        //     .min(1, 'Number of compounds must be 1 or greater')
-                        //     .max(10, 'Number of compounds must be 10 or fewer')
-                        //     .required('Choose a number of compounds between 1 and 10'),
+                        compounds: Yup.number()
+                            .min(1, 'Number of compounds must be 1 or greater')
+                            .max(30, 'Number of compounds must be 30 or fewer'),
                         trancheAddress: Yup.string()
                             .required(),
                         tokenAddress: Yup.string()
