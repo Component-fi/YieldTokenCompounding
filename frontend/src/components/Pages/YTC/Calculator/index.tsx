@@ -297,7 +297,7 @@ const Form: React.FC<FormProps> = (props) => {
                         gridGap={2}
                     >
                         Term
-                        <InfoTooltip label={copy.tooltips.term}/>
+                        <InfoTooltip label={copy.tooltips.term} w={3} h={3}/>
                     </Flex>
                 </FormLabel>
                 <Flex
@@ -368,7 +368,7 @@ const Form: React.FC<FormProps> = (props) => {
                         gridGap={2}
                     >
                         Input Amount
-                        <InfoTooltip label={copy.tooltips.input_amount}/>
+                        <InfoTooltip label={copy.tooltips.input_amount} h={3} w={3}/>
                     </Flex>
                 </FormLabel>
                 <Flex

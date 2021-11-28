@@ -70,7 +70,7 @@ const ResultsTable: React.FC<TableProps> = (props) => {
                             gridGap={2}
                         >
                             Estimated Variable Rate
-                            <InfoTooltip label={copy.tooltips.estimated_variable_rate}/>
+                            <InfoTooltip label={copy.tooltips.estimated_variable_rate} h={3} w={3}/>
                         </Flex>
                     </FormLabel>
                     <InputGroup
@@ -109,7 +109,7 @@ const ResultsTable: React.FC<TableProps> = (props) => {
                         gridGap={2}
                     >
                         Number of Compounds
-                        <InfoTooltip label={copy.tooltips.number_of_compounds}/>
+                        <InfoTooltip label={copy.tooltips.number_of_compounds} w={3} h={3}/>
                     </Flex>
                 </FormLabel>
                 <Table
