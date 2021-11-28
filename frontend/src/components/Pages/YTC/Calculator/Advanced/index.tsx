@@ -18,7 +18,7 @@ export const AdvancedCollapsable: React.FC = () => {
         <Button variant="link" onClick={handleToggle} gridGap={2}>
             {show ? <ChevronDownIcon/> : <ChevronRightIcon/>}
             {show ? "Hide" : "Show"} Advanced Options
-            <InfoTooltip label={copy.tooltips.advanced_options}/>
+            <InfoTooltip label={copy.tooltips.advanced_options} h={3} w={3}/>
         </Button>
         <Collapse in={show} >
             <FormLabel
