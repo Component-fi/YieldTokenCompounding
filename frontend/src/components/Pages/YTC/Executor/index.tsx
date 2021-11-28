@@ -74,13 +74,17 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
                 signer
             ).then((receipt) => {
                 setSimulationResults([]);
-                setNotification(
-                    {
-                        text: "YTC Execution Succesful",
-                        type: "SUCCESS",
-                        linkText: "View on Explorer",
-                        link: `https://etherscan.io/tx/${receipt.transactionHash}`
-                    }
+                setNotification((currentNotifications) => {
+                    return [
+                        ...currentNotifications,
+                        {
+                            text: "YTC Execution Succesful",
+                            type: "SUCCESS",
+                            linkText: "View on Explorer",
+                            link: `https://etherscan.io/tx/${receipt.transactionHash}`
+                        }
+                    ]
+                }
             );
             }).finally(() => {
                 setIsLoading(false)

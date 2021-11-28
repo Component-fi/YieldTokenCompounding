@@ -40,16 +40,27 @@ const AbstractApproval: React.FC<AbstractApprovalProps> = (props) => {
 
     const abstractHandleApprove = () => {
         handleApprove().then((receipt) => {
-            setNotification({
-                text: approvalMessage,
-                type: "SUCCESS",
-                linkText: "View on Explorer",
-                link: `https://etherscan.io/tx/${receipt.transactionHash}`
+            setNotification((currentNotifications) => {
+                return [
+                    ...currentNotifications,
+                    {
+                        text: approvalMessage,
+                        type: "SUCCESS",
+                        linkText: "View on Explorer",
+                        link: `https://etherscan.io/tx/${receipt.transactionHash}`
+                    }
+                ]
             })
-        }).catch(() => {
-            setNotification({
-                type: "ERROR",
-                text: "Token Approval Failed"
+        }).catch((error) => {
+            setNotification((currentNotifications) => {
+                return [
+                    ...currentNotifications,
+                    {
+                        type: "ERROR",
+                        text: "Token Approval Failed",
+                        details: error
+                    }
+                ]
             })
         }).finally(() => {
             setIsLoading(false);
