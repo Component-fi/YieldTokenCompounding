@@ -257,6 +257,8 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                     </Text>
                     <InfoTooltip
                         label={copy.tooltips.estimated_gain_detail}
+                        w={2}
+                        h={2}
                     />
                 </Flex>
             }
@@ -283,6 +285,8 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                         Return on Investment
                     </Text>
                     <InfoTooltip
+                        w={2}
+                        h={2}
                         label={copy.tooltips.roi}
                     />
                 </Flex>
@@ -302,6 +306,8 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                         APR
                     </Text>
                     <InfoTooltip
+                        w={2}
+                        h={2}
                         label={copy.tooltips.apr}
                     />
                 </Flex>
@@ -326,6 +332,8 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                             Minimum YT Received
                         </Text>
                         <InfoTooltip
+                            w={2}
+                            h={2}
                             label={copy.tooltips.minimum_yt_received}
                         />
                     </Flex>
@@ -350,6 +358,8 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                             Estimated Redemption
                         </Text>
                         <InfoTooltip
+                            w={2}
+                            h={2}
                             label={copy.tooltips.estimated_redemption}
                         />
                     </Flex>
@@ -373,6 +383,8 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                             Minimum Redemption
                         </Text>
                         <InfoTooltip
+                            w={2}
+                            h={2}
                             label={copy.tooltips.minimum_redemption}
                         />
                     </Flex>
