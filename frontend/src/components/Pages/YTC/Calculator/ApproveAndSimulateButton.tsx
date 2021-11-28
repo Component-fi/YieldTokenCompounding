@@ -21,18 +21,18 @@ export const ApproveAndSimulateButton: React.FC<ApproveAndSimulateButtonProps & 
         trancheAddress={trancheAddress}
         {...rest}
     >
-        <ERC20Approval
+        {/* <ERC20Approval
             tokenAddress={tokenAddress}
             tokenName={tokenName}
             approvalAddress={deployments.YieldTokenCompounding}
             amount={undefined}
             {...rest}
-        >
+        > */}
             <SimulateButton 
                 formErrors={formErrors}
                 {...rest}
             />
-        </ERC20Approval>
+        {/* </ERC20Approval> */}
     </BalancerApproval>
 }
 
@@ -40,7 +40,7 @@ interface SimulateButtonProps {
     formErrors: {[fieldName: string]: string | undefined}
 }
 
-const SimulateButton: React.FC<SimulateButtonProps & ButtonProps> = (props) => {
+export const SimulateButton: React.FC<SimulateButtonProps & ButtonProps> = (props) => {
     const isSimulating = useRecoilValue(isSimulatingAtom)
 
     const isSimulated = useRecoilValue(isSimulatedSelector)

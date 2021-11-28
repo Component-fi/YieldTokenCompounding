@@ -4,88 +4,92 @@
 import { providers, Signer, ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import Web3Modal, { IProviderOptions } from "web3modal";
+import { YTCEth } from "./typechain/YTCEth";
+import { YTCEth__factory } from "./typechain/factories/YTCEth__factory";
 import { YieldTokenCompounding } from "./typechain/YieldTokenCompounding";
 import { YieldTokenCompounding__factory } from "./typechain/factories/YieldTokenCompounding__factory";
+import { YTCEthCurve } from "./typechain/YTCEthCurve";
+import { YTCEthCurve__factory } from "./typechain/factories/YTCEthCurve__factory";
 import { BalancerPoolToken } from "./typechain/BalancerPoolToken";
 import { BalancerPoolToken__factory } from "./typechain/factories/BalancerPoolToken__factory";
-import { EthForceSender } from "./typechain/EthForceSender";
-import { EthForceSender__factory } from "./typechain/factories/EthForceSender__factory";
-import { BalanceAllocationMock } from "./typechain/BalanceAllocationMock";
-import { BalanceAllocationMock__factory } from "./typechain/factories/BalanceAllocationMock__factory";
 import { MockBalancerPoolToken } from "./typechain/MockBalancerPoolToken";
 import { MockBalancerPoolToken__factory } from "./typechain/factories/MockBalancerPoolToken__factory";
-import { MockInternalBalanceRelayer } from "./typechain/MockInternalBalanceRelayer";
-import { MockInternalBalanceRelayer__factory } from "./typechain/factories/MockInternalBalanceRelayer__factory";
 import { MockBasePool } from "./typechain/MockBasePool";
 import { MockBasePool__factory } from "./typechain/factories/MockBasePool__factory";
+import { MockFlashLoanRecipient } from "./typechain/MockFlashLoanRecipient";
+import { MockFlashLoanRecipient__factory } from "./typechain/factories/MockFlashLoanRecipient__factory";
+import { EthForceSender } from "./typechain/EthForceSender";
+import { EthForceSender__factory } from "./typechain/factories/EthForceSender__factory";
+import { MockAssetTransfersHandler } from "./typechain/MockAssetTransfersHandler";
+import { MockAssetTransfersHandler__factory } from "./typechain/factories/MockAssetTransfersHandler__factory";
+import { MockStableMath } from "./typechain/MockStableMath";
+import { MockStableMath__factory } from "./typechain/factories/MockStableMath__factory";
 import { MockPool } from "./typechain/MockPool";
 import { MockPool__factory } from "./typechain/factories/MockPool__factory";
 import { MockFactoryCreatedPool } from "./typechain/MockFactoryCreatedPool";
 import { MockFactoryCreatedPool__factory } from "./typechain/factories/MockFactoryCreatedPool__factory";
-import { MockVault } from "./typechain/MockVault";
-import { MockVault__factory } from "./typechain/factories/MockVault__factory";
-import { Multicall } from "./typechain/Multicall";
-import { Multicall__factory } from "./typechain/factories/Multicall__factory";
-import { MockFlashLoanRecipient } from "./typechain/MockFlashLoanRecipient";
-import { MockFlashLoanRecipient__factory } from "./typechain/factories/MockFlashLoanRecipient__factory";
+import { BalanceAllocationMock } from "./typechain/BalanceAllocationMock";
+import { BalanceAllocationMock__factory } from "./typechain/factories/BalanceAllocationMock__factory";
+import { MockInternalBalanceRelayer } from "./typechain/MockInternalBalanceRelayer";
+import { MockInternalBalanceRelayer__factory } from "./typechain/factories/MockInternalBalanceRelayer__factory";
 import { MockPoolFactory } from "./typechain/MockPoolFactory";
 import { MockPoolFactory__factory } from "./typechain/factories/MockPoolFactory__factory";
-import { TestToken } from "./typechain/TestToken";
-import { TestToken__factory } from "./typechain/factories/TestToken__factory";
-import { MockAssetTransfersHandler } from "./typechain/MockAssetTransfersHandler";
-import { MockAssetTransfersHandler__factory } from "./typechain/factories/MockAssetTransfersHandler__factory";
 import { MockWeightedOracleMath } from "./typechain/MockWeightedOracleMath";
 import { MockWeightedOracleMath__factory } from "./typechain/factories/MockWeightedOracleMath__factory";
+import { Multicall } from "./typechain/Multicall";
+import { Multicall__factory } from "./typechain/factories/Multicall__factory";
+import { MockVault } from "./typechain/MockVault";
+import { MockVault__factory } from "./typechain/factories/MockVault__factory";
 import { MockWeightedMath } from "./typechain/MockWeightedMath";
 import { MockWeightedMath__factory } from "./typechain/factories/MockWeightedMath__factory";
+import { TestToken } from "./typechain/TestToken";
+import { TestToken__factory } from "./typechain/factories/TestToken__factory";
+import { WETH } from "./typechain/WETH";
+import { WETH__factory } from "./typechain/factories/WETH__factory";
+import { PoolPriceOracleMock } from "./typechain/PoolPriceOracleMock";
+import { PoolPriceOracleMock__factory } from "./typechain/factories/PoolPriceOracleMock__factory";
 import { TokenFactory } from "./typechain/TokenFactory";
 import { TokenFactory__factory } from "./typechain/factories/TokenFactory__factory";
-import { MockStableMath } from "./typechain/MockStableMath";
-import { MockStableMath__factory } from "./typechain/factories/MockStableMath__factory";
 import { WeightedPool2TokensMock } from "./typechain/WeightedPool2TokensMock";
 import { WeightedPool2TokensMock__factory } from "./typechain/factories/WeightedPool2TokensMock__factory";
 import { Authorizer } from "./typechain/Authorizer";
 import { Authorizer__factory } from "./typechain/factories/Authorizer__factory";
-import { WETH } from "./typechain/WETH";
-import { WETH__factory } from "./typechain/factories/WETH__factory";
 import { ProtocolFeesCollector } from "./typechain/ProtocolFeesCollector";
 import { ProtocolFeesCollector__factory } from "./typechain/factories/ProtocolFeesCollector__factory";
-import { PoolPriceOracleMock } from "./typechain/PoolPriceOracleMock";
-import { PoolPriceOracleMock__factory } from "./typechain/factories/PoolPriceOracleMock__factory";
 import { Vault } from "./typechain/Vault";
 import { Vault__factory } from "./typechain/factories/Vault__factory";
 import { BalancerHelpers } from "./typechain/BalancerHelpers";
 import { BalancerHelpers__factory } from "./typechain/factories/BalancerHelpers__factory";
 import { ERC20 } from "./typechain/ERC20";
 import { ERC20__factory } from "./typechain/factories/ERC20__factory";
-import { StablePoolFactory } from "./typechain/StablePoolFactory";
-import { StablePoolFactory__factory } from "./typechain/factories/StablePoolFactory__factory";
-import { PoolPriceOracle } from "./typechain/PoolPriceOracle";
-import { PoolPriceOracle__factory } from "./typechain/factories/PoolPriceOracle__factory";
 import { FactoryWidePauseWindow } from "./typechain/FactoryWidePauseWindow";
 import { FactoryWidePauseWindow__factory } from "./typechain/factories/FactoryWidePauseWindow__factory";
+import { PoolPriceOracle } from "./typechain/PoolPriceOracle";
+import { PoolPriceOracle__factory } from "./typechain/factories/PoolPriceOracle__factory";
 import { StablePool } from "./typechain/StablePool";
 import { StablePool__factory } from "./typechain/factories/StablePool__factory";
-import { WeightedPoolFactory } from "./typechain/WeightedPoolFactory";
-import { WeightedPoolFactory__factory } from "./typechain/factories/WeightedPoolFactory__factory";
+import { StablePoolFactory } from "./typechain/StablePoolFactory";
+import { StablePoolFactory__factory } from "./typechain/factories/StablePoolFactory__factory";
+import { WeightedPool2Tokens } from "./typechain/WeightedPool2Tokens";
+import { WeightedPool2Tokens__factory } from "./typechain/factories/WeightedPool2Tokens__factory";
 import { WeightedPool } from "./typechain/WeightedPool";
 import { WeightedPool__factory } from "./typechain/factories/WeightedPool__factory";
 import { WeightedPool2TokensFactory } from "./typechain/WeightedPool2TokensFactory";
 import { WeightedPool2TokensFactory__factory } from "./typechain/factories/WeightedPool2TokensFactory__factory";
-import { EnumerableIERC20ToBytes32MapMock } from "./typechain/EnumerableIERC20ToBytes32MapMock";
-import { EnumerableIERC20ToBytes32MapMock__factory } from "./typechain/factories/EnumerableIERC20ToBytes32MapMock__factory";
+import { WeightedPoolFactory } from "./typechain/WeightedPoolFactory";
+import { WeightedPoolFactory__factory } from "./typechain/factories/WeightedPoolFactory__factory";
 import { ReentrancyAttack } from "./typechain/ReentrancyAttack";
 import { ReentrancyAttack__factory } from "./typechain/factories/ReentrancyAttack__factory";
-import { SignaturesValidatorMock } from "./typechain/SignaturesValidatorMock";
-import { SignaturesValidatorMock__factory } from "./typechain/factories/SignaturesValidatorMock__factory";
-import { WeightedPool2Tokens } from "./typechain/WeightedPool2Tokens";
-import { WeightedPool2Tokens__factory } from "./typechain/factories/WeightedPool2Tokens__factory";
-import { BalancerErrorsMock } from "./typechain/BalancerErrorsMock";
-import { BalancerErrorsMock__factory } from "./typechain/factories/BalancerErrorsMock__factory";
-import { TemporarilyPausableMock } from "./typechain/TemporarilyPausableMock";
-import { TemporarilyPausableMock__factory } from "./typechain/factories/TemporarilyPausableMock__factory";
 import { ReentrancyMock } from "./typechain/ReentrancyMock";
 import { ReentrancyMock__factory } from "./typechain/factories/ReentrancyMock__factory";
+import { BalancerErrorsMock } from "./typechain/BalancerErrorsMock";
+import { BalancerErrorsMock__factory } from "./typechain/factories/BalancerErrorsMock__factory";
+import { SignaturesValidatorMock } from "./typechain/SignaturesValidatorMock";
+import { SignaturesValidatorMock__factory } from "./typechain/factories/SignaturesValidatorMock__factory";
+import { TemporarilyPausableMock } from "./typechain/TemporarilyPausableMock";
+import { TemporarilyPausableMock__factory } from "./typechain/factories/TemporarilyPausableMock__factory";
+import { EnumerableIERC20ToBytes32MapMock } from "./typechain/EnumerableIERC20ToBytes32MapMock";
+import { EnumerableIERC20ToBytes32MapMock__factory } from "./typechain/factories/EnumerableIERC20ToBytes32MapMock__factory";
 
 const emptyContract = {
     instance: undefined,
@@ -105,47 +109,49 @@ const defaultSymfoniContext: SymfoniContextInterface = {
     providers: []
 };
 export const SymfoniContext = React.createContext<SymfoniContextInterface>(defaultSymfoniContext);
+export const YTCEthContext = React.createContext<SymfoniYTCEth>(emptyContract);
 export const YieldTokenCompoundingContext = React.createContext<SymfoniYieldTokenCompounding>(emptyContract);
+export const YTCEthCurveContext = React.createContext<SymfoniYTCEthCurve>(emptyContract);
 export const BalancerPoolTokenContext = React.createContext<SymfoniBalancerPoolToken>(emptyContract);
-export const EthForceSenderContext = React.createContext<SymfoniEthForceSender>(emptyContract);
-export const BalanceAllocationMockContext = React.createContext<SymfoniBalanceAllocationMock>(emptyContract);
 export const MockBalancerPoolTokenContext = React.createContext<SymfoniMockBalancerPoolToken>(emptyContract);
-export const MockInternalBalanceRelayerContext = React.createContext<SymfoniMockInternalBalanceRelayer>(emptyContract);
 export const MockBasePoolContext = React.createContext<SymfoniMockBasePool>(emptyContract);
+export const MockFlashLoanRecipientContext = React.createContext<SymfoniMockFlashLoanRecipient>(emptyContract);
+export const EthForceSenderContext = React.createContext<SymfoniEthForceSender>(emptyContract);
+export const MockAssetTransfersHandlerContext = React.createContext<SymfoniMockAssetTransfersHandler>(emptyContract);
+export const MockStableMathContext = React.createContext<SymfoniMockStableMath>(emptyContract);
 export const MockPoolContext = React.createContext<SymfoniMockPool>(emptyContract);
 export const MockFactoryCreatedPoolContext = React.createContext<SymfoniMockFactoryCreatedPool>(emptyContract);
-export const MockVaultContext = React.createContext<SymfoniMockVault>(emptyContract);
-export const MulticallContext = React.createContext<SymfoniMulticall>(emptyContract);
-export const MockFlashLoanRecipientContext = React.createContext<SymfoniMockFlashLoanRecipient>(emptyContract);
+export const BalanceAllocationMockContext = React.createContext<SymfoniBalanceAllocationMock>(emptyContract);
+export const MockInternalBalanceRelayerContext = React.createContext<SymfoniMockInternalBalanceRelayer>(emptyContract);
 export const MockPoolFactoryContext = React.createContext<SymfoniMockPoolFactory>(emptyContract);
-export const TestTokenContext = React.createContext<SymfoniTestToken>(emptyContract);
-export const MockAssetTransfersHandlerContext = React.createContext<SymfoniMockAssetTransfersHandler>(emptyContract);
 export const MockWeightedOracleMathContext = React.createContext<SymfoniMockWeightedOracleMath>(emptyContract);
+export const MulticallContext = React.createContext<SymfoniMulticall>(emptyContract);
+export const MockVaultContext = React.createContext<SymfoniMockVault>(emptyContract);
 export const MockWeightedMathContext = React.createContext<SymfoniMockWeightedMath>(emptyContract);
+export const TestTokenContext = React.createContext<SymfoniTestToken>(emptyContract);
+export const WETHContext = React.createContext<SymfoniWETH>(emptyContract);
+export const PoolPriceOracleMockContext = React.createContext<SymfoniPoolPriceOracleMock>(emptyContract);
 export const TokenFactoryContext = React.createContext<SymfoniTokenFactory>(emptyContract);
-export const MockStableMathContext = React.createContext<SymfoniMockStableMath>(emptyContract);
 export const WeightedPool2TokensMockContext = React.createContext<SymfoniWeightedPool2TokensMock>(emptyContract);
 export const AuthorizerContext = React.createContext<SymfoniAuthorizer>(emptyContract);
-export const WETHContext = React.createContext<SymfoniWETH>(emptyContract);
 export const ProtocolFeesCollectorContext = React.createContext<SymfoniProtocolFeesCollector>(emptyContract);
-export const PoolPriceOracleMockContext = React.createContext<SymfoniPoolPriceOracleMock>(emptyContract);
 export const VaultContext = React.createContext<SymfoniVault>(emptyContract);
 export const BalancerHelpersContext = React.createContext<SymfoniBalancerHelpers>(emptyContract);
 export const ERC20Context = React.createContext<SymfoniERC20>(emptyContract);
-export const StablePoolFactoryContext = React.createContext<SymfoniStablePoolFactory>(emptyContract);
-export const PoolPriceOracleContext = React.createContext<SymfoniPoolPriceOracle>(emptyContract);
 export const FactoryWidePauseWindowContext = React.createContext<SymfoniFactoryWidePauseWindow>(emptyContract);
+export const PoolPriceOracleContext = React.createContext<SymfoniPoolPriceOracle>(emptyContract);
 export const StablePoolContext = React.createContext<SymfoniStablePool>(emptyContract);
-export const WeightedPoolFactoryContext = React.createContext<SymfoniWeightedPoolFactory>(emptyContract);
+export const StablePoolFactoryContext = React.createContext<SymfoniStablePoolFactory>(emptyContract);
+export const WeightedPool2TokensContext = React.createContext<SymfoniWeightedPool2Tokens>(emptyContract);
 export const WeightedPoolContext = React.createContext<SymfoniWeightedPool>(emptyContract);
 export const WeightedPool2TokensFactoryContext = React.createContext<SymfoniWeightedPool2TokensFactory>(emptyContract);
-export const EnumerableIERC20ToBytes32MapMockContext = React.createContext<SymfoniEnumerableIERC20ToBytes32MapMock>(emptyContract);
+export const WeightedPoolFactoryContext = React.createContext<SymfoniWeightedPoolFactory>(emptyContract);
 export const ReentrancyAttackContext = React.createContext<SymfoniReentrancyAttack>(emptyContract);
-export const SignaturesValidatorMockContext = React.createContext<SymfoniSignaturesValidatorMock>(emptyContract);
-export const WeightedPool2TokensContext = React.createContext<SymfoniWeightedPool2Tokens>(emptyContract);
-export const BalancerErrorsMockContext = React.createContext<SymfoniBalancerErrorsMock>(emptyContract);
-export const TemporarilyPausableMockContext = React.createContext<SymfoniTemporarilyPausableMock>(emptyContract);
 export const ReentrancyMockContext = React.createContext<SymfoniReentrancyMock>(emptyContract);
+export const BalancerErrorsMockContext = React.createContext<SymfoniBalancerErrorsMock>(emptyContract);
+export const SignaturesValidatorMockContext = React.createContext<SymfoniSignaturesValidatorMock>(emptyContract);
+export const TemporarilyPausableMockContext = React.createContext<SymfoniTemporarilyPausableMock>(emptyContract);
+export const EnumerableIERC20ToBytes32MapMockContext = React.createContext<SymfoniEnumerableIERC20ToBytes32MapMock>(emptyContract);
 
 export interface SymfoniContextInterface {
     init: (provider?: string) => void;
@@ -161,9 +167,19 @@ export interface SymfoniProps {
     loadingComponent?: React.ReactNode;
 }
 
+export interface SymfoniYTCEth {
+    instance?: YTCEth;
+    factory?: YTCEth__factory;
+}
+
 export interface SymfoniYieldTokenCompounding {
     instance?: YieldTokenCompounding;
     factory?: YieldTokenCompounding__factory;
+}
+
+export interface SymfoniYTCEthCurve {
+    instance?: YTCEthCurve;
+    factory?: YTCEthCurve__factory;
 }
 
 export interface SymfoniBalancerPoolToken {
@@ -171,29 +187,34 @@ export interface SymfoniBalancerPoolToken {
     factory?: BalancerPoolToken__factory;
 }
 
-export interface SymfoniEthForceSender {
-    instance?: EthForceSender;
-    factory?: EthForceSender__factory;
-}
-
-export interface SymfoniBalanceAllocationMock {
-    instance?: BalanceAllocationMock;
-    factory?: BalanceAllocationMock__factory;
-}
-
 export interface SymfoniMockBalancerPoolToken {
     instance?: MockBalancerPoolToken;
     factory?: MockBalancerPoolToken__factory;
 }
 
-export interface SymfoniMockInternalBalanceRelayer {
-    instance?: MockInternalBalanceRelayer;
-    factory?: MockInternalBalanceRelayer__factory;
-}
-
 export interface SymfoniMockBasePool {
     instance?: MockBasePool;
     factory?: MockBasePool__factory;
+}
+
+export interface SymfoniMockFlashLoanRecipient {
+    instance?: MockFlashLoanRecipient;
+    factory?: MockFlashLoanRecipient__factory;
+}
+
+export interface SymfoniEthForceSender {
+    instance?: EthForceSender;
+    factory?: EthForceSender__factory;
+}
+
+export interface SymfoniMockAssetTransfersHandler {
+    instance?: MockAssetTransfersHandler;
+    factory?: MockAssetTransfersHandler__factory;
+}
+
+export interface SymfoniMockStableMath {
+    instance?: MockStableMath;
+    factory?: MockStableMath__factory;
 }
 
 export interface SymfoniMockPool {
@@ -206,19 +227,14 @@ export interface SymfoniMockFactoryCreatedPool {
     factory?: MockFactoryCreatedPool__factory;
 }
 
-export interface SymfoniMockVault {
-    instance?: MockVault;
-    factory?: MockVault__factory;
+export interface SymfoniBalanceAllocationMock {
+    instance?: BalanceAllocationMock;
+    factory?: BalanceAllocationMock__factory;
 }
 
-export interface SymfoniMulticall {
-    instance?: Multicall;
-    factory?: Multicall__factory;
-}
-
-export interface SymfoniMockFlashLoanRecipient {
-    instance?: MockFlashLoanRecipient;
-    factory?: MockFlashLoanRecipient__factory;
+export interface SymfoniMockInternalBalanceRelayer {
+    instance?: MockInternalBalanceRelayer;
+    factory?: MockInternalBalanceRelayer__factory;
 }
 
 export interface SymfoniMockPoolFactory {
@@ -226,19 +242,19 @@ export interface SymfoniMockPoolFactory {
     factory?: MockPoolFactory__factory;
 }
 
-export interface SymfoniTestToken {
-    instance?: TestToken;
-    factory?: TestToken__factory;
-}
-
-export interface SymfoniMockAssetTransfersHandler {
-    instance?: MockAssetTransfersHandler;
-    factory?: MockAssetTransfersHandler__factory;
-}
-
 export interface SymfoniMockWeightedOracleMath {
     instance?: MockWeightedOracleMath;
     factory?: MockWeightedOracleMath__factory;
+}
+
+export interface SymfoniMulticall {
+    instance?: Multicall;
+    factory?: Multicall__factory;
+}
+
+export interface SymfoniMockVault {
+    instance?: MockVault;
+    factory?: MockVault__factory;
 }
 
 export interface SymfoniMockWeightedMath {
@@ -246,14 +262,24 @@ export interface SymfoniMockWeightedMath {
     factory?: MockWeightedMath__factory;
 }
 
+export interface SymfoniTestToken {
+    instance?: TestToken;
+    factory?: TestToken__factory;
+}
+
+export interface SymfoniWETH {
+    instance?: WETH;
+    factory?: WETH__factory;
+}
+
+export interface SymfoniPoolPriceOracleMock {
+    instance?: PoolPriceOracleMock;
+    factory?: PoolPriceOracleMock__factory;
+}
+
 export interface SymfoniTokenFactory {
     instance?: TokenFactory;
     factory?: TokenFactory__factory;
-}
-
-export interface SymfoniMockStableMath {
-    instance?: MockStableMath;
-    factory?: MockStableMath__factory;
 }
 
 export interface SymfoniWeightedPool2TokensMock {
@@ -266,19 +292,9 @@ export interface SymfoniAuthorizer {
     factory?: Authorizer__factory;
 }
 
-export interface SymfoniWETH {
-    instance?: WETH;
-    factory?: WETH__factory;
-}
-
 export interface SymfoniProtocolFeesCollector {
     instance?: ProtocolFeesCollector;
     factory?: ProtocolFeesCollector__factory;
-}
-
-export interface SymfoniPoolPriceOracleMock {
-    instance?: PoolPriceOracleMock;
-    factory?: PoolPriceOracleMock__factory;
 }
 
 export interface SymfoniVault {
@@ -296,9 +312,9 @@ export interface SymfoniERC20 {
     factory?: ERC20__factory;
 }
 
-export interface SymfoniStablePoolFactory {
-    instance?: StablePoolFactory;
-    factory?: StablePoolFactory__factory;
+export interface SymfoniFactoryWidePauseWindow {
+    instance?: FactoryWidePauseWindow;
+    factory?: FactoryWidePauseWindow__factory;
 }
 
 export interface SymfoniPoolPriceOracle {
@@ -306,19 +322,19 @@ export interface SymfoniPoolPriceOracle {
     factory?: PoolPriceOracle__factory;
 }
 
-export interface SymfoniFactoryWidePauseWindow {
-    instance?: FactoryWidePauseWindow;
-    factory?: FactoryWidePauseWindow__factory;
-}
-
 export interface SymfoniStablePool {
     instance?: StablePool;
     factory?: StablePool__factory;
 }
 
-export interface SymfoniWeightedPoolFactory {
-    instance?: WeightedPoolFactory;
-    factory?: WeightedPoolFactory__factory;
+export interface SymfoniStablePoolFactory {
+    instance?: StablePoolFactory;
+    factory?: StablePoolFactory__factory;
+}
+
+export interface SymfoniWeightedPool2Tokens {
+    instance?: WeightedPool2Tokens;
+    factory?: WeightedPool2Tokens__factory;
 }
 
 export interface SymfoniWeightedPool {
@@ -331,9 +347,9 @@ export interface SymfoniWeightedPool2TokensFactory {
     factory?: WeightedPool2TokensFactory__factory;
 }
 
-export interface SymfoniEnumerableIERC20ToBytes32MapMock {
-    instance?: EnumerableIERC20ToBytes32MapMock;
-    factory?: EnumerableIERC20ToBytes32MapMock__factory;
+export interface SymfoniWeightedPoolFactory {
+    instance?: WeightedPoolFactory;
+    factory?: WeightedPoolFactory__factory;
 }
 
 export interface SymfoniReentrancyAttack {
@@ -341,14 +357,9 @@ export interface SymfoniReentrancyAttack {
     factory?: ReentrancyAttack__factory;
 }
 
-export interface SymfoniSignaturesValidatorMock {
-    instance?: SignaturesValidatorMock;
-    factory?: SignaturesValidatorMock__factory;
-}
-
-export interface SymfoniWeightedPool2Tokens {
-    instance?: WeightedPool2Tokens;
-    factory?: WeightedPool2Tokens__factory;
+export interface SymfoniReentrancyMock {
+    instance?: ReentrancyMock;
+    factory?: ReentrancyMock__factory;
 }
 
 export interface SymfoniBalancerErrorsMock {
@@ -356,14 +367,19 @@ export interface SymfoniBalancerErrorsMock {
     factory?: BalancerErrorsMock__factory;
 }
 
+export interface SymfoniSignaturesValidatorMock {
+    instance?: SignaturesValidatorMock;
+    factory?: SignaturesValidatorMock__factory;
+}
+
 export interface SymfoniTemporarilyPausableMock {
     instance?: TemporarilyPausableMock;
     factory?: TemporarilyPausableMock__factory;
 }
 
-export interface SymfoniReentrancyMock {
-    instance?: ReentrancyMock;
-    factory?: ReentrancyMock__factory;
+export interface SymfoniEnumerableIERC20ToBytes32MapMock {
+    instance?: EnumerableIERC20ToBytes32MapMock;
+    factory?: EnumerableIERC20ToBytes32MapMock__factory;
 }
 
 export const Symfoni: React.FC<SymfoniProps> = ({
@@ -380,47 +396,49 @@ export const Symfoni: React.FC<SymfoniProps> = ({
     const [currentAddress, setCurrentAddress] = useState<string>(defaultCurrentAddress);
     const [fallbackProvider] = useState<string | undefined>(undefined);
     const [providerPriority, setProviderPriority] = useState<string[]>(["web3modal", "hardhat"]);
+    const [YTCEth, setYTCEth] = useState<SymfoniYTCEth>(emptyContract);
     const [YieldTokenCompounding, setYieldTokenCompounding] = useState<SymfoniYieldTokenCompounding>(emptyContract);
+    const [YTCEthCurve, setYTCEthCurve] = useState<SymfoniYTCEthCurve>(emptyContract);
     const [BalancerPoolToken, setBalancerPoolToken] = useState<SymfoniBalancerPoolToken>(emptyContract);
-    const [EthForceSender, setEthForceSender] = useState<SymfoniEthForceSender>(emptyContract);
-    const [BalanceAllocationMock, setBalanceAllocationMock] = useState<SymfoniBalanceAllocationMock>(emptyContract);
     const [MockBalancerPoolToken, setMockBalancerPoolToken] = useState<SymfoniMockBalancerPoolToken>(emptyContract);
-    const [MockInternalBalanceRelayer, setMockInternalBalanceRelayer] = useState<SymfoniMockInternalBalanceRelayer>(emptyContract);
     const [MockBasePool, setMockBasePool] = useState<SymfoniMockBasePool>(emptyContract);
+    const [MockFlashLoanRecipient, setMockFlashLoanRecipient] = useState<SymfoniMockFlashLoanRecipient>(emptyContract);
+    const [EthForceSender, setEthForceSender] = useState<SymfoniEthForceSender>(emptyContract);
+    const [MockAssetTransfersHandler, setMockAssetTransfersHandler] = useState<SymfoniMockAssetTransfersHandler>(emptyContract);
+    const [MockStableMath, setMockStableMath] = useState<SymfoniMockStableMath>(emptyContract);
     const [MockPool, setMockPool] = useState<SymfoniMockPool>(emptyContract);
     const [MockFactoryCreatedPool, setMockFactoryCreatedPool] = useState<SymfoniMockFactoryCreatedPool>(emptyContract);
-    const [MockVault, setMockVault] = useState<SymfoniMockVault>(emptyContract);
-    const [Multicall, setMulticall] = useState<SymfoniMulticall>(emptyContract);
-    const [MockFlashLoanRecipient, setMockFlashLoanRecipient] = useState<SymfoniMockFlashLoanRecipient>(emptyContract);
+    const [BalanceAllocationMock, setBalanceAllocationMock] = useState<SymfoniBalanceAllocationMock>(emptyContract);
+    const [MockInternalBalanceRelayer, setMockInternalBalanceRelayer] = useState<SymfoniMockInternalBalanceRelayer>(emptyContract);
     const [MockPoolFactory, setMockPoolFactory] = useState<SymfoniMockPoolFactory>(emptyContract);
-    const [TestToken, setTestToken] = useState<SymfoniTestToken>(emptyContract);
-    const [MockAssetTransfersHandler, setMockAssetTransfersHandler] = useState<SymfoniMockAssetTransfersHandler>(emptyContract);
     const [MockWeightedOracleMath, setMockWeightedOracleMath] = useState<SymfoniMockWeightedOracleMath>(emptyContract);
+    const [Multicall, setMulticall] = useState<SymfoniMulticall>(emptyContract);
+    const [MockVault, setMockVault] = useState<SymfoniMockVault>(emptyContract);
     const [MockWeightedMath, setMockWeightedMath] = useState<SymfoniMockWeightedMath>(emptyContract);
+    const [TestToken, setTestToken] = useState<SymfoniTestToken>(emptyContract);
+    const [WETH, setWETH] = useState<SymfoniWETH>(emptyContract);
+    const [PoolPriceOracleMock, setPoolPriceOracleMock] = useState<SymfoniPoolPriceOracleMock>(emptyContract);
     const [TokenFactory, setTokenFactory] = useState<SymfoniTokenFactory>(emptyContract);
-    const [MockStableMath, setMockStableMath] = useState<SymfoniMockStableMath>(emptyContract);
     const [WeightedPool2TokensMock, setWeightedPool2TokensMock] = useState<SymfoniWeightedPool2TokensMock>(emptyContract);
     const [Authorizer, setAuthorizer] = useState<SymfoniAuthorizer>(emptyContract);
-    const [WETH, setWETH] = useState<SymfoniWETH>(emptyContract);
     const [ProtocolFeesCollector, setProtocolFeesCollector] = useState<SymfoniProtocolFeesCollector>(emptyContract);
-    const [PoolPriceOracleMock, setPoolPriceOracleMock] = useState<SymfoniPoolPriceOracleMock>(emptyContract);
     const [Vault, setVault] = useState<SymfoniVault>(emptyContract);
     const [BalancerHelpers, setBalancerHelpers] = useState<SymfoniBalancerHelpers>(emptyContract);
     const [ERC20, setERC20] = useState<SymfoniERC20>(emptyContract);
-    const [StablePoolFactory, setStablePoolFactory] = useState<SymfoniStablePoolFactory>(emptyContract);
-    const [PoolPriceOracle, setPoolPriceOracle] = useState<SymfoniPoolPriceOracle>(emptyContract);
     const [FactoryWidePauseWindow, setFactoryWidePauseWindow] = useState<SymfoniFactoryWidePauseWindow>(emptyContract);
+    const [PoolPriceOracle, setPoolPriceOracle] = useState<SymfoniPoolPriceOracle>(emptyContract);
     const [StablePool, setStablePool] = useState<SymfoniStablePool>(emptyContract);
-    const [WeightedPoolFactory, setWeightedPoolFactory] = useState<SymfoniWeightedPoolFactory>(emptyContract);
+    const [StablePoolFactory, setStablePoolFactory] = useState<SymfoniStablePoolFactory>(emptyContract);
+    const [WeightedPool2Tokens, setWeightedPool2Tokens] = useState<SymfoniWeightedPool2Tokens>(emptyContract);
     const [WeightedPool, setWeightedPool] = useState<SymfoniWeightedPool>(emptyContract);
     const [WeightedPool2TokensFactory, setWeightedPool2TokensFactory] = useState<SymfoniWeightedPool2TokensFactory>(emptyContract);
-    const [EnumerableIERC20ToBytes32MapMock, setEnumerableIERC20ToBytes32MapMock] = useState<SymfoniEnumerableIERC20ToBytes32MapMock>(emptyContract);
+    const [WeightedPoolFactory, setWeightedPoolFactory] = useState<SymfoniWeightedPoolFactory>(emptyContract);
     const [ReentrancyAttack, setReentrancyAttack] = useState<SymfoniReentrancyAttack>(emptyContract);
-    const [SignaturesValidatorMock, setSignaturesValidatorMock] = useState<SymfoniSignaturesValidatorMock>(emptyContract);
-    const [WeightedPool2Tokens, setWeightedPool2Tokens] = useState<SymfoniWeightedPool2Tokens>(emptyContract);
-    const [BalancerErrorsMock, setBalancerErrorsMock] = useState<SymfoniBalancerErrorsMock>(emptyContract);
-    const [TemporarilyPausableMock, setTemporarilyPausableMock] = useState<SymfoniTemporarilyPausableMock>(emptyContract);
     const [ReentrancyMock, setReentrancyMock] = useState<SymfoniReentrancyMock>(emptyContract);
+    const [BalancerErrorsMock, setBalancerErrorsMock] = useState<SymfoniBalancerErrorsMock>(emptyContract);
+    const [SignaturesValidatorMock, setSignaturesValidatorMock] = useState<SymfoniSignaturesValidatorMock>(emptyContract);
+    const [TemporarilyPausableMock, setTemporarilyPausableMock] = useState<SymfoniTemporarilyPausableMock>(emptyContract);
+    const [EnumerableIERC20ToBytes32MapMock, setEnumerableIERC20ToBytes32MapMock] = useState<SymfoniEnumerableIERC20ToBytes32MapMock>(emptyContract);
     useEffect(() => {
         if (messages.length > 0)
             console.debug(messages.pop())
@@ -498,47 +516,49 @@ export const Symfoni: React.FC<SymfoniProps> = ({
                 setMessages(old => [...old, text])
             }
             const finishWithContracts = (text: string) => {
+                setYTCEth(getYTCEth(_provider, _signer))
                 setYieldTokenCompounding(getYieldTokenCompounding(_provider, _signer))
+                setYTCEthCurve(getYTCEthCurve(_provider, _signer))
                 setBalancerPoolToken(getBalancerPoolToken(_provider, _signer))
-                setEthForceSender(getEthForceSender(_provider, _signer))
-                setBalanceAllocationMock(getBalanceAllocationMock(_provider, _signer))
                 setMockBalancerPoolToken(getMockBalancerPoolToken(_provider, _signer))
-                setMockInternalBalanceRelayer(getMockInternalBalanceRelayer(_provider, _signer))
                 setMockBasePool(getMockBasePool(_provider, _signer))
+                setMockFlashLoanRecipient(getMockFlashLoanRecipient(_provider, _signer))
+                setEthForceSender(getEthForceSender(_provider, _signer))
+                setMockAssetTransfersHandler(getMockAssetTransfersHandler(_provider, _signer))
+                setMockStableMath(getMockStableMath(_provider, _signer))
                 setMockPool(getMockPool(_provider, _signer))
                 setMockFactoryCreatedPool(getMockFactoryCreatedPool(_provider, _signer))
-                setMockVault(getMockVault(_provider, _signer))
-                setMulticall(getMulticall(_provider, _signer))
-                setMockFlashLoanRecipient(getMockFlashLoanRecipient(_provider, _signer))
+                setBalanceAllocationMock(getBalanceAllocationMock(_provider, _signer))
+                setMockInternalBalanceRelayer(getMockInternalBalanceRelayer(_provider, _signer))
                 setMockPoolFactory(getMockPoolFactory(_provider, _signer))
-                setTestToken(getTestToken(_provider, _signer))
-                setMockAssetTransfersHandler(getMockAssetTransfersHandler(_provider, _signer))
                 setMockWeightedOracleMath(getMockWeightedOracleMath(_provider, _signer))
+                setMulticall(getMulticall(_provider, _signer))
+                setMockVault(getMockVault(_provider, _signer))
                 setMockWeightedMath(getMockWeightedMath(_provider, _signer))
+                setTestToken(getTestToken(_provider, _signer))
+                setWETH(getWETH(_provider, _signer))
+                setPoolPriceOracleMock(getPoolPriceOracleMock(_provider, _signer))
                 setTokenFactory(getTokenFactory(_provider, _signer))
-                setMockStableMath(getMockStableMath(_provider, _signer))
                 setWeightedPool2TokensMock(getWeightedPool2TokensMock(_provider, _signer))
                 setAuthorizer(getAuthorizer(_provider, _signer))
-                setWETH(getWETH(_provider, _signer))
                 setProtocolFeesCollector(getProtocolFeesCollector(_provider, _signer))
-                setPoolPriceOracleMock(getPoolPriceOracleMock(_provider, _signer))
                 setVault(getVault(_provider, _signer))
                 setBalancerHelpers(getBalancerHelpers(_provider, _signer))
                 setERC20(getERC20(_provider, _signer))
-                setStablePoolFactory(getStablePoolFactory(_provider, _signer))
-                setPoolPriceOracle(getPoolPriceOracle(_provider, _signer))
                 setFactoryWidePauseWindow(getFactoryWidePauseWindow(_provider, _signer))
+                setPoolPriceOracle(getPoolPriceOracle(_provider, _signer))
                 setStablePool(getStablePool(_provider, _signer))
-                setWeightedPoolFactory(getWeightedPoolFactory(_provider, _signer))
+                setStablePoolFactory(getStablePoolFactory(_provider, _signer))
+                setWeightedPool2Tokens(getWeightedPool2Tokens(_provider, _signer))
                 setWeightedPool(getWeightedPool(_provider, _signer))
                 setWeightedPool2TokensFactory(getWeightedPool2TokensFactory(_provider, _signer))
-                setEnumerableIERC20ToBytes32MapMock(getEnumerableIERC20ToBytes32MapMock(_provider, _signer))
+                setWeightedPoolFactory(getWeightedPoolFactory(_provider, _signer))
                 setReentrancyAttack(getReentrancyAttack(_provider, _signer))
-                setSignaturesValidatorMock(getSignaturesValidatorMock(_provider, _signer))
-                setWeightedPool2Tokens(getWeightedPool2Tokens(_provider, _signer))
-                setBalancerErrorsMock(getBalancerErrorsMock(_provider, _signer))
-                setTemporarilyPausableMock(getTemporarilyPausableMock(_provider, _signer))
                 setReentrancyMock(getReentrancyMock(_provider, _signer))
+                setBalancerErrorsMock(getBalancerErrorsMock(_provider, _signer))
+                setSignaturesValidatorMock(getSignaturesValidatorMock(_provider, _signer))
+                setTemporarilyPausableMock(getTemporarilyPausableMock(_provider, _signer))
+                setEnumerableIERC20ToBytes32MapMock(getEnumerableIERC20ToBytes32MapMock(_provider, _signer))
                 finish(text)
             }
             if (!autoInit && initializeCounter === 0) return finish("Auto init turned off.")
@@ -567,13 +587,33 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return () => { subscribed = false }
     }, [initializeCounter])
 
+    const getYTCEth = (_provider: providers.Provider, _signer?: Signer) => {
+
+        const contractAddress = "0xC5C14557eDF336731a44E35aCF4b9A3e2eAC3E72"
+        const instance = _signer ? YTCEth__factory.connect(contractAddress, _signer) : YTCEth__factory.connect(contractAddress, _provider)
+        const contract: SymfoniYTCEth = {
+            instance: instance,
+            factory: _signer ? new YTCEth__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
     const getYieldTokenCompounding = (_provider: providers.Provider, _signer?: Signer) => {
 
-        const contractAddress = "0xC250bc80EC944550Db2276925f0582D58728C2A4"
+        const contractAddress = "0xe4ecfc8aff5bea1e06618e862491e190239f4d1e"
         const instance = _signer ? YieldTokenCompounding__factory.connect(contractAddress, _signer) : YieldTokenCompounding__factory.connect(contractAddress, _provider)
         const contract: SymfoniYieldTokenCompounding = {
             instance: instance,
             factory: _signer ? new YieldTokenCompounding__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
+    const getYTCEthCurve = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? YTCEthCurve__factory.connect(ethers.constants.AddressZero, _signer) : YTCEthCurve__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniYTCEthCurve = {
+            instance: instance,
+            factory: _signer ? new YTCEthCurve__factory(_signer) : undefined,
         }
         return contract
     }
@@ -587,24 +627,6 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getEthForceSender = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? EthForceSender__factory.connect(ethers.constants.AddressZero, _signer) : EthForceSender__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniEthForceSender = {
-            instance: instance,
-            factory: _signer ? new EthForceSender__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
-    const getBalanceAllocationMock = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? BalanceAllocationMock__factory.connect(ethers.constants.AddressZero, _signer) : BalanceAllocationMock__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniBalanceAllocationMock = {
-            instance: instance,
-            factory: _signer ? new BalanceAllocationMock__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
     const getMockBalancerPoolToken = (_provider: providers.Provider, _signer?: Signer) => {
         let instance = _signer ? MockBalancerPoolToken__factory.connect(ethers.constants.AddressZero, _signer) : MockBalancerPoolToken__factory.connect(ethers.constants.AddressZero, _provider)
         const contract: SymfoniMockBalancerPoolToken = {
@@ -614,20 +636,47 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getMockInternalBalanceRelayer = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? MockInternalBalanceRelayer__factory.connect(ethers.constants.AddressZero, _signer) : MockInternalBalanceRelayer__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniMockInternalBalanceRelayer = {
-            instance: instance,
-            factory: _signer ? new MockInternalBalanceRelayer__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
     const getMockBasePool = (_provider: providers.Provider, _signer?: Signer) => {
         let instance = _signer ? MockBasePool__factory.connect(ethers.constants.AddressZero, _signer) : MockBasePool__factory.connect(ethers.constants.AddressZero, _provider)
         const contract: SymfoniMockBasePool = {
             instance: instance,
             factory: _signer ? new MockBasePool__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
+    const getMockFlashLoanRecipient = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? MockFlashLoanRecipient__factory.connect(ethers.constants.AddressZero, _signer) : MockFlashLoanRecipient__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniMockFlashLoanRecipient = {
+            instance: instance,
+            factory: _signer ? new MockFlashLoanRecipient__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
+    const getEthForceSender = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? EthForceSender__factory.connect(ethers.constants.AddressZero, _signer) : EthForceSender__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniEthForceSender = {
+            instance: instance,
+            factory: _signer ? new EthForceSender__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
+    const getMockAssetTransfersHandler = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? MockAssetTransfersHandler__factory.connect(ethers.constants.AddressZero, _signer) : MockAssetTransfersHandler__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniMockAssetTransfersHandler = {
+            instance: instance,
+            factory: _signer ? new MockAssetTransfersHandler__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
+    const getMockStableMath = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? MockStableMath__factory.connect(ethers.constants.AddressZero, _signer) : MockStableMath__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniMockStableMath = {
+            instance: instance,
+            factory: _signer ? new MockStableMath__factory(_signer) : undefined,
         }
         return contract
     }
@@ -650,29 +699,20 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getMockVault = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? MockVault__factory.connect(ethers.constants.AddressZero, _signer) : MockVault__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniMockVault = {
+    const getBalanceAllocationMock = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? BalanceAllocationMock__factory.connect(ethers.constants.AddressZero, _signer) : BalanceAllocationMock__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniBalanceAllocationMock = {
             instance: instance,
-            factory: _signer ? new MockVault__factory(_signer) : undefined,
+            factory: _signer ? new BalanceAllocationMock__factory(_signer) : undefined,
         }
         return contract
     }
         ;
-    const getMulticall = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? Multicall__factory.connect(ethers.constants.AddressZero, _signer) : Multicall__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniMulticall = {
+    const getMockInternalBalanceRelayer = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? MockInternalBalanceRelayer__factory.connect(ethers.constants.AddressZero, _signer) : MockInternalBalanceRelayer__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniMockInternalBalanceRelayer = {
             instance: instance,
-            factory: _signer ? new Multicall__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
-    const getMockFlashLoanRecipient = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? MockFlashLoanRecipient__factory.connect(ethers.constants.AddressZero, _signer) : MockFlashLoanRecipient__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniMockFlashLoanRecipient = {
-            instance: instance,
-            factory: _signer ? new MockFlashLoanRecipient__factory(_signer) : undefined,
+            factory: _signer ? new MockInternalBalanceRelayer__factory(_signer) : undefined,
         }
         return contract
     }
@@ -686,29 +726,29 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getTestToken = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? TestToken__factory.connect(ethers.constants.AddressZero, _signer) : TestToken__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniTestToken = {
-            instance: instance,
-            factory: _signer ? new TestToken__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
-    const getMockAssetTransfersHandler = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? MockAssetTransfersHandler__factory.connect(ethers.constants.AddressZero, _signer) : MockAssetTransfersHandler__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniMockAssetTransfersHandler = {
-            instance: instance,
-            factory: _signer ? new MockAssetTransfersHandler__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
     const getMockWeightedOracleMath = (_provider: providers.Provider, _signer?: Signer) => {
         let instance = _signer ? MockWeightedOracleMath__factory.connect(ethers.constants.AddressZero, _signer) : MockWeightedOracleMath__factory.connect(ethers.constants.AddressZero, _provider)
         const contract: SymfoniMockWeightedOracleMath = {
             instance: instance,
             factory: _signer ? new MockWeightedOracleMath__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
+    const getMulticall = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? Multicall__factory.connect(ethers.constants.AddressZero, _signer) : Multicall__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniMulticall = {
+            instance: instance,
+            factory: _signer ? new Multicall__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
+    const getMockVault = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? MockVault__factory.connect(ethers.constants.AddressZero, _signer) : MockVault__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniMockVault = {
+            instance: instance,
+            factory: _signer ? new MockVault__factory(_signer) : undefined,
         }
         return contract
     }
@@ -722,20 +762,38 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
+    const getTestToken = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? TestToken__factory.connect(ethers.constants.AddressZero, _signer) : TestToken__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniTestToken = {
+            instance: instance,
+            factory: _signer ? new TestToken__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
+    const getWETH = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? WETH__factory.connect(ethers.constants.AddressZero, _signer) : WETH__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniWETH = {
+            instance: instance,
+            factory: _signer ? new WETH__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
+    const getPoolPriceOracleMock = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? PoolPriceOracleMock__factory.connect(ethers.constants.AddressZero, _signer) : PoolPriceOracleMock__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniPoolPriceOracleMock = {
+            instance: instance,
+            factory: _signer ? new PoolPriceOracleMock__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
     const getTokenFactory = (_provider: providers.Provider, _signer?: Signer) => {
         let instance = _signer ? TokenFactory__factory.connect(ethers.constants.AddressZero, _signer) : TokenFactory__factory.connect(ethers.constants.AddressZero, _provider)
         const contract: SymfoniTokenFactory = {
             instance: instance,
             factory: _signer ? new TokenFactory__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
-    const getMockStableMath = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? MockStableMath__factory.connect(ethers.constants.AddressZero, _signer) : MockStableMath__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniMockStableMath = {
-            instance: instance,
-            factory: _signer ? new MockStableMath__factory(_signer) : undefined,
         }
         return contract
     }
@@ -758,29 +816,11 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getWETH = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? WETH__factory.connect(ethers.constants.AddressZero, _signer) : WETH__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniWETH = {
-            instance: instance,
-            factory: _signer ? new WETH__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
     const getProtocolFeesCollector = (_provider: providers.Provider, _signer?: Signer) => {
         let instance = _signer ? ProtocolFeesCollector__factory.connect(ethers.constants.AddressZero, _signer) : ProtocolFeesCollector__factory.connect(ethers.constants.AddressZero, _provider)
         const contract: SymfoniProtocolFeesCollector = {
             instance: instance,
             factory: _signer ? new ProtocolFeesCollector__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
-    const getPoolPriceOracleMock = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? PoolPriceOracleMock__factory.connect(ethers.constants.AddressZero, _signer) : PoolPriceOracleMock__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniPoolPriceOracleMock = {
-            instance: instance,
-            factory: _signer ? new PoolPriceOracleMock__factory(_signer) : undefined,
         }
         return contract
     }
@@ -812,11 +852,11 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getStablePoolFactory = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? StablePoolFactory__factory.connect(ethers.constants.AddressZero, _signer) : StablePoolFactory__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniStablePoolFactory = {
+    const getFactoryWidePauseWindow = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? FactoryWidePauseWindow__factory.connect(ethers.constants.AddressZero, _signer) : FactoryWidePauseWindow__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniFactoryWidePauseWindow = {
             instance: instance,
-            factory: _signer ? new StablePoolFactory__factory(_signer) : undefined,
+            factory: _signer ? new FactoryWidePauseWindow__factory(_signer) : undefined,
         }
         return contract
     }
@@ -830,15 +870,6 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getFactoryWidePauseWindow = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? FactoryWidePauseWindow__factory.connect(ethers.constants.AddressZero, _signer) : FactoryWidePauseWindow__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniFactoryWidePauseWindow = {
-            instance: instance,
-            factory: _signer ? new FactoryWidePauseWindow__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
     const getStablePool = (_provider: providers.Provider, _signer?: Signer) => {
         let instance = _signer ? StablePool__factory.connect(ethers.constants.AddressZero, _signer) : StablePool__factory.connect(ethers.constants.AddressZero, _provider)
         const contract: SymfoniStablePool = {
@@ -848,11 +879,20 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getWeightedPoolFactory = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? WeightedPoolFactory__factory.connect(ethers.constants.AddressZero, _signer) : WeightedPoolFactory__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniWeightedPoolFactory = {
+    const getStablePoolFactory = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? StablePoolFactory__factory.connect(ethers.constants.AddressZero, _signer) : StablePoolFactory__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniStablePoolFactory = {
             instance: instance,
-            factory: _signer ? new WeightedPoolFactory__factory(_signer) : undefined,
+            factory: _signer ? new StablePoolFactory__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
+    const getWeightedPool2Tokens = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? WeightedPool2Tokens__factory.connect(ethers.constants.AddressZero, _signer) : WeightedPool2Tokens__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniWeightedPool2Tokens = {
+            instance: instance,
+            factory: _signer ? new WeightedPool2Tokens__factory(_signer) : undefined,
         }
         return contract
     }
@@ -875,11 +915,11 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getEnumerableIERC20ToBytes32MapMock = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? EnumerableIERC20ToBytes32MapMock__factory.connect(ethers.constants.AddressZero, _signer) : EnumerableIERC20ToBytes32MapMock__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniEnumerableIERC20ToBytes32MapMock = {
+    const getWeightedPoolFactory = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? WeightedPoolFactory__factory.connect(ethers.constants.AddressZero, _signer) : WeightedPoolFactory__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniWeightedPoolFactory = {
             instance: instance,
-            factory: _signer ? new EnumerableIERC20ToBytes32MapMock__factory(_signer) : undefined,
+            factory: _signer ? new WeightedPoolFactory__factory(_signer) : undefined,
         }
         return contract
     }
@@ -893,20 +933,11 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getSignaturesValidatorMock = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? SignaturesValidatorMock__factory.connect(ethers.constants.AddressZero, _signer) : SignaturesValidatorMock__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniSignaturesValidatorMock = {
+    const getReentrancyMock = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? ReentrancyMock__factory.connect(ethers.constants.AddressZero, _signer) : ReentrancyMock__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniReentrancyMock = {
             instance: instance,
-            factory: _signer ? new SignaturesValidatorMock__factory(_signer) : undefined,
-        }
-        return contract
-    }
-        ;
-    const getWeightedPool2Tokens = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? WeightedPool2Tokens__factory.connect(ethers.constants.AddressZero, _signer) : WeightedPool2Tokens__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniWeightedPool2Tokens = {
-            instance: instance,
-            factory: _signer ? new WeightedPool2Tokens__factory(_signer) : undefined,
+            factory: _signer ? new ReentrancyMock__factory(_signer) : undefined,
         }
         return contract
     }
@@ -920,6 +951,15 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
+    const getSignaturesValidatorMock = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? SignaturesValidatorMock__factory.connect(ethers.constants.AddressZero, _signer) : SignaturesValidatorMock__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniSignaturesValidatorMock = {
+            instance: instance,
+            factory: _signer ? new SignaturesValidatorMock__factory(_signer) : undefined,
+        }
+        return contract
+    }
+        ;
     const getTemporarilyPausableMock = (_provider: providers.Provider, _signer?: Signer) => {
         let instance = _signer ? TemporarilyPausableMock__factory.connect(ethers.constants.AddressZero, _signer) : TemporarilyPausableMock__factory.connect(ethers.constants.AddressZero, _provider)
         const contract: SymfoniTemporarilyPausableMock = {
@@ -929,11 +969,11 @@ export const Symfoni: React.FC<SymfoniProps> = ({
         return contract
     }
         ;
-    const getReentrancyMock = (_provider: providers.Provider, _signer?: Signer) => {
-        let instance = _signer ? ReentrancyMock__factory.connect(ethers.constants.AddressZero, _signer) : ReentrancyMock__factory.connect(ethers.constants.AddressZero, _provider)
-        const contract: SymfoniReentrancyMock = {
+    const getEnumerableIERC20ToBytes32MapMock = (_provider: providers.Provider, _signer?: Signer) => {
+        let instance = _signer ? EnumerableIERC20ToBytes32MapMock__factory.connect(ethers.constants.AddressZero, _signer) : EnumerableIERC20ToBytes32MapMock__factory.connect(ethers.constants.AddressZero, _provider)
+        const contract: SymfoniEnumerableIERC20ToBytes32MapMock = {
             instance: instance,
-            factory: _signer ? new ReentrancyMock__factory(_signer) : undefined,
+            factory: _signer ? new EnumerableIERC20ToBytes32MapMock__factory(_signer) : undefined,
         }
         return contract
     }
@@ -952,98 +992,102 @@ export const Symfoni: React.FC<SymfoniProps> = ({
             <ProviderContext.Provider value={[provider, setProvider]}>
                 <SignerContext.Provider value={[signer, setSigner]}>
                     <CurrentAddressContext.Provider value={[currentAddress, setCurrentAddress]}>
-                        <YieldTokenCompoundingContext.Provider value={YieldTokenCompounding}>
-                            <BalancerPoolTokenContext.Provider value={BalancerPoolToken}>
-                                <EthForceSenderContext.Provider value={EthForceSender}>
-                                    <BalanceAllocationMockContext.Provider value={BalanceAllocationMock}>
+                        <YTCEthContext.Provider value={YTCEth}>
+                            <YieldTokenCompoundingContext.Provider value={YieldTokenCompounding}>
+                                <YTCEthCurveContext.Provider value={YTCEthCurve}>
+                                    <BalancerPoolTokenContext.Provider value={BalancerPoolToken}>
                                         <MockBalancerPoolTokenContext.Provider value={MockBalancerPoolToken}>
-                                            <MockInternalBalanceRelayerContext.Provider value={MockInternalBalanceRelayer}>
-                                                <MockBasePoolContext.Provider value={MockBasePool}>
-                                                    <MockPoolContext.Provider value={MockPool}>
-                                                        <MockFactoryCreatedPoolContext.Provider value={MockFactoryCreatedPool}>
-                                                            <MockVaultContext.Provider value={MockVault}>
-                                                                <MulticallContext.Provider value={Multicall}>
-                                                                    <MockFlashLoanRecipientContext.Provider value={MockFlashLoanRecipient}>
-                                                                        <MockPoolFactoryContext.Provider value={MockPoolFactory}>
-                                                                            <TestTokenContext.Provider value={TestToken}>
-                                                                                <MockAssetTransfersHandlerContext.Provider value={MockAssetTransfersHandler}>
+                                            <MockBasePoolContext.Provider value={MockBasePool}>
+                                                <MockFlashLoanRecipientContext.Provider value={MockFlashLoanRecipient}>
+                                                    <EthForceSenderContext.Provider value={EthForceSender}>
+                                                        <MockAssetTransfersHandlerContext.Provider value={MockAssetTransfersHandler}>
+                                                            <MockStableMathContext.Provider value={MockStableMath}>
+                                                                <MockPoolContext.Provider value={MockPool}>
+                                                                    <MockFactoryCreatedPoolContext.Provider value={MockFactoryCreatedPool}>
+                                                                        <BalanceAllocationMockContext.Provider value={BalanceAllocationMock}>
+                                                                            <MockInternalBalanceRelayerContext.Provider value={MockInternalBalanceRelayer}>
+                                                                                <MockPoolFactoryContext.Provider value={MockPoolFactory}>
                                                                                     <MockWeightedOracleMathContext.Provider value={MockWeightedOracleMath}>
-                                                                                        <MockWeightedMathContext.Provider value={MockWeightedMath}>
-                                                                                            <TokenFactoryContext.Provider value={TokenFactory}>
-                                                                                                <MockStableMathContext.Provider value={MockStableMath}>
-                                                                                                    <WeightedPool2TokensMockContext.Provider value={WeightedPool2TokensMock}>
-                                                                                                        <AuthorizerContext.Provider value={Authorizer}>
-                                                                                                            <WETHContext.Provider value={WETH}>
-                                                                                                                <ProtocolFeesCollectorContext.Provider value={ProtocolFeesCollector}>
-                                                                                                                    <PoolPriceOracleMockContext.Provider value={PoolPriceOracleMock}>
-                                                                                                                        <VaultContext.Provider value={Vault}>
-                                                                                                                            <BalancerHelpersContext.Provider value={BalancerHelpers}>
-                                                                                                                                <ERC20Context.Provider value={ERC20}>
-                                                                                                                                    <StablePoolFactoryContext.Provider value={StablePoolFactory}>
-                                                                                                                                        <PoolPriceOracleContext.Provider value={PoolPriceOracle}>
+                                                                                        <MulticallContext.Provider value={Multicall}>
+                                                                                            <MockVaultContext.Provider value={MockVault}>
+                                                                                                <MockWeightedMathContext.Provider value={MockWeightedMath}>
+                                                                                                    <TestTokenContext.Provider value={TestToken}>
+                                                                                                        <WETHContext.Provider value={WETH}>
+                                                                                                            <PoolPriceOracleMockContext.Provider value={PoolPriceOracleMock}>
+                                                                                                                <TokenFactoryContext.Provider value={TokenFactory}>
+                                                                                                                    <WeightedPool2TokensMockContext.Provider value={WeightedPool2TokensMock}>
+                                                                                                                        <AuthorizerContext.Provider value={Authorizer}>
+                                                                                                                            <ProtocolFeesCollectorContext.Provider value={ProtocolFeesCollector}>
+                                                                                                                                <VaultContext.Provider value={Vault}>
+                                                                                                                                    <BalancerHelpersContext.Provider value={BalancerHelpers}>
+                                                                                                                                        <ERC20Context.Provider value={ERC20}>
                                                                                                                                             <FactoryWidePauseWindowContext.Provider value={FactoryWidePauseWindow}>
-                                                                                                                                                <StablePoolContext.Provider value={StablePool}>
-                                                                                                                                                    <WeightedPoolFactoryContext.Provider value={WeightedPoolFactory}>
-                                                                                                                                                        <WeightedPoolContext.Provider value={WeightedPool}>
-                                                                                                                                                            <WeightedPool2TokensFactoryContext.Provider value={WeightedPool2TokensFactory}>
-                                                                                                                                                                <EnumerableIERC20ToBytes32MapMockContext.Provider value={EnumerableIERC20ToBytes32MapMock}>
-                                                                                                                                                                    <ReentrancyAttackContext.Provider value={ReentrancyAttack}>
-                                                                                                                                                                        <SignaturesValidatorMockContext.Provider value={SignaturesValidatorMock}>
-                                                                                                                                                                            <WeightedPool2TokensContext.Provider value={WeightedPool2Tokens}>
-                                                                                                                                                                                <BalancerErrorsMockContext.Provider value={BalancerErrorsMock}>
-                                                                                                                                                                                    <TemporarilyPausableMockContext.Provider value={TemporarilyPausableMock}>
-                                                                                                                                                                                        <ReentrancyMockContext.Provider value={ReentrancyMock}>
-                                                                                                                                                                                            {showLoading && loading ?
-                                                                                                                                                                                                props.loadingComponent
-                                                                                                                                                                                                    ? props.loadingComponent
-                                                                                                                                                                                                    : <div>
-                                                                                                                                                                                                        {messages.map((msg, i) => (
-                                                                                                                                                                                                            <p key={i}>{msg}</p>
-                                                                                                                                                                                                        ))}
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                : props.children
-                                                                                                                                                                                            }
-                                                                                                                                                                                        </ReentrancyMockContext.Provider >
-                                                                                                                                                                                    </TemporarilyPausableMockContext.Provider >
-                                                                                                                                                                                </BalancerErrorsMockContext.Provider >
-                                                                                                                                                                            </WeightedPool2TokensContext.Provider >
-                                                                                                                                                                        </SignaturesValidatorMockContext.Provider >
-                                                                                                                                                                    </ReentrancyAttackContext.Provider >
-                                                                                                                                                                </EnumerableIERC20ToBytes32MapMockContext.Provider >
-                                                                                                                                                            </WeightedPool2TokensFactoryContext.Provider >
-                                                                                                                                                        </WeightedPoolContext.Provider >
-                                                                                                                                                    </WeightedPoolFactoryContext.Provider >
-                                                                                                                                                </StablePoolContext.Provider >
+                                                                                                                                                <PoolPriceOracleContext.Provider value={PoolPriceOracle}>
+                                                                                                                                                    <StablePoolContext.Provider value={StablePool}>
+                                                                                                                                                        <StablePoolFactoryContext.Provider value={StablePoolFactory}>
+                                                                                                                                                            <WeightedPool2TokensContext.Provider value={WeightedPool2Tokens}>
+                                                                                                                                                                <WeightedPoolContext.Provider value={WeightedPool}>
+                                                                                                                                                                    <WeightedPool2TokensFactoryContext.Provider value={WeightedPool2TokensFactory}>
+                                                                                                                                                                        <WeightedPoolFactoryContext.Provider value={WeightedPoolFactory}>
+                                                                                                                                                                            <ReentrancyAttackContext.Provider value={ReentrancyAttack}>
+                                                                                                                                                                                <ReentrancyMockContext.Provider value={ReentrancyMock}>
+                                                                                                                                                                                    <BalancerErrorsMockContext.Provider value={BalancerErrorsMock}>
+                                                                                                                                                                                        <SignaturesValidatorMockContext.Provider value={SignaturesValidatorMock}>
+                                                                                                                                                                                            <TemporarilyPausableMockContext.Provider value={TemporarilyPausableMock}>
+                                                                                                                                                                                                <EnumerableIERC20ToBytes32MapMockContext.Provider value={EnumerableIERC20ToBytes32MapMock}>
+                                                                                                                                                                                                    {showLoading && loading ?
+                                                                                                                                                                                                        props.loadingComponent
+                                                                                                                                                                                                            ? props.loadingComponent
+                                                                                                                                                                                                            : <div>
+                                                                                                                                                                                                                {messages.map((msg, i) => (
+                                                                                                                                                                                                                    <p key={i}>{msg}</p>
+                                                                                                                                                                                                                ))}
+                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                        : props.children
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                </EnumerableIERC20ToBytes32MapMockContext.Provider >
+                                                                                                                                                                                            </TemporarilyPausableMockContext.Provider >
+                                                                                                                                                                                        </SignaturesValidatorMockContext.Provider >
+                                                                                                                                                                                    </BalancerErrorsMockContext.Provider >
+                                                                                                                                                                                </ReentrancyMockContext.Provider >
+                                                                                                                                                                            </ReentrancyAttackContext.Provider >
+                                                                                                                                                                        </WeightedPoolFactoryContext.Provider >
+                                                                                                                                                                    </WeightedPool2TokensFactoryContext.Provider >
+                                                                                                                                                                </WeightedPoolContext.Provider >
+                                                                                                                                                            </WeightedPool2TokensContext.Provider >
+                                                                                                                                                        </StablePoolFactoryContext.Provider >
+                                                                                                                                                    </StablePoolContext.Provider >
+                                                                                                                                                </PoolPriceOracleContext.Provider >
                                                                                                                                             </FactoryWidePauseWindowContext.Provider >
-                                                                                                                                        </PoolPriceOracleContext.Provider >
-                                                                                                                                    </StablePoolFactoryContext.Provider >
-                                                                                                                                </ERC20Context.Provider >
-                                                                                                                            </BalancerHelpersContext.Provider >
-                                                                                                                        </VaultContext.Provider >
-                                                                                                                    </PoolPriceOracleMockContext.Provider >
-                                                                                                                </ProtocolFeesCollectorContext.Provider >
-                                                                                                            </WETHContext.Provider >
-                                                                                                        </AuthorizerContext.Provider >
-                                                                                                    </WeightedPool2TokensMockContext.Provider >
-                                                                                                </MockStableMathContext.Provider >
-                                                                                            </TokenFactoryContext.Provider >
-                                                                                        </MockWeightedMathContext.Provider >
+                                                                                                                                        </ERC20Context.Provider >
+                                                                                                                                    </BalancerHelpersContext.Provider >
+                                                                                                                                </VaultContext.Provider >
+                                                                                                                            </ProtocolFeesCollectorContext.Provider >
+                                                                                                                        </AuthorizerContext.Provider >
+                                                                                                                    </WeightedPool2TokensMockContext.Provider >
+                                                                                                                </TokenFactoryContext.Provider >
+                                                                                                            </PoolPriceOracleMockContext.Provider >
+                                                                                                        </WETHContext.Provider >
+                                                                                                    </TestTokenContext.Provider >
+                                                                                                </MockWeightedMathContext.Provider >
+                                                                                            </MockVaultContext.Provider >
+                                                                                        </MulticallContext.Provider >
                                                                                     </MockWeightedOracleMathContext.Provider >
-                                                                                </MockAssetTransfersHandlerContext.Provider >
-                                                                            </TestTokenContext.Provider >
-                                                                        </MockPoolFactoryContext.Provider >
-                                                                    </MockFlashLoanRecipientContext.Provider >
-                                                                </MulticallContext.Provider >
-                                                            </MockVaultContext.Provider >
-                                                        </MockFactoryCreatedPoolContext.Provider >
-                                                    </MockPoolContext.Provider >
-                                                </MockBasePoolContext.Provider >
-                                            </MockInternalBalanceRelayerContext.Provider >
+                                                                                </MockPoolFactoryContext.Provider >
+                                                                            </MockInternalBalanceRelayerContext.Provider >
+                                                                        </BalanceAllocationMockContext.Provider >
+                                                                    </MockFactoryCreatedPoolContext.Provider >
+                                                                </MockPoolContext.Provider >
+                                                            </MockStableMathContext.Provider >
+                                                        </MockAssetTransfersHandlerContext.Provider >
+                                                    </EthForceSenderContext.Provider >
+                                                </MockFlashLoanRecipientContext.Provider >
+                                            </MockBasePoolContext.Provider >
                                         </MockBalancerPoolTokenContext.Provider >
-                                    </BalanceAllocationMockContext.Provider >
-                                </EthForceSenderContext.Provider >
-                            </BalancerPoolTokenContext.Provider >
-                        </YieldTokenCompoundingContext.Provider >
+                                    </BalancerPoolTokenContext.Provider >
+                                </YTCEthCurveContext.Provider >
+                            </YieldTokenCompoundingContext.Provider >
+                        </YTCEthContext.Provider >
                     </CurrentAddressContext.Provider>
                 </SignerContext.Provider>
             </ProviderContext.Provider>

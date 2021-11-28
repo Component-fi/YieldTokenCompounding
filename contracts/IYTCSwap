@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.7.0;
+pragma experimental ABIEncoderV2;
+
+import "./balancer-core-v2/lib/openzeppelin/IERC20.sol";
+import "./YieldTokenCompounding.sol";
+
+/// @notice yield token compounding without having to swap to basetokens from ETH manually
+interface IYTCEth {
+
+    // Requires all the same inputs as YieldTokenCompoundingSwap + the address of the underlying token
+    function compound(
+        uint8 _n,
+        address _trancheAddress,
+        bytes32 _balancerPoolId,
+        uint256 _expectedYtOutput,
+        uint256 _expectedBaseTokensSpent,
+        address _underlyingAddress,
+        uint256 _amountUnderlying
+    ) external returns (uint amountIn)
+}

@@ -15,7 +15,7 @@ import { BaseTokenPriceTag } from "../../../Prices";
 import Card from "../../../Reusable/Card";
 import { simulateYTCForCompoundRange } from "../../../../features/ytc/simulateYTC";
 import { getVariableAPY } from '../../../../features/prices/yearn';
-import { ApproveAndSimulateButton } from "./ApproveAndSimulateButton";
+import { ApproveAndSimulateButton, SimulateButton } from "./ApproveAndSimulateButton";
 import { TrancheDetails } from "./Tranche";
 import { TokenIcon } from "../../../Tokens/TokenIcon";
 import { InfoTooltip } from "../../../Reusable/Tooltip";
@@ -85,8 +85,8 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
                 }
             }
             
-            const signer = provider.getSigner(account);
-            simulateYTCForCompoundRange(userData, elementAddresses, compoundRange, signer).then(
+            // const signer = provider.getSigner(account);
+            simulateYTCForCompoundRange(userData, elementAddresses, compoundRange, provider).then(
                 (results) => {
                     setSimulationResults(() => {
                         return results;
@@ -135,7 +135,7 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
                     Yup.object({
                         amount: Yup.number().nullable()
                             .min(0.0000000000000000001, 'Amount must be greater than 0')
-                            .max((balance ? balance : 0), 'Insufficient balance')
+                            // .max((balance ? balance : 0), 'Insufficient balance')
                             .required('An amount of tokens is required'),
                         compounds: Yup.number()
                             .min(1, 'Number of compounds must be 1 or greater')
