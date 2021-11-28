@@ -1,10 +1,14 @@
+import { getCurves } from "crypto";
 import { BigNumber, ethers, Signer } from "ethers";
 import _ from "lodash";
 import { GAS_LIMITS } from "../../constants/gasLimits";
 import { ElementAddresses } from "../../types/manual/types";
+import { getCurveSwapAddress, isCurveToken } from "../prices/curve";
+import { getZapInData, getZapSwapData } from "../zapper/getTransactionData";
 import { getYTCParameters, YTCInput, YTCOutput, YTCParameters } from "./ytcHelpers";
 
 const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 const LACK_OF_LIQUIDITY_MESSAGE = "Error: VM Exception while processing transaction: reverted with reason string 'BAL#001'";
 
@@ -94,6 +98,33 @@ export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balan
         },
         inputs: userData,
     }
+}
+
+export const simulateYTCZap = async ({ytc, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate}: YTCParameters, userData: YTCInput, signer: Signer): Promise<YTCOutput> => {
+
+    let zapData;
+
+    if (isCurveToken(baseTokenName)){
+        const poolAddress = await getCurveSwapAddress(userData.baseTokenAddress, signer);
+
+        zapData = await getZapInData({
+            ownerAddress: ytc.address,
+            sellToken: ZERO_ADDRESS,
+            poolAddress,
+            sellAmount: ethers.utils.parseEther("10000"),
+            protocol: "curve",
+        })
+    } else {
+        zapData = await getZapSwapData({
+            ownerAddress: ytc.address,
+            sellToken: ZERO_ADDRESS,
+            buyToken: userData.baseTokenAddress,
+            sellAmount: ethers.utils.parseEther("10000"),
+        })
+    }
+
+
+    const returnedVals = await ytcZap.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, zapData);
 }
 
 // Runs the simulateYTC method for a range of compounds, rather than just one

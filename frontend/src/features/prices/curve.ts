@@ -111,7 +111,7 @@ const getTriCryptoPrice = async (tokenAddress: string, signer: Signer): Promise<
 
 // Some curve lp contracts are both the erc20 and the swap pool contract, some have this functionality separated
 // When there are two contracts the ERC20 token will have a minter variable that contains the address of the swap contract
-const getCurveSwapAddress = async (tokenAddress: string, signer: Signer): Promise<string> => {
+export const getCurveSwapAddress = async (tokenAddress: string, signer: Signer): Promise<string> => {
     const erc20MinterAbi = IERC20Minter.abi;
 
     const erc20Contract = new Contract(tokenAddress, erc20MinterAbi, signer) as IERC20MinterType;
