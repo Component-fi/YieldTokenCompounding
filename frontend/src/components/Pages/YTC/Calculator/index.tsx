@@ -32,7 +32,7 @@ export interface FormFields {
     tokenAddress: string | undefined,
     trancheAddress: string | undefined,
     amount: number | undefined,
-    compounds: number,
+    compounds: number | undefined,
     percentExposure: number,
 }
 
@@ -69,14 +69,16 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
             setIsSimulating(true);
 
             let compoundRange: [number, number] = [1, 8];
-            if (values.compounds > 0){
-                compoundRange = [values.compounds-1, values.compounds+1];
-            }
-            if (values.compounds === 1){
-                compoundRange = [1, 3];
-            }
-            if (values.compounds >= 30){
-                compoundRange = [28, 30];
+            if (values.compounds){
+                if (values.compounds > 0){
+                    compoundRange = [values.compounds-1, values.compounds+1];
+                }
+                if (values.compounds === 1){
+                    compoundRange = [1, 3];
+                }
+                if (values.compounds >= 30){
+                    compoundRange = [28, 30];
+                }
             }
             
             simulateYTCForCompoundRange(userData, elementAddresses, compoundRange, signer).then(
@@ -106,7 +108,7 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
         tokenAddress: undefined,
         trancheAddress: undefined,
         amount: 0,
-        compounds: 0,
+        compounds: undefined,
         percentExposure: 0,
     }
 
