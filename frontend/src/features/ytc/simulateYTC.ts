@@ -6,6 +6,20 @@ import { getYTCParameters, YTCInput, YTCOutput, YTCParameters } from "./ytcHelpe
 
 const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
+const LACK_OF_LIQUIDITY_MESSAGE = "Error: VM Exception while processing transaction: reverted with reason string 'BAL#001'";
+
+interface JsonErrorType extends Error {
+    code: -32603;
+    message: "Internal JSON-RPC error.";
+    data: {
+        code: number,
+        message: string,
+    };
+}
+const isJsonErrorType = (error: any): error is JsonErrorType => {
+    return (error as JsonErrorType).code === -32603;
+}
+
 // Simulates a single yield token compounding execution to determine what the output would be
 // No actual transaction is executed
 // param YTC Parameters, derived params required to execute the transaction, a ytc contract instance, the balancer pool, decimals for tokens, the name of the yield token etc.
@@ -13,16 +27,34 @@ const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 // param signer, Signer of the transaction
 // returns YTCOutput, contains both input data, and the results fo the simulation, including yield exposure, gas fees, tokens spent, remaining tokens etc.
 export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate}: YTCParameters, userData: YTCInput, signer: Signer): Promise<YTCOutput> => {
-    // Call the method statically to calculate the estimated return
-    // The last two arguments are to prevent slippage, but this isn't required as it is a simulation and cannot be frontrun
-    const returnedVals = await ytc.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX);
+    try{
+        // Call the method statically to calculate the estimated return
+        // The last two arguments are to prevent slippage, but this isn't required as it is a simulation and cannot be frontrun
+        var returnedVals = await ytc.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX);
+    } catch (error) {
+        // if this is a json rpc error type
+        if (isJsonErrorType(error)){
+            const reason = error.data.message;
+
+            // Assign a natural language reason for this on chain error
+            if (reason === LACK_OF_LIQUIDITY_MESSAGE){
+                throw new Error("Insufficient liquidity: Principal Pool")
+            }
+        } else {
+            throw error
+        }
+    }
 
     // Estimate the required amount of gas, this is likely very imprecise
     // const gasAmountEstimate = await ytc.estimateGas.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0");
     // TODO this is using the mean of hardcoded gas estimations
     const gasAmountEstimate = BigNumber.from(GAS_LIMITS[userData.numberOfCompounds])
 
-    const ethGasFees = await gasLimitToEthGasFee(signer, gasAmountEstimate);
+    try {
+        var ethGasFees = await gasLimitToEthGasFee(signer, gasAmountEstimate);
+    } catch (error){
+        throw new Error("Could not calculate Gas Fees")
+    }
 
     const gasFeesInBaseToken = ethToBaseTokenRate * ethGasFees;
 
@@ -93,8 +125,13 @@ export const simulateYTCForCompoundRange = async (userData: YTCInput, constants:
         return result.value;
     })
 
+    const errors: Error[] = results.filter(isRejected).map((result: PromiseRejectedResult) => (result.reason));
+
     if (fulfilledResults.length === 0){
-        throw new Error("Simulation failed: no results")
+        if (errors.length > 0){
+            console.log(errors[0]);
+            throw new Error(errors[0].message)
+        }
     }
     return fulfilledResults;
 }
@@ -127,7 +164,7 @@ const gasLimitToEthGasFee = async (signer: ethers.Signer, gasAmountEstimate: eth
     const {maxFeePerGas, maxPriorityFeePerGas} = await signer.getFeeData();
 
     if (!maxFeePerGas || !maxPriorityFeePerGas){
-        throw Error('get gas fees failed')
+        throw Error('Could not get gas fees')
     }
 
     const gasCostWei: ethers.BigNumber = gasAmountEstimate.mul(maxFeePerGas.add(maxPriorityFeePerGas));
@@ -139,3 +176,4 @@ const gasLimitToEthGasFee = async (signer: ethers.Signer, gasAmountEstimate: eth
 
 
 const isFilled = <T extends {}>(v: PromiseSettledResult<T>): v is PromiseFulfilledResult<T> => v.status === 'fulfilled';
+const isRejected = (v: PromiseSettledResult<any>): v is PromiseRejectedResult => v.status === 'rejected';
