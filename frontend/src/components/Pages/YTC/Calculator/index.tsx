@@ -22,6 +22,7 @@ import { TokenIcon } from "../../../Tokens/TokenIcon";
 import { InfoTooltip } from "../../../Reusable/Tooltip";
 import { AdvancedCollapsable } from "./Advanced";
 import { deployments } from "../../../../constants/apy-mainnet-constants";
+import copy from '../../../../constants/copy.json';
 
 interface CalculateProps {
     tokens: Token[];
@@ -296,7 +297,7 @@ const Form: React.FC<FormProps> = (props) => {
                         gridGap={2}
                     >
                         Term
-                        <InfoTooltip label="Select an active Element Finance Tranche"/>
+                        <InfoTooltip label={copy.tooltips.term}/>
                     </Flex>
                 </FormLabel>
                 <Flex
@@ -367,7 +368,7 @@ const Form: React.FC<FormProps> = (props) => {
                         gridGap={2}
                     >
                         Input Amount
-                        <InfoTooltip label="Yield Token Compounding requires collateral of the base token during the ytc transaction. Only a portion of these tokens will be spent, and the rest will be returned to you when the transaction is complete."/>
+                        <InfoTooltip label={copy.tooltips.input_amount}/>
                     </Flex>
                 </FormLabel>
                 <Flex

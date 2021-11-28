@@ -7,6 +7,7 @@ import { getCompoundsFromTargetExposure } from "../../../../../features/ytc/simu
 import { FormFields } from "..";
 import { InfoTooltip } from "../../../../Reusable/Tooltip";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import copy from '../../../../../constants/copy.json';
 
 export const AdvancedCollapsable: React.FC = () => {
     const [show, setShow] = useState<boolean>(false);
@@ -17,7 +18,7 @@ export const AdvancedCollapsable: React.FC = () => {
         <Button variant="link" onClick={handleToggle} gridGap={2}>
             {show ? <ChevronDownIcon/> : <ChevronRightIcon/>}
             {show ? "Hide" : "Show"} Advanced Options
-            <InfoTooltip label="The simulator will by default run with 1-8 compounds. Advanced options allow you to change this by selecting either the number of compounds you want to simulate"/>
+            <InfoTooltip label={copy.tooltips.advanced_options}/>
         </Button>
         <Collapse in={show} >
             <FormLabel
