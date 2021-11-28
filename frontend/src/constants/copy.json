@@ -14,6 +14,6 @@
         "roi": "Percentage return on the tokens that are spent over the course of the term. Estimated Gain / Tokens Spent",
         "estimated_gain_detail": "The estimated gain after costs. Estimated Return - Tokens Spent - Gas fees.",
         "apr": "Return on investment over the term annualized.",
-        "variable_exposure": "The amount of exposure you have to the variable interst rate. The higher the variable rate, the larger that this will be at redemption"
+        "variable_exposure": "The amount of exposure you have to the variable interest rate. The higher the variable rate, the larger that this will be at redemption"
     }
 }
