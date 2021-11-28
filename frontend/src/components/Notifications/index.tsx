@@ -9,15 +9,21 @@ export const Notifications = () => {
     const toast = useToast();
 
     useEffect(() => {
-        if (notification){
+        if (notification.length > 0){
+            const notificationLength = notification.length;
+            const latestNotification = notification[notificationLength - 1];
+
+            console.log(latestNotification);
+
             toast({
                 position: "bottom-right",
                 render: () => (
                     <NotificationBox
-                        text={notification.text}
-                        type={notification.type}
-                        link={notification.link}
-                        linkText={notification.linkText}
+                        text={latestNotification.text}
+                        type={latestNotification.type}
+                        link={latestNotification.link}
+                        linkText={latestNotification.linkText}
+                        details={latestNotification.details}
                     />
                 ),
             })
@@ -32,10 +38,11 @@ export interface NotificationBoxProps {
     type: "ERROR" | "SUCCESS" | "GENERAL"
     linkText?: string,
     link?: string,
+    details?: string,
 }
 
 const NotificationBox: React.FC<NotificationBoxProps> = (props) => {
-    const {text, type, link, linkText} = props;
+    const {text, type, link, linkText, details} = props;
 
     const color = (() => {
         switch(type){
@@ -62,6 +69,9 @@ const NotificationBox: React.FC<NotificationBoxProps> = (props) => {
         >
             {linkText}
         </Link>}
+        {details && <Text>
+            {details}
+        </Text>}
     </Box>
 
 }
