@@ -174,9 +174,10 @@ const Form: React.FC<FormProps> = (props) => {
     const erc20 = useContext(ERC20Context)
     const [currentAddress] = useContext(CurrentAddressContext)
     const [tranches, setTranches] = useState<Tranche[] | undefined>(undefined);
-    const [simulationResults] = useRecoilValue(simulationResultsAtom);
+    const [simulationResults, setSimulationResults] = useRecoilState(simulationResultsAtom);
     const elementAddresses = useRecoilValue(elementAddressesAtom)
     const history = useHistory();
+    const location = useLocation();
     const query = useQuery();
     const formik = useFormikContext<FormFields>();
 
@@ -191,7 +192,7 @@ const Form: React.FC<FormProps> = (props) => {
         },
         // TODO this should be resolved not ignored
         // eslint-disable-next-line
-        [tokens],
+        [tokens, location],
     )
 
     const getTokenNameByAddress = useCallback(
@@ -235,7 +236,12 @@ const Form: React.FC<FormProps> = (props) => {
             const tokenAddress = getTokenAddress();
             setFieldValue('tokenAddress', tokenAddress)
         }
-    }, [getTokenAddress, tokens, setFieldValue])
+    }, [getTokenAddress, tokens, setFieldValue, location])
+
+    // on location change, reset the simulation results
+    useEffect(() => {
+        setSimulationResults([]);
+    }, [location, setSimulationResults])
 
     useEffect(() => {
         updateTokens();
