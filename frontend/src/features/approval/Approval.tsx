@@ -97,20 +97,25 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
     const [provider] = useContext(ProviderContext);
     const erc20 = useContext(ERC20Context);
     const [currentAddress] = useContext(CurrentAddressContext)
-    const {amount = MAX_UINT_HEX, approvalAddress, tokenAddress, tokenName, children, ...rest} = props;
-
+    const {amount, approvalAddress, tokenAddress, tokenName, children, ...rest} = props;
 
     const [isApproved, setIsApproved] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
 
     const handleCheckApproval = useCallback(
         async () => {
             if (tokenAddress && approvalAddress && provider){
                 const tokenContract = erc20.factory?.attach(tokenAddress);
-                if (tokenContract && amount){
-                    const decimals = await tokenContract.decimals();
-                    const absoluteAmount = utils.parseUnits(amount.toString(), decimals)
-                    checkApproval(absoluteAmount.toString(), approvalAddress, currentAddress, tokenContract).then((result) => {
+                if (tokenContract){
+                    let absoluteAmount;
+                    if (amount){
+                        const decimals = await tokenContract.decimals();
+                        absoluteAmount = utils.parseUnits(amount.toString(), decimals).toString();
+                    } else {
+                        absoluteAmount = MAX_UINT_HEX;
+                    }
+                    checkApproval(absoluteAmount, approvalAddress, currentAddress, tokenContract).then((result) => {
                         if (result) {
                             setIsApproved(true)
                          } else {
@@ -132,9 +137,14 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
 
                 // send the approval request
                 const tokenContract = erc20.factory?.attach(tokenAddress);
-                if (tokenContract && amount){
-                    const decimals = await tokenContract.decimals();
-                    const absoluteAmount = utils.parseUnits(amount.toString(), decimals)
+                if (tokenContract){
+                    let absoluteAmount;
+                    if (amount){
+                        const decimals = await tokenContract.decimals();
+                        absoluteAmount = utils.parseUnits(amount.toString(), decimals)
+                    } else {
+                        absoluteAmount = MAX_UINT_HEX;
+                    }
                     const receipt = await sendApproval(absoluteAmount.toString(), approvalAddress, tokenContract)
                     handleCheckApproval();
                     return receipt;
@@ -152,7 +162,7 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
         setIsLoading={setIsLoading}
         handleApprove={handleApprove}
         handleCheckApproval={handleCheckApproval}
-        approveText={`Approve ${amount} ${tokenName?.toUpperCase()}`}
+        approveText={(amount) ? `Approve ${amount} ${tokenName?.toUpperCase()}` : `Approve ${tokenName?.toUpperCase()}` }
         provider = {provider}
         {...rest}
     >

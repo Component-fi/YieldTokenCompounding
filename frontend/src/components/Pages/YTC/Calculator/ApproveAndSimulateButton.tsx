@@ -25,7 +25,7 @@ export const ApproveAndSimulateButton: React.FC<ApproveAndSimulateButtonProps & 
             tokenAddress={tokenAddress}
             tokenName={tokenName}
             approvalAddress={deployments.YieldTokenCompounding}
-            amount={amount}
+            amount={undefined}
             {...rest}
         >
             <SimulateButton 
