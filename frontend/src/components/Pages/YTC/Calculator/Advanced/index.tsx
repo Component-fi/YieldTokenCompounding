@@ -117,6 +117,8 @@ const NumberCompoundsField = () => {
                 name="compounds"
                 onBlur={formik.handleBlur}
                 value={formik.values.compounds}
+                max={30}
+                min={1}
                 placeholder={"0"}
                 onChange={formik.handleChange}
                 id="amount-input"/>
