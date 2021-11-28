@@ -336,7 +336,7 @@ const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                             {shortenNumber(minimumReceived)}
                         </Text>
                         (<YTPriceTag
-                            amount={expectedReturn}
+                            amount={minimumReceived}
                             baseTokenName={baseTokenName}
                             trancheAddress={trancheAddress}
                         />)
@@ -450,7 +450,7 @@ const ExposureBar: React.FC<ExposureBarProps> = (props) => {
                 <Text fontSize={"xs"} mr={0.5}>
                     {shortenNumber(minimumRedemptionBaseTokens)}
                 </Text>
-                <Tooltip label="The minimum that will be received when redeeming your yield tokens. The variable interest rate over the term will have no effect on this capital.">
+                <Tooltip label={copy.tooltips.minimum_redemption}>
                     <Flex bgColor="green.400" w={`${minimumRedemptionPercentage}%`} justify="center" align="center" h="70%"
                         _hover={{
                             borderColor: "green.200",
@@ -470,7 +470,7 @@ const ExposureBar: React.FC<ExposureBarProps> = (props) => {
                 </Tooltip>
                 <Flex bgColor="black" h="full" w="0.5">
                 </Flex>
-                <Tooltip label="The amount of exposure you have to the variable interst rate. The higher the variable rate, the larger that this will be at redemption">
+                <Tooltip label={copy.tooltips.variable_exposure}>
                     <Flex bgColor="component.orange" w={`${variableExposurePercentage}%`} justify="center" align="center" h="70%"
                         _hover={{
                             borderColor: "yellow.400",
@@ -490,10 +490,6 @@ const ExposureBar: React.FC<ExposureBarProps> = (props) => {
                 </Tooltip>
                 <Text fontSize={"xs"} ml={0.5}>
                     {shortenNumber(variableExposureTokens)}
-                    {/* <BaseTokenPriceTag
-                        amount={variableExposureTokens}
-                        baseTokenName={baseTokenName}
-                    /> */}
                 </Text>
             </Flex>
         </Flex>
