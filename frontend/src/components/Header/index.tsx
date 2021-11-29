@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import Wallet from '../Wallet';
 import WalletSettings from '../Wallet/Settings';
-import componentLogo from '../../images/Logo_Dot_Color.svg';
+import componentLogo from '../../images/Logo_Dot_Color_Main_Orange.svg';
 import { Flex, Icon } from '@chakra-ui/react';
 
 export const Header = () => {
