@@ -418,7 +418,7 @@ const Form: React.FC<FormProps> = (props) => {
                         <Box
                             id="balance"
                         >
-                            Balance: {balance ? balance : <Spinner/>}
+                            Balance: {(balance !== undefined) ? balance : <Spinner/>}
                         </Box>
                     </Flex>
                 </Flex>
