@@ -3,6 +3,8 @@ import {Button, Flex, Icon, Modal as ChakraModal, ModalBody, ModalCloseButton, M
 import { CurrentAddressContext, ProviderContext, SymfoniContext } from '../../hardhat/SymfoniContext';
 import Card from '../Reusable/Card';
 import { SignerContext } from '../../hardhat/SymfoniContext';
+import { autoConnectAtom } from '../../recoil/autoConnect/atom';
+import { useRecoilState } from 'recoil';
 
 interface Props {
     isOpen: boolean;
@@ -16,14 +18,17 @@ export const Modal = (props: Props) => {
     const setProvider = useContext(ProviderContext)[1];
     const [signer, setSigner] = useContext(SignerContext);
     const [currentAddress] = useContext(CurrentAddressContext)
+    const setAutoConnect = useRecoilState(autoConnectAtom)[1];
 
     const handleConnect = async () => {
+        setAutoConnect(true);
         init();
     }
 
     const handleDisconnect = () => {
         setProvider(undefined);
         setSigner(undefined);
+        setAutoConnect(false);
     }
 
     return (

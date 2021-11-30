@@ -5,11 +5,13 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { elementAddressesAtom } from './recoil/element/atom';
 import { fetchElementState } from './recoil/element/fetch';
 import { chainNameAtom } from './recoil/chain/atom';
+import { autoConnectAtom } from './recoil/autoConnect/atom';
 
 function App() {
 
   const [, setElementState] = useRecoilState(elementAddressesAtom);
   const chainName = useRecoilValue(chainNameAtom);
+  const autoConnect = useRecoilValue(autoConnectAtom);
 
   // Get the element state file from their github repo
   // TODO this is reliant on the github repository
@@ -21,7 +23,7 @@ function App() {
 
   return (
     <div className="App">
-      <Symfoni autoInit={true} loadingComponent={<Layout/>}>
+      <Symfoni autoInit={autoConnect} loadingComponent={<Layout/>}>
           <Layout/>
       </Symfoni>
     </div>
