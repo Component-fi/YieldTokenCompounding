@@ -66,6 +66,7 @@ export interface YTCParameters {
     baseTokenName: string;
     baseTokenAmountAbsolute: BigNumber;
     ytSymbol: string;
+    ytAddress: string;
     ethToBaseTokenRate: number;
 }
 
@@ -134,6 +135,7 @@ export const getYTCParameters = async (userData: YTCInput, elementAddresses: Ele
         baseTokenName,
         baseTokenAmountAbsolute: amount,
         ytSymbol,
+        ytAddress: yieldTokenAddress,
         ethToBaseTokenRate: ethToBaseToken,
     }
 

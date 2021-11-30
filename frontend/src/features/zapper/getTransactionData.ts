@@ -50,7 +50,7 @@ const getZapInData = async ({
   affiliateAddress = ZERO_ADDRESS,
 }: GetZapInData) => {
   const params = {
-    api_key: process.env.ZAPPER_API_KEY,
+    api_key: process.env.REACT_APP_ZAPPER_API_KEY,
     ownerAddress,
     sellAmount: sellAmount.toString(),
     sellTokenAddress: sellToken,
@@ -88,7 +88,7 @@ export const getZapSwapData = async ({
 }: ZapSwapDataInput) => {
 
     const params = {
-        api_key: process.env.ZAPPER_API_KEY,
+        api_key: process.env.REACT_APP_ZAPPER_API_KEY,
         ownerAddress,
         buyTokenAddress: buyToken,
         sellTokenAddress: sellToken,

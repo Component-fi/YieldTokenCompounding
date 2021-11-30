@@ -16,17 +16,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         ])
     }
 
-    const ytcContract = "0x3df5229f24040cf0218969c2406b302744edc18b"
-    const uniRouteContract = "0x7a250d5630b4cf539739df2c5dacb4c659f2488d"
+    // const ytcContract = "0x3df5229f24040cf0218969c2406b302744edc18b"
 
   // const ytc_contract = await YTC.deploy(balVault, trancheFactory, bytecodeHash);
-  await deploy('YTCEth', {
+  await deploy('YTCZap', {
     from: signer.address,
-    args: [ytcAddress, uniRouteContract],
+    args: [ytcAddress],
     log: true,
   });
 
-  const deployedContract = await hre.deployments.get('YTCEth');
+  const deployedContract = await hre.deployments.get('YTCZap');
 
   console.log('contract deployed to: ', deployedContract.address)
   

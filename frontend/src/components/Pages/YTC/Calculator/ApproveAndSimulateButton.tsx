@@ -40,7 +40,7 @@ interface SimulateButtonProps {
     formErrors: {[fieldName: string]: string | undefined}
 }
 
-const SimulateButton: React.FC<SimulateButtonProps & ButtonProps> = (props) => {
+export const SimulateButton: React.FC<SimulateButtonProps & ButtonProps> = (props) => {
     const isSimulating = useRecoilValue(isSimulatingAtom)
 
     const isSimulated = useRecoilValue(isSimulatedSelector)
