@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Text, Flex } from '@chakra-ui/react'
-import { ProviderContext, CurrentAddressContext } from "../../hardhat/SymfoniContext";
 import { chainNameAtom } from '../../recoil/chain/atom';
 import { useRecoilState } from 'recoil';
 import { Modal } from './Modal';
-import { SignerContext } from '../../hardhat/SymfoniContext';
+import { Web3Provider } from '@ethersproject/providers';
+import { useWeb3React } from '@web3-react/core';
 
 interface Props {
 }
@@ -12,14 +12,14 @@ interface Props {
 export const Wallet = (props: Props) => {
 
     const [isOpen, setIsOpen] = useState<boolean>(false)
-    const [provider] = useContext(ProviderContext);
-    const [signer] = useContext(SignerContext)
-    const [currentAddress] = useContext(CurrentAddressContext)
+    const web3React = useWeb3React();
 
     const [chainName, setChainName] = useRecoilState(chainNameAtom);
 
     // Set the network name when connected
     useEffect(() => {
+        const provider = web3React.library as Web3Provider;
+
         provider?.getNetwork().then(
             ({name}) => {
                 if (name === "homestead"){
@@ -29,7 +29,7 @@ export const Wallet = (props: Props) => {
                 }
             }
         )
-    }, [provider, setChainName])
+    }, [web3React.active, setChainName, web3React.library])
 
 
     const shortenAddress = (address: string): string => {
@@ -43,7 +43,7 @@ export const Wallet = (props: Props) => {
                 setIsOpen={setIsOpen}
             />
             {
-                !!signer ? 
+                web3React.active ? 
                 <Flex
                     justifyContent = "space-between"
                     alignItems = "center"
@@ -69,7 +69,7 @@ export const Wallet = (props: Props) => {
                         _hover={{
                             bg: 'primary.hover',
                         }}>
-                            {shortenAddress(currentAddress)}
+                            {shortenAddress(web3React.account || "")}
                     </Button> 
                 </Flex> :
                 <Button

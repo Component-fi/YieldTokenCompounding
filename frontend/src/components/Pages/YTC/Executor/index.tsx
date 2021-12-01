@@ -3,8 +3,7 @@ import { YTCGain, YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { executeYieldTokenCompounding } from "../../../../features/ytc/executeYieldTokenCompounding";
 import { elementAddressesAtom } from "../../../../recoil/element/atom";
 import { useRecoilValue } from 'recoil';
-import { useContext, useEffect, useRef, useState } from "react";
-import { SignerContext } from "../../../../hardhat/SymfoniContext";
+import { useEffect, useRef, useState } from "react";
 import { slippageToleranceAtom } from "../../../../recoil/transactionSettings/atom";
 import { notificationAtom } from "../../../../recoil/notifications/atom";
 import { useRecoilState } from 'recoil';
@@ -21,6 +20,8 @@ import copy from '../../../../constants/copy.json';
 import { trancheSelector } from "../../../../recoil/trancheRates/atom";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { InfoOutlineIcon } from '@chakra-ui/icons';
+import { Web3Provider } from '@ethersproject/providers';
+import { useWeb3React } from "@web3-react/core";
 
 export interface ApeProps {
     baseToken: {
@@ -46,7 +47,8 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
     const elementAddresses = useRecoilValue(elementAddressesAtom);
-    const [signer] = useContext(SignerContext);
+    const { library, account } = useWeb3React();
+    const provider = library as Web3Provider;
     const slippageTolerance = useRecoilValue(slippageToleranceAtom);
     const setNotification = useRecoilState(notificationAtom)[1];
 
@@ -62,6 +64,7 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
 
     // Execute the actual calculation transaction
     const handleExecuteTransaction = () => {
+        const signer = provider.getSigner(account || undefined);
         if (signer){
             setIsLoading(true);
             executeYieldTokenCompounding(

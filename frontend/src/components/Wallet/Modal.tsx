@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import {Button, Flex, Icon, Modal as ChakraModal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text} from '@chakra-ui/react';
-import { CurrentAddressContext, ProviderContext, SymfoniContext } from '../../hardhat/SymfoniContext';
 import Card from '../Reusable/Card';
-import { SignerContext } from '../../hardhat/SymfoniContext';
+import { useWeb3React } from '@web3-react/core';
+import {injected} from '../../connectors';
 
 interface Props {
     isOpen: boolean;
@@ -12,18 +12,15 @@ interface Props {
 export const Modal = (props: Props) => {
     const {isOpen, setIsOpen} = props;
 
-    const {init} = useContext(SymfoniContext);
-    const setProvider = useContext(ProviderContext)[1];
-    const [signer, setSigner] = useContext(SignerContext);
-    const [currentAddress] = useContext(CurrentAddressContext)
+    const web3React = useWeb3React();
+
 
     const handleConnect = async () => {
-        init();
+        web3React.activate(injected);
     }
 
     const handleDisconnect = () => {
-        setProvider(undefined);
-        setSigner(undefined);
+        web3React.deactivate();
     }
 
     return (
@@ -38,7 +35,7 @@ export const Modal = (props: Props) => {
                 rounded="2xl"
             >
                 <Card>
-                    {signer ? <Content title="Your Wallet">
+                    {web3React.active ? <Content title="Your Wallet">
                         <Flex
                             flexDir="column"
                             gridGap={3}
@@ -48,7 +45,7 @@ export const Modal = (props: Props) => {
                                     Your Address:
                                 </Text>
                                 <Text>
-                                    {currentAddress}
+                                    {web3React.account}
                                 </Text>
                             </Flex>
                             <Button
