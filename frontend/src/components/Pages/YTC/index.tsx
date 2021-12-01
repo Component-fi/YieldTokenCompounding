@@ -48,8 +48,8 @@ export const YTC: React.FC<YTCProps> = (props) => {
     return <div>
         <Title
             title="Yield Token Compounding"
-            infoLinkText="What is Yield Token Compounding?"
-            infoLink="https://medium.com/element-finance/intro-to-yield-token-compounding-40a75a11e18c#:~:text=Element%20lets%20you%20put%20otherwise,Yield%20Token%20Compounding%20(YTC)."
+            infoLinkText="How do I use this tool?"
+            infoLink="https://medium.com/@component_general/how-to-yield-token-compound-using-the-ytc-tool-742d140a7c9c"
         />
         <Calculator
             tokens={baseTokens}
