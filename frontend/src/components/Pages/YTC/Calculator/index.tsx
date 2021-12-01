@@ -1,12 +1,11 @@
 import { Spinner } from "../../../Reusable/Spinner";
 import { Box, Button, Flex, FormLabel, Input, InputGroup, InputRightAddon, Select, Text} from "@chakra-ui/react";
 import { Formik, FormikHelpers, useFormikContext } from "formik";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { getActiveTranches, getBalance } from "../../../../features/element";
-import { CurrentAddressContext, ERC20Context, SignerContext } from "../../../../hardhat/SymfoniContext";
 import { elementAddressesAtom } from "../../../../recoil/element/atom";
 import { isSimulatingAtom, simulationResultsAtom } from "../../../../recoil/simulationResults/atom";
 import { Token, Tranche } from "../../../../types/manual/types";
@@ -23,6 +22,9 @@ import { InfoTooltip } from "../../../Reusable/Tooltip";
 import { AdvancedCollapsable } from "./Advanced";
 import { deployments } from "../../../../constants/apy-mainnet-constants";
 import copy from '../../../../constants/copy.json';
+import { useWeb3React } from "@web3-react/core";
+import { Web3Provider } from '@ethersproject/providers';
+import { ERC20__factory } from "../../../../hardhat/typechain/factories/ERC20__factory";
 
 interface CalculateProps {
     tokens: Token[];
@@ -43,7 +45,9 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
     const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
     const setIsSimulating = useRecoilState(isSimulatingAtom)[1];
     const elementAddresses = useRecoilValue(elementAddressesAtom);
-    const [signer] = useContext(SignerContext)
+    const { library, account } = useWeb3React();
+    const provider = library as Web3Provider;
+
     const [balance, setBalance] = useState<number | undefined>(undefined);
     const [variableApy, setVariableApy] = useState<number | undefined>(undefined);
 
@@ -55,7 +59,7 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
                 !!values.trancheAddress &&
                 !!values.amount &&
                 !!ytcContractAddress &&
-                !!signer
+                !!account
         ){
             const userData: YTCInput = {
                 baseTokenAddress: values.tokenAddress,
@@ -81,6 +85,7 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
                 }
             }
             
+            const signer = provider.getSigner(account);
             simulateYTCForCompoundRange(userData, elementAddresses, compoundRange, signer).then(
                 (results) => {
                     setSimulationResults(() => {
@@ -175,8 +180,6 @@ const Form: React.FC<FormProps> = (props) => {
 
     const {tokens, onChange, balance, setBalance, setVariableApy} = props;
 
-    const erc20 = useContext(ERC20Context)
-    const [currentAddress] = useContext(CurrentAddressContext)
     const [tranches, setTranches] = useState<Tranche[] | undefined>(undefined);
     const [simulationResults, setSimulationResults] = useRecoilState(simulationResultsAtom);
     const elementAddresses = useRecoilValue(elementAddressesAtom)
@@ -184,6 +187,9 @@ const Form: React.FC<FormProps> = (props) => {
     const location = useLocation();
     const query = useQuery();
     const formik = useFormikContext<FormFields>();
+
+    const { library, account } = useWeb3React();
+    const provider = (library as Web3Provider);
 
     const tokenAddress = formik.values.tokenAddress;
     const setFieldValue = formik.setFieldValue;
@@ -212,14 +218,14 @@ const Form: React.FC<FormProps> = (props) => {
 
     const updateBalance = useCallback(
         () => {
-            if (tokenAddress){
-                const tokenContract = erc20.factory?.attach(tokenAddress);
+            if (tokenAddress && account){
+                const tokenContract = ERC20__factory.connect(tokenAddress, provider)
                 setBalance(undefined);
-                getBalance(currentAddress, tokenContract).then((res) => {
+                getBalance(account, tokenContract).then((res) => {
                     setBalance(res);
                 })
             }
-        }, [tokenAddress, currentAddress, erc20.factory, setBalance]
+        }, [tokenAddress, account, setBalance, provider]
     )
     
 
@@ -250,7 +256,7 @@ const Form: React.FC<FormProps> = (props) => {
     useEffect(() => {
         updateTokens();
         updateBalance();
-    }, [tokenAddress, elementAddresses, erc20.factory, currentAddress, setFieldValue, setBalance, updateTokens, updateBalance])
+    }, [tokenAddress, elementAddresses, account, setFieldValue, setBalance, updateTokens, updateBalance])
 
     useEffect(() => {
         updateBalance();

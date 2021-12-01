@@ -1,11 +1,15 @@
-import React, { ReactElement, useCallback, useContext, useEffect, useState } from 'react'
+import React, { ReactElement, useCallback, useEffect, useState } from 'react'
 import { Button, ButtonProps, Spinner } from '@chakra-ui/react'
 import { checkApproval, sendApproval } from './approvalAPI';
-import { ProviderContext, ERC20Context, CurrentAddressContext, YieldTokenCompoundingContext, SymfoniContext } from '../../hardhat/SymfoniContext';
 import { BigNumber, ContractReceipt, utils, providers } from 'ethers';
 import { notificationAtom } from '../../recoil/notifications/atom';
 import { useRecoilState } from 'recoil';
 import { deployments } from '../../constants/apy-mainnet-constants';
+import { useWeb3React } from '@web3-react/core';
+import { injected } from '../../connectors';
+import { Web3Provider } from '@ethersproject/providers';
+import { ERC20__factory } from '../../hardhat/typechain/factories/ERC20__factory';
+import { YieldTokenCompounding__factory } from '../../hardhat/typechain/factories/YieldTokenCompounding__factory';
 
 const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
@@ -27,7 +31,7 @@ type AbstractApprovalProps = {
 const AbstractApproval: React.FC<AbstractApprovalProps> = (props) => {
     const {approveText, approvalMessage, children, handleCheckApproval, handleApprove, provider, isLoading, isApproved, setIsLoading, ...rest} = props;
 
-    const {init} = useContext(SymfoniContext);
+    const { activate } = useWeb3React();
 
 
     useEffect(() => {
@@ -70,7 +74,7 @@ const AbstractApproval: React.FC<AbstractApprovalProps> = (props) => {
     if (!provider){
         return <Button
             {...rest}
-            onClick={() => init()}
+            onClick={() => activate(injected)}
         >
             CONNECT YOUR WALLET
         </Button>
@@ -105,9 +109,8 @@ type ERC20ApprovalProps = {
 
 // An implementation of the approval button specifically for erc20 tokens
 export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
-    const [provider] = useContext(ProviderContext);
-    const erc20 = useContext(ERC20Context);
-    const [currentAddress] = useContext(CurrentAddressContext)
+    const { library, account } = useWeb3React();
+    const provider = (library as Web3Provider);
     const {amount, approvalAddress, tokenAddress, tokenName, children, ...rest} = props;
 
     const [isApproved, setIsApproved] = useState(false);
@@ -116,8 +119,9 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
 
     const handleCheckApproval = useCallback(
         async () => {
-            if (tokenAddress && approvalAddress && provider){
-                const tokenContract = erc20.factory?.attach(tokenAddress);
+            const signer = provider?.getSigner(account || undefined);
+            if (tokenAddress && approvalAddress && signer && account){
+                const tokenContract = ERC20__factory.connect(tokenAddress, signer);
                 if (tokenContract){
                     let absoluteAmount;
                     if (amount){
@@ -126,7 +130,7 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
                     } else {
                         absoluteAmount = MAX_UINT_HEX;
                     }
-                    checkApproval(absoluteAmount, approvalAddress, currentAddress, tokenContract).then((result) => {
+                    checkApproval(absoluteAmount, approvalAddress, account, tokenContract).then((result) => {
                         if (result) {
                             setIsApproved(true)
                          } else {
@@ -138,16 +142,17 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
                 }
             }
         },
-        [currentAddress, amount, approvalAddress, erc20.factory, provider, tokenAddress],
+        [account, amount, approvalAddress, provider, tokenAddress],
     )
 
     const handleApprove: () => Promise<ContractReceipt> = useCallback(
         async () => {
-            if (approvalAddress && tokenAddress && provider) {
+            const signer = provider?.getSigner(account || undefined);
+            if (approvalAddress && tokenAddress && signer && account) {
                 setIsLoading(true);
 
                 // send the approval request
-                const tokenContract = erc20.factory?.attach(tokenAddress);
+                const tokenContract = ERC20__factory.connect(tokenAddress, signer);
                 if (tokenContract){
                     let absoluteAmount;
                     if (amount){
@@ -163,7 +168,7 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
             }
             throw new Error('Could not connect to token contract')
         },
-        [amount, tokenAddress, approvalAddress, handleCheckApproval, erc20.factory, provider]
+        [amount, tokenAddress, approvalAddress, handleCheckApproval, provider, account]
     )
 
     return <AbstractApproval
@@ -191,9 +196,10 @@ interface BalancerApprovalProps {
 
 // An implementation of the approval button specifically for approving a balancer pool to use funds from the YTC contract
 export const BalancerApproval: React.FC<BalancerApprovalProps> = (props) => {
-    const [provider] = useContext(ProviderContext);
-    const ytcContext = useContext(YieldTokenCompoundingContext);
-    const ytc = ytcContext.instance?.attach(deployments.YieldTokenCompounding)
+    const { library } = useWeb3React();
+    const provider = (library as Web3Provider);
+    const signer = provider?.getSigner();
+    const ytc = YieldTokenCompounding__factory.connect(deployments.YieldTokenCompounding, signer);
 
     const { trancheAddress, children, ...rest} = props;
 

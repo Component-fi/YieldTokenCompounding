@@ -1,11 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { SignerContext } from '../../hardhat/SymfoniContext';
+import React, { useEffect, useState } from 'react'
 import { elementAddressesAtom } from '../../recoil/element/atom';
 import {useRecoilValue} from 'recoil';
 import { getTokenPrice } from '../../features/prices';
 import { shortenNumber } from '../../utils/shortenNumber';
 import { getYTCSpotPrice } from '../../features/element/ytcSpot';
 import { Text } from '@chakra-ui/react';
+import { Web3Provider } from '@ethersproject/providers';
+import { useWeb3React } from '@web3-react/core';
 
 interface PriceFeedProps {
     price: number | undefined;
@@ -49,16 +50,18 @@ export const YTPriceTag: React.FC<YTPriceTagProps> = (props) => {
     const {baseTokenName, trancheAddress, amount} = props;
 
     const [price, setPrice] = useState<number>(0);
-    const [signer] = useContext(SignerContext);
+    const { library } = useWeb3React();
+    const provider = library as Web3Provider;
     const elementAddresses = useRecoilValue(elementAddressesAtom);
 
     useEffect(() => {
+        const signer = provider?.getSigner();
         if (baseTokenName && trancheAddress && signer){
             getYTCSpotPrice(baseTokenName, trancheAddress, elementAddresses, signer).then((price) => {
                 setPrice(price);
             })
         }
-    })
+    }, [provider, baseTokenName, trancheAddress, elementAddresses])
 
 
     return (
@@ -79,11 +82,13 @@ export const BaseTokenPriceTag: React.FC<BaseTokenPriceTagProps> = (props) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [price, setPrice] = useState<number>(0);
-    const [signer] = useContext(SignerContext);
+    const { library } = useWeb3React();
+    const provider = library as Web3Provider;
     const elementAddresses = useRecoilValue(elementAddressesAtom);
 
     useEffect(() => {
-        if(baseTokenName){
+        const signer = provider?.getSigner();
+        if(baseTokenName && signer){
             setIsLoading(true);
             getTokenPrice(baseTokenName, elementAddresses, signer).then((value) => {
                 setPrice(value);
@@ -93,7 +98,7 @@ export const BaseTokenPriceTag: React.FC<BaseTokenPriceTagProps> = (props) => {
                 setIsLoading(false)
             })
         }
-    }, [baseTokenName, elementAddresses, signer])
+    }, [baseTokenName, elementAddresses, provider])
 
 
     return (

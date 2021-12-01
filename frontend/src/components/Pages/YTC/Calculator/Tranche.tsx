@@ -1,8 +1,7 @@
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { getRemainingTrancheYears, getTrancheByAddress } from "../../../../features/element";
 import { getFixedRate } from "../../../../features/element/fixedRate";
 import { getTokenNameByAddress, yieldTokenAccruedValue } from "../../../../features/ytc/ytcHelpers";
-import { SignerContext } from "../../../../hardhat/SymfoniContext";
 import { TrancheRatesInterface, trancheSelector } from "../../../../recoil/trancheRates/atom";
 import { Tranche } from "../../../../types/manual/types";
 import { shortenNumber } from "../../../../utils/shortenNumber";
@@ -12,6 +11,9 @@ import { elementAddressesAtom } from "../../../../recoil/element/atom";
 import { getVariableAPY } from '../../../../features/prices/yearn';
 import { Spinner } from "../../../Reusable/Spinner";
 import { DetailPane } from "../../../Reusable/DetailPane";
+import { useWeb3React } from "@web3-react/core";
+import { Web3Provider } from '@ethersproject/providers';
+
 
 
 interface TrancheDetailsProps {
@@ -24,7 +26,8 @@ export const TrancheDetails: React.FC<TrancheDetailsProps> = (props) => {
     const {trancheAddress, tokenAddress} = props;
 
     const elementAddresses = useRecoilValue(elementAddressesAtom);
-    const [signer] = useContext(SignerContext);
+    const { library } = useWeb3React();
+    const provider = (library as Web3Provider);
     const [trancheRate, setTrancheRates] = useRecoilState(trancheSelector(trancheAddress));
 
     const handleChangeTrancheRate = useCallback((rateChange: Partial<TrancheRatesInterface>) => {
@@ -54,6 +57,7 @@ export const TrancheDetails: React.FC<TrancheDetailsProps> = (props) => {
         // get baseTokenName
         const baseTokenName = getTokenNameByAddress(tokenAddress, elementAddresses.tokens);
 
+        const signer = provider?.getSigner();
         if (baseTokenName && signer){
             getFixedRate(baseTokenName, trancheAddress, elementAddresses, signer).then((fixedRate) => {
                 handleChangeTrancheRate({
@@ -63,10 +67,11 @@ export const TrancheDetails: React.FC<TrancheDetailsProps> = (props) => {
                 console.error(error);
             })
         }
-    }, [handleChangeTrancheRate, signer, trancheAddress, elementAddresses, tokenAddress])
+    }, [handleChangeTrancheRate, provider, trancheAddress, elementAddresses, tokenAddress])
 
     // set the accruedValue for the tranche
     useEffect(() => {
+        const signer = provider?.getSigner();
         if (signer){
             yieldTokenAccruedValue(elementAddresses, trancheAddress, signer).then((accruedValue) => {
                 handleChangeTrancheRate({
@@ -76,7 +81,7 @@ export const TrancheDetails: React.FC<TrancheDetailsProps> = (props) => {
                 console.error(error);
             })
         }
-    }, [elementAddresses, signer, trancheAddress, handleChangeTrancheRate])
+    }, [elementAddresses, provider, trancheAddress, handleChangeTrancheRate])
 
     useEffect(() => {
         const baseTokenName = getTokenNameByAddress(tokenAddress, elementAddresses.tokens);
