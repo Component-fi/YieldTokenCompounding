@@ -2,7 +2,8 @@ import React from 'react';
 import {Button, Flex, Icon, Modal as ChakraModal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text} from '@chakra-ui/react';
 import Card from '../Reusable/Card';
 import { useWeb3React } from '@web3-react/core';
-import {injected} from '../../connectors';
+import {injected, walletconnect} from '../../connectors';
+import walletConnectLogo from '../../images/walletconnect-square-white.svg';
 
 interface Props {
     isOpen: boolean;
@@ -15,8 +16,12 @@ export const Modal = (props: Props) => {
     const web3React = useWeb3React();
 
 
-    const handleConnect = async () => {
+    const handleWebWallet = () => {
         web3React.activate(injected);
+    }
+
+    const handleWalletConnect = () => {
+        web3React.activate(walletconnect);
     }
 
     const handleDisconnect = () => {
@@ -64,7 +69,7 @@ export const Modal = (props: Props) => {
                         title="Connect Wallet"
                     >
                         <Button
-                            onClick={handleConnect}
+                            onClick={handleWebWallet}
                             flexDir="column"
                             height={100}
                             p={5}
@@ -79,6 +84,22 @@ export const Modal = (props: Props) => {
                             </Icon>
                             <Text>
                                 Web Wallet
+                            </Text>
+                        </Button>
+                        <Button
+                            onClick={handleWalletConnect}
+                            flexDir="column"
+                            height={100}
+                            p={5}
+                            bgColor="main.primary"
+                            color="text.secondary"
+                            _hover = {{
+                                bgColor: "main.primary_hover"
+                            }}
+                        >
+                            <img src={walletConnectLogo} alt="Wallet Connect Logo"/>
+                            <Text>
+                                Wallet Connect
                             </Text>
                         </Button>
                     </Content>
