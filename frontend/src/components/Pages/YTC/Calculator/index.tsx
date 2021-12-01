@@ -85,8 +85,8 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
                 }
             }
             
-            const signer = provider.getSigner(account);
-            simulateYTCForCompoundRange(userData, elementAddresses, compoundRange, signer).then(
+            // const signer = provider.getSigner(account);
+            simulateYTCForCompoundRange(userData, elementAddresses, compoundRange, provider).then(
                 (results) => {
                     setSimulationResults(() => {
                         return results;
@@ -484,12 +484,12 @@ const Form: React.FC<FormProps> = (props) => {
             </Flex>
             <AdvancedCollapsable/>
         </Card>
-        <SimulateButton
+        <ApproveAndSimulateButton
             formErrors={formik.errors}
-            // tokenAddress={formik.values.tokenAddress}
-            // tokenName={getTokenNameByAddress(formik.values.tokenAddress)}
-            // trancheAddress={formik.values.trancheAddress}
-            // amount={formik.values.amount}
+            tokenAddress={formik.values.tokenAddress}
+            tokenName={getTokenNameByAddress(formik.values.tokenAddress)}
+            trancheAddress={formik.values.trancheAddress}
+            amount={formik.values.amount}
             rounded="full"
             bgColor="main.primary"
             color="text.secondary"

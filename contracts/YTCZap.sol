@@ -7,8 +7,6 @@ import "./balancer-core-v2/lib/openzeppelin/IERC20.sol";
 import "./balancer-core-v2/lib/openzeppelin/SafeMath.sol";
 import "./balancer-core-v2/lib/openzeppelin/SafeERC20.sol";
 
-
-
 /// @notice yield token compounding without having to swap to basetokens from ETH manually
 contract YTCZap {
     using SafeMath for uint256;
@@ -18,6 +16,13 @@ contract YTCZap {
 
     constructor(address _ytcAddress){
         ytcContract = IYieldTokenCompounding(_ytcAddress);
+    }
+
+    // no-one other than the blackhole address should be able to call this contract
+    // It will eat your tokens!!!
+    modifier onlyBlackHole {
+        require(msg.sender == address(0));
+        _;
     }
 
     struct YTCInputs {
@@ -43,7 +48,7 @@ contract YTCZap {
         address _yieldToken,
         bytes calldata _zapCallData,
         address payable _zapperContract
-    ) external payable returns (uint256, uint256) {
+    ) external payable onlyBlackHole returns (uint256, uint256) {
 
         YTCInputs memory ytcInputs;
 
@@ -75,12 +80,6 @@ contract YTCZap {
         {
             (yieldTokensReceived, baseTokensSpent ) = ytcContract.compound(ytcInputs.n, ytcInputs.trancheAddress, ytcInputs.balancerPoolId, ytcInputs.amount, ytcInputs.expectedYtOutput, ytcInputs.expectedBaseTokensSpent);
         }
-
-        // transfer yieldTokens back to msg.sender
-        IERC20(_yieldToken).safeTransfer(msg.sender, yieldTokensReceived);
-
-        // transfer baseTokens to msg.sender
-        IERC20(_baseToken).safeTransfer(msg.sender, amount - baseTokensSpent);
 
         return (yieldTokensReceived, baseTokensSpent);
     }

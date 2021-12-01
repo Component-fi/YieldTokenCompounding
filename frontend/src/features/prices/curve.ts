@@ -14,36 +14,36 @@ export const isCurveToken = (x: any): x is CurveTokenName => {
     return validCurveTokens.includes(x);
 }
 
-export const getPriceOfCurveLP = async (tokenName: string, elementAddresses: ElementAddresses ,signer: Signer) => {
+export const getPriceOfCurveLP = async (tokenName: string, elementAddresses: ElementAddresses, signerOrProvider: Signer | ethers.providers.Provider) => {
     const tokenAddress = elementAddresses.tokens[tokenName];
 
     if (!tokenAddress){
         throw new Error('Could not find token address of ' + tokenName)
     }
 
-    const swapAddress = await getCurveSwapAddress(tokenAddress, signer);
+    const swapAddress = await getCurveSwapAddress(tokenAddress, signerOrProvider);
 
     if (!swapAddress){
         throw new Error('Could not find swap address for curve token ' + tokenName)
     }
 
-    const virtualPrice: number = await getCurveVirtualPrice(swapAddress, signer);
+    const virtualPrice: number = await getCurveVirtualPrice(swapAddress, signerOrProvider);
     // get the price of the underlying assets
-    const basePrice: number = await getBasePrice(tokenName, swapAddress, signer)
+    const basePrice: number = await getBasePrice(tokenName, swapAddress, signerOrProvider)
 
     // get the price of 
     return basePrice * virtualPrice;
 }
 
-const getBasePrice = async (tokenName: string, swapAddress: string, signer: Signer): Promise<number> => {
+const getBasePrice = async (tokenName: string, swapAddress: string, signerOrProvider: Signer | ethers.providers.Provider): Promise<number> => {
     let basePrice: number;
     let ethPrice;
     switch(tokenName){
         case "crv3crypto": 
-            basePrice = await getTriCryptoPrice(swapAddress, signer);
+            basePrice = await getTriCryptoPrice(swapAddress, signerOrProvider);
             break;
         case "crvtricrypto": 
-            basePrice = await getTriCryptoPrice(swapAddress, signer);
+            basePrice = await getTriCryptoPrice(swapAddress, signerOrProvider);
             break;
         case "stecrv": 
             ethPrice = await getRelativePriceFromCoingecko("eth", "usd")
@@ -67,11 +67,11 @@ const getBasePrice = async (tokenName: string, swapAddress: string, signer: Sign
     return basePrice;
 }
 
-const getCurveVirtualPrice = async (tokenAddress: string, signer: Signer): Promise<number> => {
+const getCurveVirtualPrice = async (tokenAddress: string, signerOrProvider: Signer | ethers.providers.Provider): Promise<number> => {
     // get the curve pool contract
     const curveAbi = ICurveFi.abi;
     // get the number of decimals
-    const curveContract = new Contract(tokenAddress, curveAbi, signer) as ICurveType;
+    const curveContract = new Contract(tokenAddress, curveAbi, signerOrProvider) as ICurveType;
 
     const virtualPriceAbsolute = await curveContract.get_virtual_price();
 
@@ -82,10 +82,10 @@ const getCurveVirtualPrice = async (tokenAddress: string, signer: Signer): Promi
     return virtualPriceNormalized;
 }
 
-const getTriCryptoPrice = async (tokenAddress: string, signer: Signer): Promise<number> => {
+const getTriCryptoPrice = async (tokenAddress: string, signerOrProvider: Signer | ethers.providers.Provider): Promise<number> => {
     const curveAbi = ICurveFi.abi;
 
-    const curveContract = new Contract(tokenAddress, curveAbi, signer) as ICurveType;
+    const curveContract = new Contract(tokenAddress, curveAbi, signerOrProvider) as ICurveType;
 
     const lpTokenAddress = await curveContract.token();
 
@@ -93,7 +93,7 @@ const getTriCryptoPrice = async (tokenAddress: string, signer: Signer): Promise<
 
     const erc20Abi = ERC20.abi;
 
-    const erc20Contract = new Contract(lpTokenAddress, erc20Abi, signer) as ERC20Type;
+    const erc20Contract = new Contract(lpTokenAddress, erc20Abi, signerOrProvider) as ERC20Type;
 
     const totalSupplyAbsolute = await erc20Contract.totalSupply();
 
@@ -111,10 +111,10 @@ const getTriCryptoPrice = async (tokenAddress: string, signer: Signer): Promise<
 
 // Some curve lp contracts are both the erc20 and the swap pool contract, some have this functionality separated
 // When there are two contracts the ERC20 token will have a minter variable that contains the address of the swap contract
-export const getCurveSwapAddress = async (tokenAddress: string, signer: Signer): Promise<string> => {
+export const getCurveSwapAddress = async (tokenAddress: string, signerOrProvider: Signer | ethers.providers.Provider): Promise<string> => {
     const erc20MinterAbi = IERC20Minter.abi;
 
-    const erc20Contract = new Contract(tokenAddress, erc20MinterAbi, signer) as IERC20MinterType;
+    const erc20Contract = new Contract(tokenAddress, erc20MinterAbi, signerOrProvider) as IERC20MinterType;
 
     try {
         const minter = await erc20Contract.minter()

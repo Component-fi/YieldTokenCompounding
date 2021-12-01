@@ -75,7 +75,7 @@ export interface YTCParameters {
 // param elementAddresses, constant containing the deployment addresses of tokens vaults and pools
 // param signer, the signer of the transaction
 // Returns, YTC parameters, a ytc contract instance, the balancer pool, decimals for tokens, the name of the yield token ...etc
-export const getYTCParameters = async (userData: YTCInput, elementAddresses: ElementAddresses, signer: Signer): Promise<YTCParameters> => {
+export const getYTCParameters = async (userData: YTCInput, elementAddresses: ElementAddresses, signerOrProvider: Signer | ethers.providers.Provider): Promise<YTCParameters> => {
     const ytcAbi = YieldTokenCompounding.abi;
     const erc20Abi = ERC20.abi;
     const trancheAbi = ITranche.abi;
@@ -104,26 +104,22 @@ export const getYTCParameters = async (userData: YTCInput, elementAddresses: Ele
     const balancerPoolId = trancheDetails.ptPool.poolId;    
     
     // Load contracts
-    const ytc = new ethers.Contract(yieldTokenCompoundingAddress, ytcAbi, signer);
-    const tranche: ITrancheType = (new ethers.Contract(trancheAddress, trancheAbi, signer)) as ITrancheType;
+    const ytc = new ethers.Contract(yieldTokenCompoundingAddress, ytcAbi, signerOrProvider);
+    const tranche: ITrancheType = (new ethers.Contract(trancheAddress, trancheAbi, signerOrProvider)) as ITrancheType;
     const trancheExpiration = trancheDetails.expiration;
     const yieldTokenAddress = await tranche.interestToken();
-    const yieldToken: ERC20Type = (new ethers.Contract(yieldTokenAddress, erc20Abi, signer)) as ERC20Type;
+    const yieldToken: ERC20Type = (new ethers.Contract(yieldTokenAddress, erc20Abi, signerOrProvider)) as ERC20Type;
     const ytSymbol = await yieldToken.symbol();
     const yieldTokenDecimals = ethers.BigNumber.from(await yieldToken.decimals()).toNumber();
-    const baseToken: ERC20Type = new ethers.Contract(baseTokenAddress, erc20Abi, signer) as ERC20Type;
+    const baseToken: ERC20Type = new ethers.Contract(baseTokenAddress, erc20Abi, signerOrProvider) as ERC20Type;
     const baseTokenDecimals = ethers.BigNumber.from(await baseToken.decimals()).toNumber();
 
-    const baseTokenBalance = await baseToken.balanceOf(await signer.getAddress());
     const amountCollateralDespositedAbsolute = ethers.utils.parseUnits(userData.amountCollateralDeposited.toString(), baseTokenDecimals);
 
     // if the suggested amount is greater than the total amount, return the total amount instead
     let amount = amountCollateralDespositedAbsolute;
-    if (amountCollateralDespositedAbsolute.sub(baseTokenBalance).gt(0)){
-        amount = baseTokenBalance;
-    }
 
-    const ethToBaseToken = await ethToBaseTokenRate(baseTokenName, elementAddresses, signer);
+    const ethToBaseToken = await ethToBaseTokenRate(baseTokenName, elementAddresses, signerOrProvider);
 
     return {
         ytc,
@@ -210,9 +206,9 @@ export const getTokenNameByAddress = (address: string, tokens: {[name: string]: 
     return result && result[0]
 }
 
-const ethToBaseTokenRate = async (baseTokenName: string, elementAddresses: ElementAddresses, signer: Signer) => {
-    const baseTokenPrice = await getTokenPrice(baseTokenName, elementAddresses, signer);
-    const ethPrice =  await getTokenPrice("eth", elementAddresses, signer);
+const ethToBaseTokenRate = async (baseTokenName: string, elementAddresses: ElementAddresses, signerOrProvider: Signer | ethers.providers.Provider) => {
+    const baseTokenPrice = await getTokenPrice(baseTokenName, elementAddresses, signerOrProvider);
+    const ethPrice =  await getTokenPrice("eth", elementAddresses, signerOrProvider);
 
     return (ethPrice/baseTokenPrice);
 

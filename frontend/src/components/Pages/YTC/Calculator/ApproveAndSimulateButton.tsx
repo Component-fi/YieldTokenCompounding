@@ -21,18 +21,18 @@ export const ApproveAndSimulateButton: React.FC<ApproveAndSimulateButtonProps & 
         trancheAddress={trancheAddress}
         {...rest}
     >
-        <ERC20Approval
+        {/* <ERC20Approval
             tokenAddress={tokenAddress}
             tokenName={tokenName}
             approvalAddress={deployments.YieldTokenCompounding}
             amount={undefined}
             {...rest}
-        >
+        > */}
             <SimulateButton 
                 formErrors={formErrors}
                 {...rest}
             />
-        </ERC20Approval>
+        {/* </ERC20Approval> */}
     </BalancerApproval>
 }
 

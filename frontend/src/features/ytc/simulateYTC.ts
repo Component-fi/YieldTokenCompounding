@@ -1,5 +1,6 @@
 import { getCurves } from "crypto";
 import { BigNumber, Contract, ethers, Signer } from "ethers";
+import { Provider } from '@ethersproject/providers';
 import _ from "lodash";
 import { GAS_LIMITS } from "../../constants/gasLimits";
 import { ElementAddresses } from "../../types/manual/types";
@@ -8,6 +9,7 @@ import { getZapInData, getZapSwapData } from "../zapper/getTransactionData";
 import { getYTCParameters, YTCInput, YTCOutput, YTCParameters } from "./ytcHelpers";
 import { YTCZap as YTCZapType } from "../../hardhat/typechain/YTCZap";
 import YTCZap from "../../artifacts/contracts/YTCZap.sol/YTCZap.json";
+import { parseEther } from "ethers/lib/utils";
 
 const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
@@ -102,15 +104,15 @@ export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balan
     }
 }
 
-export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate}: YTCParameters, userData: YTCInput, signer: Signer): Promise<YTCOutput> => {
+export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate}: YTCParameters, userData: YTCInput, signerOrProvider: Signer | Provider): Promise<YTCOutput> => {
 
     let zapResponse;
     const zapAddress = "0x867fe1461fc8A8A536AB0420FA866eEe19622a7d";
 
-    const ytcZap = new Contract(zapAddress, YTCZap.abi, signer);
+    const ytcZap = new Contract(zapAddress, YTCZap.abi, signerOrProvider);
 
     if (isCurveToken(baseTokenName)){
-        const poolAddress = await getCurveSwapAddress(userData.baseTokenAddress, signer);
+        const poolAddress = await getCurveSwapAddress(userData.baseTokenAddress, signerOrProvider);
 
         zapResponse = await getZapInData({
             ownerAddress: ytc.address,
@@ -127,9 +129,10 @@ export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExp
             sellAmount: ethers.utils.parseEther("100"),
         })
     }
+    console.log(zapResponse);
 
     try {
-        var returnedVals = await ytcZap.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, userData.baseTokenAddress, ytAddress, zapResponse.data, zapResponse.to);
+        var returnedVals = await ytcZap.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, userData.baseTokenAddress, ytAddress, zapResponse.data, zapResponse.to, ({from: ZERO_ADDRESS, value: parseEther("100")}));
     } catch (e) {
         console.error(e);
         throw e;
@@ -140,7 +143,7 @@ export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExp
     // TODO this is using the mean of hardcoded gas estimations
     const gasAmountEstimate = BigNumber.from(GAS_LIMITS[userData.numberOfCompounds])
 
-    const ethGasFees = await gasLimitToEthGasFee(signer, gasAmountEstimate);
+    const ethGasFees = await gasLimitToEthGasFee(signerOrProvider, gasAmountEstimate);
 
     const gasFeesInBaseToken = ethToBaseTokenRate * ethGasFees;
 
@@ -188,9 +191,9 @@ export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExp
 // param compound Range, the lowest, and largest number of compounds for the simulation to execute
 // param signer, Signer of the transaction
 // Returns YTCOutput[], an array of yield token compounding outputs
-export const simulateYTCForCompoundRange = async (userData: YTCInput, constants: ElementAddresses, compoundRange: [number, number], signer: Signer): Promise<YTCOutput[]> => {
+export const simulateYTCForCompoundRange = async (userData: YTCInput, constants: ElementAddresses, compoundRange: [number, number], signerOrProvider: Signer | ethers.providers.Provider): Promise<YTCOutput[]> => {
 
-    const yieldCalculationParameters = await getYTCParameters(userData, constants, signer);
+    const yieldCalculationParameters = await getYTCParameters(userData, constants, signerOrProvider);
 
     const promises =  _.range(compoundRange[0], compoundRange[1] + 1).map((index) => {
         const data: YTCInput = { 
@@ -201,7 +204,7 @@ export const simulateYTCForCompoundRange = async (userData: YTCInput, constants:
         return simulateYTCZap(
             yieldCalculationParameters,
             data,
-            signer
+            signerOrProvider
         )
     })
 
@@ -246,8 +249,8 @@ export const getCompoundsFromTargetExposure = (fixedRate: number, targetExposure
 }
 
 //eslint-disable-next-line
-const gasLimitToEthGasFee = async (signer: ethers.Signer, gasAmountEstimate: ethers.BigNumber): Promise<number> => {
-    const {maxFeePerGas, maxPriorityFeePerGas} = await signer.getFeeData();
+const gasLimitToEthGasFee = async (signerOrProvider: ethers.Signer | ethers.providers.Provider, gasAmountEstimate: ethers.BigNumber): Promise<number> => {
+    const {maxFeePerGas, maxPriorityFeePerGas} = await signerOrProvider.getFeeData();
 
     if (!maxFeePerGas || !maxPriorityFeePerGas){
         throw Error('Could not get gas fees')
