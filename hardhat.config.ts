@@ -4,7 +4,6 @@ import "@nomiclabs/hardhat-ethers";
 import "hardhat-deploy-ethers";
 import "hardhat-deploy";
 import "hardhat-ethernal";
-import "@symfoni/hardhat-react";
 import "@typechain/hardhat";
 import "@typechain/ethers-v5";
 
@@ -55,11 +54,11 @@ task("clean", "Clears the cache and deletes all artifacts",  async (args, hre, r
  * @type import('hardhat/config').HardhatUserConfig
  */
 const config: HardhatUserConfig = {
-  react: {
-    providerPriority: ["web3modal", "hardhat"],
+  typechain: {
+    outDir: "frontend/src/hardhat/typechain",
+    target: "ethers-v5",
   },
   paths: {
-    react: "./frontend/src/hardhat",
     sources: "./contracts",
     artifacts: "./frontend/src/artifacts",
     tests: "./test",
@@ -69,7 +68,6 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
-      inject: false, // optional. If true, it will EXPOSE your mnemonic in your frontend code. Then it would be available as an "in-page browser wallet" / signer which can sign without confirmation.
       hardfork: "london",
       accounts: [
         {
