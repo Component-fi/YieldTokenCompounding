@@ -8,16 +8,13 @@ import "./balancer-core-v2/lib/openzeppelin/SafeMath.sol";
 import "./balancer-core-v2/lib/openzeppelin/SafeERC20.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 
-/// @notice yield token compounding without having to swap to basetokens from ETH manually
+/// @notice Yield token compounding without having to swap to basetokens from ETH manually
+// Only available to users to
 contract YTCZap {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    constructor(){
-    }
-
     // no-one other than the blackhole address should be able to call this contract
-    // It will eat your tokens!!!
     modifier onlyBlackHole {
         require(msg.sender == address(57005));
         _;
@@ -42,8 +39,6 @@ contract YTCZap {
         address payable zapperContract;
     }
 
-
-
     function compoundUniswap(
         address _ytcContractAddress,
         uint8 _n,
@@ -57,22 +52,17 @@ contract YTCZap {
         uint256 _deadline,
         address payable _uniswapContract
     ) external payable onlyBlackHole returns (uint256, uint256) {
-        YTCInputs memory ytcInputs;
-
-        // We need to do this in two separate blocks due to local variable limits
-        {
-            ytcInputs.ytcContract = IYieldTokenCompounding(_ytcContractAddress);
-            ytcInputs.n = _n;
-            ytcInputs.trancheAddress = _trancheAddress;
-            ytcInputs.balancerPoolId = _balancerPoolId;
-            ytcInputs.expectedYtOutput = _expectedYtOutput;
-        }
-        {
-            ytcInputs.amount = _amount;
-            ytcInputs.expectedBaseTokensSpent = _expectedBaseTokensSpent;
-            ytcInputs.baseToken = _baseToken;
-            ytcInputs.yieldToken = _yieldToken;
-        }
+        YTCInputs memory ytcInputs = _initYTCInputs(
+            _ytcContractAddress,
+            _n,
+            _trancheAddress,
+            _balancerPoolId,
+            _amount,
+            _expectedYtOutput,
+            _expectedBaseTokensSpent,
+            _baseToken,
+            _yieldToken
+        );
 
         SwapInputs memory swapInputs;
         {
@@ -100,6 +90,43 @@ contract YTCZap {
         bytes calldata _zapperCallData,
         address payable _zapperContract
     ) external payable onlyBlackHole returns (uint256, uint256) {
+
+        YTCInputs memory ytcInputs = _initYTCInputs(
+            _ytcContractAddress,
+            _n,
+            _trancheAddress,
+            _balancerPoolId,
+            _amount,
+            _expectedYtOutput,
+            _expectedBaseTokensSpent,
+            _baseToken,
+            _yieldToken
+        );
+
+        SwapInputs memory swapInputs;
+        {
+            swapInputs.zapperCallData = _zapperCallData;
+            swapInputs.zapperContract = _zapperContract;
+        }
+
+        return _compound(
+            ytcInputs,
+            swapInputs,
+            0
+        );
+    }
+
+    function _initYTCInputs(
+        address _ytcContractAddress,
+        uint8 _n,
+        address _trancheAddress,
+        bytes32 _balancerPoolId,
+        uint256 _amount,
+        uint256 _expectedYtOutput,
+        uint256 _expectedBaseTokensSpent,
+        address _baseToken,
+        address _yieldToken
+    ) internal returns (YTCInputs memory){
         YTCInputs memory ytcInputs;
 
         // We need to do this in two separate blocks due to local variable limits
@@ -117,17 +144,7 @@ contract YTCZap {
             ytcInputs.yieldToken = _yieldToken;
         }
 
-        SwapInputs memory swapInputs;
-        {
-            swapInputs.zapperCallData = _zapperCallData;
-            swapInputs.zapperContract = _zapperContract;
-        }
-
-        return _compound(
-            ytcInputs,
-            swapInputs,
-            0
-        );
+        return ytcInputs;
     }
     
     // Requires all the same inputs as YieldTokenCompoundingSwap + the address of the base token, the yield token, and the zapper information
