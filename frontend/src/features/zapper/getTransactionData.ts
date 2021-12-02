@@ -62,7 +62,7 @@ const getZapInData = async ({
   };
 
   const data = await axios
-    .get(`http://api.zapper.fi/v1/zap-in/${protocol}/transaction`, { params })
+    .get(`https://api.zapper.fi/v1/zap-in/${protocol}/transaction`, { params })
     .then((r) => {
       return r.data;
     })
