@@ -1,12 +1,11 @@
 import { DeployFunction } from 'hardhat-deploy/types';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { deployments } from '../frontend/src/constants/apy-mainnet-constants';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const [signer] = await hre.ethers.getSigners();
   const {deploy} = hre.deployments;
   console.log(`Deploying contracts using ${signer.address}`);
-
-  const ytcAddress = (await hre.deployments.get("YieldTokenCompounding")).address;
 
   if (hre.network.name === "hardhat"){
     // give 100 eth to the account 
@@ -16,12 +15,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         ])
     }
 
-    // const ytcContract = "0x3df5229f24040cf0218969c2406b302744edc18b"
-
-  // const ytc_contract = await YTC.deploy(balVault, trancheFactory, bytecodeHash);
   await deploy('YTCZap', {
     from: signer.address,
-    args: [ytcAddress],
+    args: [],
     log: true,
   });
 
