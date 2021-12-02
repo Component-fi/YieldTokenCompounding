@@ -1,20 +1,11 @@
-import { getCurves } from "crypto";
-import { BigNumber, Contract, ethers, Signer } from "ethers";
+import { BigNumber, ethers, Signer } from "ethers";
 import { Provider } from '@ethersproject/providers';
 import _ from "lodash";
 import { GAS_LIMITS } from "../../constants/gasLimits";
 import { ElementAddresses } from "../../types/manual/types";
-import { getCurveSwapAddress, isCurveToken } from "../prices/curve";
-import { getZapInData, getZapSwapData } from "../zapper/getTransactionData";
 import { getYTCParameters, YTCInput, YTCOutput, YTCParameters } from "./ytcHelpers";
-import { YTCZap as YTCZapType } from "../../hardhat/typechain/YTCZap";
-import YTCZap from "../../artifacts/contracts/YTCZap.sol/YTCZap.json";
-import { deployments } from '../../constants/apy-mainnet-constants';
-import { parseEther } from "ethers/lib/utils";
 
 const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-const BURN_ADDRESS = "0x000000000000000000000000000000000000dead";
 
 const LACK_OF_LIQUIDITY_MESSAGE = "Error: VM Exception while processing transaction: reverted with reason string 'BAL#001'";
 
@@ -106,41 +97,9 @@ export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balan
     }
 }
 
-export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate}: YTCParameters, userData: YTCInput, signerOrProvider: Signer | Provider): Promise<YTCOutput> => {
+export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate, simulate}: YTCParameters, userData: YTCInput,  signerOrProvider: Signer | Provider): Promise<YTCOutput> => {
 
-    const zapAddress = deployments.YTCZap;
-    const ytcAddress = deployments.YieldTokenCompounding;
-    const uniswapAddress = deployments.UniswapRouter;
-
-    const ytcZap = new Contract(zapAddress, YTCZap.abi, signerOrProvider);
-
-    if (isCurveToken(baseTokenName)){
-        const poolAddress = await getCurveSwapAddress(userData.baseTokenAddress, signerOrProvider);
-
-        const zapResponse = await getZapInData({
-            ownerAddress: ytc.address,
-            sellToken: ZERO_ADDRESS,
-            poolAddress,
-            sellAmount: ethers.utils.parseEther("100"),
-            protocol: "curve",
-        })
-
-        try {
-            var returnedVals = await ytcZap.callStatic.compoundZapper(ytcAddress, userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, userData.baseTokenAddress, ytAddress, zapResponse.data, zapResponse.to, ({from: BURN_ADDRESS, value: parseEther("100")}));
-        } catch (e) {
-            console.error(e);
-            throw e;
-        }
-    } else {
-        try {
-            var returnedVals = await ytcZap.callStatic.compoundUniswap(ytcAddress, userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, userData.baseTokenAddress, ytAddress, MAX_UINT_HEX, uniswapAddress, ({from: BURN_ADDRESS, value: parseEther("100")}))
-        } catch (e) {
-            console.error(e);
-            throw e;
-        }
-    }
-
-
+    const returnedVals = await simulate(userData.numberOfCompounds);
     // Estimate the required amount of gas, this is likely very imprecise
     // const gasAmountEstimate = await ytc.estimateGas.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0");
     // TODO this is using the mean of hardcoded gas estimations
