@@ -22,9 +22,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     var data = JSON.parse(fs.readFileSync("./constants/mainnet-constants.json").toString());
   }
 
-  const artifact = hre.deployments.getArtifact("YTCEth");
-  console.log(artifact);
-
   // const bytecodeHash = ethers.utils.solidityKeccak256(["bytes"], [data.trancheBytecode]);
   const balVault = data.balancerVault;
   // const trancheFactory = data.trancheFactory;
