@@ -40,7 +40,9 @@ export const validCurveTokens = [
 export const validCoingeckoTokens = Object.keys(COINGECKO_TOKEN_NAME_TRANSLATION);
 
 export const deployments = {
-    YieldTokenCompounding: "0x3df5229f24040cf0218969c2406b302744edc18b"
+    YieldTokenCompounding: "0x3df5229f24040cf0218969c2406b302744edc18b",
+    YTCZap: "0x867fe1461fc8A8A536AB0420FA866eEe19622a7d",
+    UniswapRouter: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
 }
 
 export const overrides = {from: "0xbdd495978d814Fe1E64aEc34E71E43cB5F6876Cb"}

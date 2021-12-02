@@ -9,10 +9,12 @@ import { getZapInData, getZapSwapData } from "../zapper/getTransactionData";
 import { getYTCParameters, YTCInput, YTCOutput, YTCParameters } from "./ytcHelpers";
 import { YTCZap as YTCZapType } from "../../hardhat/typechain/YTCZap";
 import YTCZap from "../../artifacts/contracts/YTCZap.sol/YTCZap.json";
+import { deployments } from '../../constants/apy-mainnet-constants';
 import { parseEther } from "ethers/lib/utils";
 
 const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+const BURN_ADDRESS = "0x000000000000000000000000000000000000dead";
 
 const LACK_OF_LIQUIDITY_MESSAGE = "Error: VM Exception while processing transaction: reverted with reason string 'BAL#001'";
 
@@ -106,37 +108,38 @@ export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balan
 
 export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate}: YTCParameters, userData: YTCInput, signerOrProvider: Signer | Provider): Promise<YTCOutput> => {
 
-    let zapResponse;
-    const zapAddress = "0x867fe1461fc8A8A536AB0420FA866eEe19622a7d";
+    const zapAddress = deployments.YTCZap;
+    const ytcAddress = deployments.YieldTokenCompounding;
+    const uniswapAddress = deployments.UniswapRouter;
 
     const ytcZap = new Contract(zapAddress, YTCZap.abi, signerOrProvider);
 
     if (isCurveToken(baseTokenName)){
         const poolAddress = await getCurveSwapAddress(userData.baseTokenAddress, signerOrProvider);
 
-        zapResponse = await getZapInData({
+        const zapResponse = await getZapInData({
             ownerAddress: ytc.address,
             sellToken: ZERO_ADDRESS,
             poolAddress,
             sellAmount: ethers.utils.parseEther("100"),
             protocol: "curve",
         })
-    } else {
-        zapResponse = await getZapSwapData({
-            ownerAddress: ytc.address,
-            sellToken: ZERO_ADDRESS,
-            buyToken: userData.baseTokenAddress,
-            sellAmount: ethers.utils.parseEther("100"),
-        })
-    }
-    console.log(zapResponse);
 
-    try {
-        var returnedVals = await ytcZap.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, userData.baseTokenAddress, ytAddress, zapResponse.data, zapResponse.to, ({from: ZERO_ADDRESS, value: parseEther("100")}));
-    } catch (e) {
-        console.error(e);
-        throw e;
+        try {
+            var returnedVals = await ytcZap.callStatic.compoundZapper(ytcAddress, userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, userData.baseTokenAddress, ytAddress, zapResponse.data, zapResponse.to, ({from: BURN_ADDRESS, value: parseEther("100")}));
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
+    } else {
+        try {
+            var returnedVals = await ytcZap.callStatic.compoundUniswap(ytcAddress, userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX, userData.baseTokenAddress, ytAddress, MAX_UINT_HEX, uniswapAddress, ({from: BURN_ADDRESS, value: parseEther("100")}))
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
     }
+
 
     // Estimate the required amount of gas, this is likely very imprecise
     // const gasAmountEstimate = await ytc.estimateGas.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0");
