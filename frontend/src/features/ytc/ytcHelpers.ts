@@ -146,13 +146,13 @@ export const getYTCParameters = async (userData: YTCInput, elementAddresses: Ele
             ownerAddress: ytc.address,
             sellToken: ZERO_ADDRESS,
             poolAddress,
-            sellAmount: ethers.utils.parseEther("100"),
+            sellAmount: ethers.utils.parseEther("3000"),
             protocol: "curve",
         })
 
-        simulate = async (n: number) => { return await ytcZap.callStatic.compoundZapper(ytcAddress, n, trancheAddress, balancerPoolId, amount, "0", MAX_UINT_HEX, userData.baseTokenAddress, yieldTokenAddress, zapResponse.data, zapResponse.to, ({from: BURN_ADDRESS, value: parseEther("100")}))};
+        simulate = async (n: number) => { return await ytcZap.callStatic.compoundZapper(ytcAddress, n, trancheAddress, balancerPoolId, amount, "0", MAX_UINT_HEX, userData.baseTokenAddress, yieldTokenAddress, zapResponse.data, zapResponse.to, ({from: BURN_ADDRESS, value: parseEther("3000")}))};
     } else {
-        simulate = async (n: number) => { return await ytcZap.callStatic.compoundUniswap(ytcAddress, n, trancheAddress, balancerPoolId, amount, "0", MAX_UINT_HEX, userData.baseTokenAddress, yieldTokenAddress, MAX_UINT_HEX, uniswapAddress, ({from: BURN_ADDRESS, value: parseEther("100")}))};
+        simulate = async (n: number) => { return await ytcZap.callStatic.compoundUniswap(ytcAddress, n, trancheAddress, balancerPoolId, amount, "0", MAX_UINT_HEX, userData.baseTokenAddress, yieldTokenAddress, MAX_UINT_HEX, uniswapAddress, ({from: BURN_ADDRESS, value: parseEther("3000")}))};
     }
 
     return {
