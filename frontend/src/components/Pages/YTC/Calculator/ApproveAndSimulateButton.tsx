@@ -1,7 +1,8 @@
 import { Button, ButtonProps, Spinner } from "@chakra-ui/react";
-import { BalancerApproval } from "../../../../features/approval/Approval";
+import { BalancerApproval, ERC20Approval } from "../../../../features/approval/Approval";
 import { useRecoilValue } from 'recoil';
 import { isSimulatedSelector, isSimulatingAtom } from "../../../../recoil/simulationResults/atom";
+import { deployments } from "../../../../constants/apy-mainnet-constants";
 
 interface ApproveAndSimulateButtonProps {
     tokenAddress: string | undefined;
@@ -20,19 +21,38 @@ export const ApproveAndSimulateButton: React.FC<ApproveAndSimulateButtonProps & 
         trancheAddress={trancheAddress}
         {...rest}
     >
-        {/* <ERC20Approval
+            <SimulateButton 
+                formErrors={formErrors}
+                {...rest}
+            />
+    </BalancerApproval>
+}
+
+interface ApproveAndConfirmButtonProps {
+    tokenAddress: string | undefined;
+    tokenName: string | undefined;
+    isLoading: boolean;
+    handleExecuteTransaction: () => void;
+}
+
+export const ApproveAndConfirmButton: React.FC<ApproveAndConfirmButtonProps & ButtonProps> = (props) => {
+
+    const { tokenAddress, tokenName, isLoading, handleExecuteTransaction, ...rest } = props;
+
+        return <ERC20Approval
             tokenAddress={tokenAddress}
             tokenName={tokenName}
             approvalAddress={deployments.YieldTokenCompounding}
             amount={undefined}
             {...rest}
-        > */}
-            <SimulateButton 
-                formErrors={formErrors}
+        >
+            <Button
+                onClick={handleExecuteTransaction}
                 {...rest}
-            />
-        {/* </ERC20Approval> */}
-    </BalancerApproval>
+            >
+                {isLoading ? <Spinner/> : "CONFIRM TRANSACTION"}
+            </Button>
+        </ERC20Approval>
 }
 
 interface SimulateButtonProps {
