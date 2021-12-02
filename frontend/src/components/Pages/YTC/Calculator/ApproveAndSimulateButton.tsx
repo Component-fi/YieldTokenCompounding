@@ -1,8 +1,7 @@
 import { Button, ButtonProps, Spinner } from "@chakra-ui/react";
-import { BalancerApproval, ERC20Approval } from "../../../../features/approval/Approval";
+import { BalancerApproval } from "../../../../features/approval/Approval";
 import { useRecoilValue } from 'recoil';
 import { isSimulatedSelector, isSimulatingAtom } from "../../../../recoil/simulationResults/atom";
-import {deployments} from '../../../../constants/apy-mainnet-constants';
 
 interface ApproveAndSimulateButtonProps {
     tokenAddress: string | undefined;

@@ -10,6 +10,14 @@ import { getTokenPrice } from "../prices";
 import { getUnderlyingTotal } from "../element/wrappedPositionAmount";
 import { getPrincipalTotal } from "../element/principalTotal";
 import { getYieldTotal } from "../element/yieldTotal";
+import { deployments } from "../../constants/apy-mainnet-constants";
+import YTCZap from "../../artifacts/contracts/YTCZap.sol/YTCZap.json";
+import { getCurveSwapAddress, isCurveToken } from "../prices/curve";
+import { getZapInData } from "../zapper/getTransactionData";
+import { parseEther } from "ethers/lib/utils";
+const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+const BURN_ADDRESS = "0x000000000000000000000000000000000000dead";
 
 export interface YTCInput {
     baseTokenAddress: string;
@@ -68,6 +76,7 @@ export interface YTCParameters {
     ytSymbol: string;
     ytAddress: string;
     ethToBaseTokenRate: number;
+    simulate: (n: number) => Promise<any[]>;
 }
 
 // helper function to retrieve parameters required for running the YTC transaction
@@ -121,6 +130,31 @@ export const getYTCParameters = async (userData: YTCInput, elementAddresses: Ele
 
     const ethToBaseToken = await ethToBaseTokenRate(baseTokenName, elementAddresses, signerOrProvider);
 
+    const zapAddress = deployments.YTCZap;
+    const ytcAddress = deployments.YieldTokenCompounding;
+    const uniswapAddress = deployments.UniswapRouter;
+
+    const ytcZap = new Contract(zapAddress, YTCZap.abi, signerOrProvider);
+
+
+
+    let simulate;
+    if (isCurveToken(baseTokenName)){
+        const poolAddress = await getCurveSwapAddress(userData.baseTokenAddress, signerOrProvider);
+
+        const zapResponse = await getZapInData({
+            ownerAddress: ytc.address,
+            sellToken: ZERO_ADDRESS,
+            poolAddress,
+            sellAmount: ethers.utils.parseEther("100"),
+            protocol: "curve",
+        })
+
+        simulate = async (n: number) => { return await ytcZap.callStatic.compoundZapper(ytcAddress, n, trancheAddress, balancerPoolId, amount, "0", MAX_UINT_HEX, userData.baseTokenAddress, yieldTokenAddress, zapResponse.data, zapResponse.to, ({from: BURN_ADDRESS, value: parseEther("100")}))};
+    } else {
+        simulate = async (n: number) => { return await ytcZap.callStatic.compoundUniswap(ytcAddress, n, trancheAddress, balancerPoolId, amount, "0", MAX_UINT_HEX, userData.baseTokenAddress, yieldTokenAddress, MAX_UINT_HEX, uniswapAddress, ({from: BURN_ADDRESS, value: parseEther("100")}))};
+    }
+
     return {
         ytc,
         trancheAddress,
@@ -133,6 +167,7 @@ export const getYTCParameters = async (userData: YTCInput, elementAddresses: Ele
         ytSymbol,
         ytAddress: yieldTokenAddress,
         ethToBaseTokenRate: ethToBaseToken,
+        simulate
     }
 
 }

@@ -15,7 +15,7 @@ import { BaseTokenPriceTag } from "../../../Prices";
 import Card from "../../../Reusable/Card";
 import { simulateYTCForCompoundRange } from "../../../../features/ytc/simulateYTC";
 import { getVariableAPY } from '../../../../features/prices/yearn';
-import { ApproveAndSimulateButton, SimulateButton } from "./ApproveAndSimulateButton";
+import { ApproveAndSimulateButton } from "./ApproveAndSimulateButton";
 import { TrancheDetails } from "./Tranche";
 import { TokenIcon } from "../../../Tokens/TokenIcon";
 import { InfoTooltip } from "../../../Reusable/Tooltip";
