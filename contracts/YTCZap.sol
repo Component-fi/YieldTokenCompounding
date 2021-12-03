@@ -120,7 +120,7 @@ contract YTCZap {
         uint256 _expectedBaseTokensSpent,
         address _baseToken,
         address _yieldToken
-    ) internal returns (YTCInputs memory){
+    ) internal pure returns (YTCInputs memory){
         YTCInputs memory ytcInputs;
 
         // We need to do this in two separate blocks due to local variable limits
@@ -156,7 +156,7 @@ contract YTCZap {
 
             // execute the correct swap based on the type
             if (_type == 0){
-                _executeCurveSwap(msg.value, ytcInputs.baseToken, swapInputs.zapperContract, swapInputs.zapperCallData);
+                _executeCurveSwap(msg.value, swapInputs.zapperContract, swapInputs.zapperCallData);
             } else if (_type == 1){
                 _executeUniswapSwap(msg.value, ytcInputs.baseToken, ytcInputs.amount, swapInputs.deadline, swapInputs.uniswapContract);
             }
@@ -187,7 +187,7 @@ contract YTCZap {
         return (yieldTokensReceived, baseTokensSpent);
     }
     
-    function _executeCurveSwap(uint256 _value, address _baseToken, address payable _zapperContract, bytes memory _zapperCallData) private {
+    function _executeCurveSwap(uint256 _value, address payable _zapperContract, bytes memory _zapperCallData) private {
         (bool success, ) = _zapperContract.call{value: _value}(_zapperCallData);
 
         require(success, "Zap Failed");
