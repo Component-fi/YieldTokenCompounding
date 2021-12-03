@@ -11,6 +11,11 @@ export const simulationResultsAtom = atom({
     default: [] as YTCOutput[],
 })
 
+export const selectedSimulationAtom = atom<number | undefined>({
+    key: 'selectedSimulation',
+    default: undefined,
+})
+
 // This atom is used to set whether or not a ytc simulation is underway
 export const isSimulatingAtom = atom({
     key: 'isSimulating',
@@ -48,5 +53,20 @@ export const calculatorGainSelector = selector({
             return simulationResults
         }
 
+    }
+})
+
+export const selectedCalculatorGainSelector = selector({
+    key: 'selectedCalculatorGain',
+    get: ({get}) => {
+        const calculatedGain = get(calculatorGainSelector);
+
+        const selectedSimulation = get(selectedSimulationAtom);
+
+        if (selectedSimulation && calculatedGain.length > selectedSimulation){
+            return calculatedGain[selectedSimulation];
+        } else {
+            return undefined;
+        }
     }
 })

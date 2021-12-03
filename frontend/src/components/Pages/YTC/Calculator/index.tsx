@@ -51,7 +51,7 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
     const [balance, setBalance] = useState<number | undefined>(undefined);
     const [variableApy, setVariableApy] = useState<number | undefined>(undefined);
 
-    const handleSubmit = (values: FormFields, formikHelpers: FormikHelpers<FormFields>) => {
+    const handleSimulate = (values: FormFields, formikHelpers: FormikHelpers<FormFields>) => {
         const ytcContractAddress = deployments.YieldTokenCompounding;
 
         if (
@@ -130,7 +130,7 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
 
             <Formik
                 initialValues={initialValues}
-                onSubmit={handleSubmit}
+                onSubmit={handleSimulate}
                 validationSchema={
                     Yup.object({
                         amount: Yup.number().nullable()
@@ -449,7 +449,6 @@ const Form: React.FC<FormProps> = (props) => {
                             name="amount"
                             onBlur={formik.handleBlur}
                             value={formik.values.amount}
-                            // variant="filled"
                             placeholder={"0.0"}
                             onChange={formik.handleChange}
                             id="amount-input"/>
