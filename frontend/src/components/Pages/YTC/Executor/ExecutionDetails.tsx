@@ -57,16 +57,10 @@ export const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
         />
         <DetailItem
             name={
-                <Flex flexDir="row" alignItems="center" gridGap={1}>
-                    <Text>
-                        Estimated Gain
-                    </Text>
-                    <InfoTooltip
-                        label={copy.tooltips.estimated_gain_detail}
-                        w={2}
-                        h={2}
-                    />
-                </Flex>
+                <TextAndTooltip
+                    text="Estimated Gain"
+                    tooltip={copy.tooltips.estimated_gain_detail}
+                />
             }
             value={netGain ? 
                 <Flex
@@ -86,16 +80,10 @@ export const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
         />
         <DetailItem
             name={
-                <Flex flexDir="row" alignItems="center" gridGap={1}>
-                    <Text>
-                        Return on Investment
-                    </Text>
-                    <InfoTooltip
-                        w={2}
-                        h={2}
-                        label={copy.tooltips.roi}
-                    />
-                </Flex>
+                <TextAndTooltip
+                    text="Return on Investment"
+                    tooltip={copy.tooltips.roi}
+                />
             }
             value={roi ? 
                 <Text
@@ -107,16 +95,10 @@ export const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
         />
         <DetailItem
             name={
-                <Flex flexDir="row" alignItems="center" gridGap={1}>
-                    <Text>
-                        APR
-                    </Text>
-                    <InfoTooltip
-                        w={2}
-                        h={2}
-                        label={copy.tooltips.apr}
-                    />
-                </Flex>
+                <TextAndTooltip
+                    text="APR"
+                    tooltip={copy.tooltips.apr}
+                />
             }
             value={apr ? 
                 <Text
@@ -133,16 +115,10 @@ export const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
         <Collapse in={show}>
             <DetailItem
                 name={
-                    <Flex flexDir="row" alignItems="center" gridGap={1}>
-                        <Text>
-                            Minimum YT Received
-                        </Text>
-                        <InfoTooltip
-                            w={2}
-                            h={2}
-                            label={copy.tooltips.minimum_yt_received}
-                        />
-                    </Flex>
+                    <TextAndTooltip
+                        text="Minimum YT Received"
+                        tooltip={copy.tooltips.minimum_yt_received}
+                    />
                 }
                 value={
                     <Flex flexDir="row" gridGap={1}>
@@ -159,16 +135,10 @@ export const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
             />
             <DetailItem
                 name={
-                    <Flex flexDir="row" alignItems="center" gridGap={1}>
-                        <Text>
-                            Estimated Redemption
-                        </Text>
-                        <InfoTooltip
-                            w={2}
-                            h={2}
-                            label={copy.tooltips.estimated_redemption}
-                        />
-                    </Flex>
+                    <TextAndTooltip
+                        text="Estimated Redemption"
+                        tooltip={copy.tooltips.estimated_redemption}
+                    />
                 }
                 value={expectedReturn ? 
                     <Flex flexDir="row" gridGap={1}>
@@ -184,16 +154,10 @@ export const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
             />
             <DetailItem
                 name={
-                    <Flex flexDir="row" alignItems="center" gridGap={1}>
-                        <Text>
-                            Minimum Redemption
-                        </Text>
-                        <InfoTooltip
-                            w={2}
-                            h={2}
-                            label={copy.tooltips.minimum_redemption}
-                        />
-                    </Flex>
+                    <TextAndTooltip
+                        text="Minimum Redemption"
+                        tooltip={copy.tooltips.minimum_redemption}
+                    />
                 }
                 value={trancheRate.accruedValue ? 
                     <Flex flexDir="row" gridGap={1}>
@@ -208,7 +172,7 @@ export const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
                 }
             />
             <DetailItem
-                name="Estimated Gas Cost:"
+                name="Estimated Gas"
                 value={
                     <Flex flexDir="row" gridGap={1}>
                         <Text>
@@ -224,6 +188,27 @@ export const ExecutionDetails: React.FC<ExecutionDetailsProps> = (props) => {
         </Collapse>
     </DetailPane>
 }
+
+interface TextAndTooltipProps {
+    text: string;
+    tooltip: string;
+}
+
+const TextAndTooltip: React.FC<TextAndTooltipProps> = (props) => {
+    const {text, tooltip} = props;
+
+    return <Flex flexDir="row" alignItems="center" gridGap={1}>
+        <Text>
+            {text}
+        </Text>
+        { tooltip && <InfoTooltip
+            w={2}
+            h={2}
+            label={tooltip}
+        /> }
+    </Flex>
+}
+
 
 const SmallGearIcon = () => {
     return <Flex justifyContent="center" alignItems="center" tabIndex={0} rounded="full" cursor="pointer">

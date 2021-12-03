@@ -1,4 +1,4 @@
-import { Flex, FormLabel, Icon, Text, Tooltip } from "@chakra-ui/react";
+import { Flex, FormLabel } from "@chakra-ui/react";
 import { YTCGain, YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { executeYieldTokenCompounding } from "../../../../features/ytc/executeYieldTokenCompounding";
 import { elementAddressesAtom } from "../../../../recoil/element/atom";
