@@ -11,6 +11,7 @@ import { Title } from "../../Title";
 import ResultsTable from "./Table";
 import Icon from "@chakra-ui/icon";
 import { Flex } from "@chakra-ui/layout";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 
 interface YTCProps {}
 
@@ -51,41 +52,56 @@ export const YTC: React.FC<YTCProps> = (props) => {
             infoLinkText="How do I use this tool?"
             infoLink="https://medium.com/@component_general/how-to-yield-token-compound-using-the-ytc-tool-742d140a7c9c"
         />
-        <Calculator
-            tokens={baseTokens}
-        />
-        {
-            (simulationResults.length > 0) && <>
-                <Flex width="full">
-                    {/** Arrow Icon */}
-                    <Icon stroke="text.primary" viewBox="0 0 24 24" h={7} w={10} mx="auto">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 17l-4 4m0 0l-4-4m4 4V3" />
-                    </Icon>
-                </Flex>
+        <Tabs variant='soft-rounded' isFitted mt={4}>
+            <TabList>
+                <Tab>Simulate</Tab>
+                <Tab>Compound</Tab>
+            </TabList>
+            <TabPanels>
+                <TabPanel>
+                    <Calculator
+                        tokens={baseTokens}
+                    />
+                    {
+                        (simulationResults.length > 0) && <>
+                            <Flex width="full">
+                                {/** Arrow Icon */}
+                                <Icon stroke="text.primary" viewBox="0 0 24 24" h={7} w={10} mx="auto">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 17l-4 4m0 0l-4-4m4 4V3" />
+                                </Icon>
+                            </Flex>
 
-                <ResultsTable
-                    selected={resultIndex}
-                    onSelect={setResultIndex}
-                />
-                {
-                    (resultIndex !== undefined ) && <>
-                        <Flex width="full">
-                            {/** Arrow Icon */}
-                            <Icon stroke="text.primary" viewBox="0 0 24 24" h={7} w={10} mx="auto">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 17l-4 4m0 0l-4-4m4 4V3" />
-                            </Icon>
-                        </Flex>
-                        <Ape
-                        {
-                            ...(processSimulationResult(
-                                simulationResults[resultIndex]
-                            ))
-                        }
-                        />
-                    </>
+                            <ResultsTable
+                                selected={resultIndex}
+                                onSelect={setResultIndex}
+                            />
+                            {
+                                (resultIndex !== undefined ) && <>
+                                    <Flex width="full">
+                                        {/** Arrow Icon */}
+                                        <Icon stroke="text.primary" viewBox="0 0 24 24" h={7} w={10} mx="auto">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 17l-4 4m0 0l-4-4m4 4V3" />
+                                        </Icon>
+                                    </Flex>
+                                    <Ape
+                                    {
+                                        ...(processSimulationResult(
+                                            simulationResults[resultIndex]
+                                        ))
+                                    }
+                                    />
+                                </>
 
-                }
-            </>
-        }
+                            }
+                        </>
+                    }
+                </TabPanel>
+                <TabPanel>
+                    <Calculator 
+                        tokens={baseTokens}
+                    />
+                </TabPanel>
+            </TabPanels>
+        </Tabs>
     </div>
 }
