@@ -9,16 +9,10 @@ import "./balancer-core-v2/lib/openzeppelin/SafeERC20.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 
 /// @notice Yield token compounding without having to swap to basetokens from ETH manually
-// Only available to users to
+/// This contract was intended to be used for simulation purposes only
 contract YTCZap {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
-
-    // no-one other than the blackhole address should be able to call this contract
-    modifier onlyBlackHole {
-        require(msg.sender == address(57005));
-        _;
-    }
 
     struct YTCInputs {
         IYieldTokenCompounding ytcContract;
@@ -51,7 +45,7 @@ contract YTCZap {
         address _yieldToken,
         uint256 _deadline,
         address payable _uniswapContract
-    ) external payable onlyBlackHole returns (uint256, uint256) {
+    ) external payable returns (uint256, uint256) {
         YTCInputs memory ytcInputs = _initYTCInputs(
             _ytcContractAddress,
             _n,
@@ -89,7 +83,7 @@ contract YTCZap {
         address _yieldToken,
         bytes calldata _zapperCallData,
         address payable _zapperContract
-    ) external payable onlyBlackHole returns (uint256, uint256) {
+    ) external payable returns (uint256, uint256) {
 
         YTCInputs memory ytcInputs = _initYTCInputs(
             _ytcContractAddress,
