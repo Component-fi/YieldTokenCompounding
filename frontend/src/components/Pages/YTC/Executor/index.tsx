@@ -1,5 +1,4 @@
 import { Flex, FormLabel } from "@chakra-ui/react";
-import { YTCGain, YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { executeYieldTokenCompounding } from "../../../../features/ytc/executeYieldTokenCompounding";
 import { elementAddressesAtom } from "../../../../recoil/element/atom";
 import { useRecoilValue } from 'recoil';
@@ -7,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { slippageToleranceAtom } from "../../../../recoil/transactionSettings/atom";
 import { notificationAtom } from "../../../../recoil/notifications/atom";
 import { useRecoilState } from 'recoil';
-import { simulationResultsAtom } from "../../../../recoil/simulationResults/atom";
+import { selectedCalculatorGainSelector, simulationResultsAtom } from "../../../../recoil/simulationResults/atom";
 import Card from "../../../Reusable/Card";
 import { TokenResult } from "./TokenResult";
 import { Web3Provider } from '@ethersproject/providers';
@@ -18,38 +17,24 @@ import { getBalance } from "../../../../features/element";
 import { ExecutionDetails } from "./ExecutionDetails";
 import { ExposureBar } from "./ExposureBar";
 
-export interface ApeProps {
-    baseToken: {
-        name: string,
-    };
-    yieldToken: {
-        name: string,
-    };
-    baseTokenAmount: number;
-    yieldTokenAmount: number;
-    userData: YTCInput;
-    inputAmount: number;
-    gas: {
-        eth: number,
-        baseToken: number,
-    };
-    gain?: YTCGain;
+export interface ExecutionProps {
 }
 
-export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
+export const Execution: React.FC<ExecutionProps> = () => {
 
-    const {baseToken, yieldToken, baseTokenAmount, yieldTokenAmount, userData, gas, inputAmount, gain} = props;
+    const selectedResult = useRecoilValue(selectedCalculatorGainSelector);
+    console.log(selectedResult);
+
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [balance, setBalance] = useState<number | undefined>(undefined);
     const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
     const elementAddresses = useRecoilValue(elementAddressesAtom);
     const { library, account } = useWeb3React();
     const provider = library as Web3Provider;
-    const slippageTolerance = useRecoilValue(slippageToleranceAtom);
     const setNotification = useRecoilState(notificationAtom)[1];
 
-    const minimumReturn = yieldTokenAmount * (1-(slippageTolerance/100))
 
+    const slippageTolerance = useRecoilValue(slippageToleranceAtom);
     const executorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -60,20 +45,24 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
 
     // get the user balance of the token;
     useEffect(() => {
-        if (account){
-            const erc20 = ERC20__factory.connect(userData.baseTokenAddress, provider);
+        if (account && selectedResult){
+            const erc20 = ERC20__factory.connect(selectedResult.inputs.baseTokenAddress, provider);
 
             setBalance(undefined);
             getBalance(account, erc20).then((res) => {
                 setBalance(res);
             })
         }
-    }, [userData, account, provider])
+    }, [selectedResult, account, provider])
+
+    if (!selectedResult){
+        return <></>
+    }
 
     // Execute the actual calculation transaction
     const handleExecuteTransaction = () => {
         const signer = provider.getSigner(account || undefined);
-        if (!balance || balance < userData.amountCollateralDeposited){
+        if (!balance || balance < selectedResult?.inputs.amountCollateralDeposited){
             setNotification((currentNotifications) => {
                 return [
                     ...currentNotifications,
@@ -87,10 +76,9 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
         } else if (signer) {
             setIsLoading(true);
             executeYieldTokenCompounding(
-                userData,
-                yieldTokenAmount,
-                // this is equivalent to base tokens spent
-                (inputAmount-baseTokenAmount),
+                selectedResult.inputs,
+                selectedResult.receivedTokens.yt.amount,
+                (selectedResult.spentTokens.baseTokens.amount),
                 slippageTolerance,
                 elementAddresses,
                 signer
@@ -115,108 +103,17 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
     }
 
     return (
-        <Flex
+        selectedResult && <Flex
             ref={executorRef}
-            id="ape"
+            id="execution"
             py={5}
             flexDir="column"
             gridGap={3}
         >
-            <Card>
-                <Flex
-                    id="outputs"
-                    flexDir='column'
-                    alignItems='stretch'
-                    gridGap={3}
-                    p={2}
-                >
-                    <FormLabel
-                        flexDir="row"
-                        justify="center"
-                        alignItems="center"
-                        alignSelf="center"
-                    >
-                        <Flex
-                            flexDir="row"
-                            alignItems="center"
-                            gridGap={2}
-                        >
-                            Review Your Transaction
-                        </Flex>
-                    </FormLabel>
-                    <Flex
-                        flexDir="column"
-                        w="full"
-                    >
-                        <FormLabel>
-                            Input
-                        </FormLabel>
-                        <TokenResult
-                            tokenType="BaseToken"
-                            trancheAddress={userData.trancheAddress}
-                            token={{
-                                name: baseToken.name,
-                                amount: inputAmount
-                            }}
-                        />
-                    </Flex>
-                    <Flex
-                        flexDir="column"
-                        w="full"
-                    >
-                        <FormLabel>
-                            Output
-                        </FormLabel>
-                        <Flex
-                            flexDir="column"
-                            gridGap={1}
-                        >
-                            <TokenResult
-                                tokenType="BaseToken"
-                                trancheAddress={userData.trancheAddress}
-                                token={{
-                                    name: baseToken.name,
-                                    amount: baseTokenAmount
-                                }}
-                            />
-                            <TokenResult
-                                tokenType="YToken"
-                                trancheAddress={userData.trancheAddress}
-                                token={{
-                                    name: yieldToken.name,
-                                    amount: yieldTokenAmount
-                                }}
-                                baseTokenName={baseToken.name}
-                            />
-                        </Flex>
-                    </Flex>
-                    <Flex mx={{base:2, sm: 16}}>
-                        <ExposureBar
-                            // equivalent to baseTokensSpent
-                            tokensSpent={inputAmount - baseTokenAmount}
-                            trancheAddress={userData.trancheAddress}
-                            minimumYTokensReceived={minimumReturn}
-                            baseTokenName={baseToken.name}
-                        />
-                    </Flex>
-                    <ExecutionDetails 
-                        slippageTolerance={slippageTolerance}
-                        estimatedGas={gas.eth}
-                        netGain= {gain?.netGain}
-                        roi={gain?.roi}
-                        apr={gain?.apr}
-                        minimumReceived={minimumReturn}
-                        expectedReturn={gain?.estimatedRedemption}
-                        baseTokenName={baseToken.name}
-                        trancheAddress={userData.trancheAddress}
-                    />
-                </Flex>
-            </Card>
+            <ExecutionCard />
             <ApproveAndConfirmButton
-                isLoading={isLoading}
                 handleExecuteTransaction={handleExecuteTransaction}
-                tokenAddress={userData.baseTokenAddress}
-                tokenName={baseToken.name}
+                isLoading={isLoading}
                 id="approve-calculate-button"
                 rounded="full"
                 bgColor="main.primary"
@@ -229,4 +126,110 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
             />
         </Flex>
     )
+}
+
+interface ExecutionCardProps { }
+
+
+const ExecutionCard: React.FC<ExecutionCardProps> = () => {
+
+    const slippageTolerance = useRecoilValue(slippageToleranceAtom);
+
+    const selectedResult = useRecoilValue(selectedCalculatorGainSelector);
+
+    if(!selectedResult){
+        return <></>
+    }
+    const minimumReceived = selectedResult.receivedTokens.yt.amount * (1-(slippageTolerance/100))
+
+    return selectedResult ? <Card>
+        <Flex
+            id="outputs"
+            flexDir='column'
+            alignItems='stretch'
+            gridGap={3}
+            p={2}
+        >
+            <FormLabel
+                flexDir="row"
+                justify="center"
+                alignItems="center"
+                alignSelf="center"
+            >
+                <Flex
+                    flexDir="row"
+                    alignItems="center"
+                    gridGap={2}
+                >
+                    Review Your Transaction
+                </Flex>
+            </FormLabel>
+            <Flex
+                flexDir="column"
+                w="full"
+            >
+                <FormLabel>
+                    Input
+                </FormLabel>
+                <TokenResult
+                    tokenType="BaseToken"
+                    trancheAddress={selectedResult.inputs.trancheAddress}
+                    token={{
+                        name: selectedResult.spentTokens.baseTokens.name,
+                        amount: selectedResult.spentTokens.baseTokens.amount
+                    }}
+                />
+            </Flex>
+            <Flex
+                flexDir="column"
+                w="full"
+            >
+                <FormLabel>
+                    Output
+                </FormLabel>
+                <Flex
+                    flexDir="column"
+                    gridGap={1}
+                >
+                    <TokenResult
+                        tokenType="BaseToken"
+                        trancheAddress={selectedResult.inputs.trancheAddress}
+                        token={{
+                            name: selectedResult.receivedTokens.baseTokens.name,
+                            amount: selectedResult.receivedTokens.baseTokens.amount
+                        }}
+                    />
+                    <TokenResult
+                        tokenType="YToken"
+                        trancheAddress={selectedResult.inputs.trancheAddress}
+                        token={{
+                            name: selectedResult.receivedTokens.yt.name,
+                            amount: selectedResult.receivedTokens.yt.amount,
+                        }}
+                        baseTokenName={selectedResult.receivedTokens.baseTokens.name}
+                    />
+                </Flex>
+            </Flex>
+            <Flex mx={{base:2, sm: 16}}>
+                <ExposureBar
+                    // equivalent to baseTokensSpent
+                    tokensSpent={selectedResult.spentTokens.baseTokens.amount - selectedResult.receivedTokens.baseTokens.amount}
+                    trancheAddress={selectedResult.inputs.trancheAddress}
+                    minimumYTokensReceived={minimumReceived}
+                    baseTokenName={selectedResult.receivedTokens.baseTokens.name}
+                />
+            </Flex>
+            <ExecutionDetails 
+                slippageTolerance={slippageTolerance}
+                estimatedGas={selectedResult.gas.eth}
+                netGain= {selectedResult.gain?.netGain}
+                roi={selectedResult.gain?.roi}
+                apr={selectedResult.gain?.apr}
+                minimumReceived={minimumReceived}
+                expectedReturn={selectedResult.gain?.estimatedRedemption}
+                baseTokenName={selectedResult.spentTokens.baseTokens.name}
+                trancheAddress={selectedResult.inputs.trancheAddress}
+            />
+        </Flex>
+    </Card> : <></>
 }
