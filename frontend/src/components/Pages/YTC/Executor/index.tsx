@@ -1,40 +1,19 @@
 import { Flex, FormLabel } from "@chakra-ui/react";
-import { executeYieldTokenCompounding } from "../../../../features/ytc/executeYieldTokenCompounding";
-import { elementAddressesAtom } from "../../../../recoil/element/atom";
 import { useRecoilValue } from 'recoil';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { slippageToleranceAtom } from "../../../../recoil/transactionSettings/atom";
-import { notificationAtom } from "../../../../recoil/notifications/atom";
-import { useRecoilState } from 'recoil';
-import { selectedCalculatorGainSelector, simulationResultsAtom } from "../../../../recoil/simulationResults/atom";
+import { selectedCalculatorGainSelector } from "../../../../recoil/simulationResults/atom";
 import Card from "../../../Reusable/Card";
 import { TokenResult } from "./TokenResult";
-import { Web3Provider } from '@ethersproject/providers';
-import { useWeb3React } from "@web3-react/core";
-import { ApproveAndConfirmButton } from "../Calculator/ApproveAndSimulateButton";
-import { ERC20__factory } from "../../../../hardhat/typechain";
-import { getBalance } from "../../../../features/element";
 import { ExecutionDetails } from "./ExecutionDetails";
 import { ExposureBar } from "./ExposureBar";
 
-export interface ExecutionProps {
-}
+export interface ExecutionProps { }
 
 export const Execution: React.FC<ExecutionProps> = () => {
 
     const selectedResult = useRecoilValue(selectedCalculatorGainSelector);
-    console.log(selectedResult);
 
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [balance, setBalance] = useState<number | undefined>(undefined);
-    const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
-    const elementAddresses = useRecoilValue(elementAddressesAtom);
-    const { library, account } = useWeb3React();
-    const provider = library as Web3Provider;
-    const setNotification = useRecoilState(notificationAtom)[1];
-
-
-    const slippageTolerance = useRecoilValue(slippageToleranceAtom);
     const executorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -43,67 +22,9 @@ export const Execution: React.FC<ExecutionProps> = () => {
         }
     }, [executorRef])
 
-    // get the user balance of the token;
-    useEffect(() => {
-        if (account && selectedResult){
-            const erc20 = ERC20__factory.connect(selectedResult.inputs.baseTokenAddress, provider);
-
-            setBalance(undefined);
-            getBalance(account, erc20).then((res) => {
-                setBalance(res);
-            })
-        }
-    }, [selectedResult, account, provider])
-
-    if (!selectedResult){
-        return <></>
-    }
-
-    // Execute the actual calculation transaction
-    const handleExecuteTransaction = () => {
-        const signer = provider.getSigner(account || undefined);
-        if (!balance || balance < selectedResult?.inputs.amountCollateralDeposited){
-            setNotification((currentNotifications) => {
-                return [
-                    ...currentNotifications,
-                    {
-                        text: "YTC Failed",
-                        type: "ERROR",
-                        details: "User does not have enough tokens"
-                    }
-                ]
-            })
-        } else if (signer) {
-            setIsLoading(true);
-            executeYieldTokenCompounding(
-                selectedResult.inputs,
-                selectedResult.receivedTokens.yt.amount,
-                (selectedResult.spentTokens.baseTokens.amount),
-                slippageTolerance,
-                elementAddresses,
-                signer
-            ).then((receipt) => {
-                setSimulationResults([]);
-                setNotification((currentNotifications) => {
-                    return [
-                        ...currentNotifications,
-                        {
-                            text: "YTC Execution Succesful",
-                            type: "SUCCESS",
-                            linkText: "View on Explorer",
-                            link: `https://etherscan.io/tx/${receipt.transactionHash}`
-                        }
-                    ]
-                }
-            );
-            }).finally(() => {
-                setIsLoading(false)
-            })
-        }
-    }
 
     return (
-        selectedResult && <Flex
+        selectedResult ? <Flex
             ref={executorRef}
             id="execution"
             py={5}
@@ -111,20 +32,7 @@ export const Execution: React.FC<ExecutionProps> = () => {
             gridGap={3}
         >
             <ExecutionCard />
-            <ApproveAndConfirmButton
-                handleExecuteTransaction={handleExecuteTransaction}
-                isLoading={isLoading}
-                id="approve-calculate-button"
-                rounded="full"
-                bgColor="main.primary"
-                _hover={{
-                    bgColor:"main.primary_hover"
-                }}
-                mt="4"
-                p="2"
-                textColor="text.secondary"
-            />
-        </Flex>
+        </Flex> : <></>
     )
 }
 
