@@ -2,7 +2,7 @@ import { Button, ButtonProps, Spinner } from "@chakra-ui/react";
 import { BalancerApproval, ERC20Approval } from "../../../../features/approval/Approval";
 import { useRecoilValue } from 'recoil';
 import { isSimulatedSelector, isSimulatingAtom } from "../../../../recoil/simulationResults/atom";
-import {deployments} from '../../../../constants/apy-mainnet-constants';
+import { deployments } from "../../../../constants/apy-mainnet-constants";
 
 interface ApproveAndSimulateButtonProps {
     tokenAddress: string | undefined;
@@ -21,26 +21,45 @@ export const ApproveAndSimulateButton: React.FC<ApproveAndSimulateButtonProps & 
         trancheAddress={trancheAddress}
         {...rest}
     >
-        <ERC20Approval
+            <SimulateButton 
+                formErrors={formErrors}
+                {...rest}
+            />
+    </BalancerApproval>
+}
+
+interface ApproveAndConfirmButtonProps {
+    tokenAddress: string | undefined;
+    tokenName: string | undefined;
+    isLoading: boolean;
+    handleExecuteTransaction: () => void;
+}
+
+export const ApproveAndConfirmButton: React.FC<ApproveAndConfirmButtonProps & ButtonProps> = (props) => {
+
+    const { tokenAddress, tokenName, isLoading, handleExecuteTransaction, ...rest } = props;
+
+        return <ERC20Approval
             tokenAddress={tokenAddress}
             tokenName={tokenName}
             approvalAddress={deployments.YieldTokenCompounding}
             amount={undefined}
             {...rest}
         >
-            <SimulateButton 
-                formErrors={formErrors}
+            <Button
+                onClick={handleExecuteTransaction}
                 {...rest}
-            />
+            >
+                {isLoading ? <Spinner/> : "CONFIRM TRANSACTION"}
+            </Button>
         </ERC20Approval>
-    </BalancerApproval>
 }
 
 interface SimulateButtonProps {
     formErrors: {[fieldName: string]: string | undefined}
 }
 
-const SimulateButton: React.FC<SimulateButtonProps & ButtonProps> = (props) => {
+export const SimulateButton: React.FC<SimulateButtonProps & ButtonProps> = (props) => {
     const isSimulating = useRecoilValue(isSimulatingAtom)
 
     const isSimulated = useRecoilValue(isSimulatedSelector)

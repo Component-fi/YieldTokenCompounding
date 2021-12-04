@@ -1,0 +1,99 @@
+// ███████╗░█████╗░██████╗░██████╗░███████╗██████╗░░░░███████╗██╗
+// ╚════██║██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔══██╗░░░██╔════╝██║
+// ░░███╔═╝███████║██████╔╝██████╔╝█████╗░░██████╔╝░░░█████╗░░██║
+// ██╔══╝░░██╔══██║██╔═══╝░██╔═══╝░██╔══╝░░██╔══██╗░░░██╔══╝░░██║
+// ███████╗██║░░██║██║░░░░░██║░░░░░███████╗██║░░██║██╗██║░░░░░██║
+// ╚══════╝╚═╝░░╚═╝╚═╝░░░░░╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚═╝╚═╝░░░░░╚═╝
+// Copyright (C) 2021 zapper
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+
+///@author Zapper
+///@notice This contract adds liquidity to Curve pools with ETH or ERC tokens.
+// SPDX-License-Identifier: GPL-2.0
+
+pragma solidity ^0.8.0;
+
+interface ICurveRegistry {
+    function getSwapAddress(address tokenAddress)
+        external
+        view
+        returns (address swapAddress);
+
+    function getTokenAddress(address swapAddress)
+        external
+        view
+        returns (address tokenAddress);
+
+    function getDepositAddress(address swapAddress)
+        external
+        view
+        returns (address depositAddress);
+
+    function getPoolTokens(address swapAddress)
+        external
+        view
+        returns (address[4] memory poolTokens);
+
+    function shouldAddUnderlying(address swapAddress)
+        external
+        view
+        returns (bool);
+
+    function getNumTokens(address swapAddress)
+        external
+        view
+        returns (uint8 numTokens);
+
+    function isBtcPool(address swapAddress) external view returns (bool);
+
+    function isEthPool(address swapAddress) external view returns (bool);
+
+    function isUnderlyingToken(
+        address swapAddress,
+        address tokenContractAddress
+    ) external view returns (bool, uint8);
+}
+
+interface ICurve_ZapIn_General_V5 {
+    event zapIn(
+        address sender,
+        address pool,
+        uint256 tokensRec,
+        address affiliate
+    );
+
+    /**
+        @notice This function adds liquidity to a Curve pool with ETH or ERC20 tokens
+        @param fromTokenAddress The token used for entry (address(0) if ether)
+        @param toTokenAddress The intermediate ERC20 token to swap to
+        @param swapAddress Curve swap address for the pool
+        @param incomingTokenQty The amount of fromTokenAddress to invest
+        @param minPoolTokens The minimum acceptable quantity of Curve LP to receive. Reverts otherwise
+        @param swapTarget Excecution target for the first swap
+        @param swapData DEX quote data
+        @param affiliate Affiliate address
+        @return crvTokensBought Quantity of Curve LP tokens received
+    */
+    function ZapIn(
+        address fromTokenAddress,
+        address toTokenAddress,
+        address swapAddress,
+        uint256 incomingTokenQty,
+        uint256 minPoolTokens,
+        address swapTarget,
+        bytes calldata swapData,
+        address affiliate
+    ) external payable returns (uint256 crvTokensBought);
+
+    function updateCurveRegistry(ICurveRegistry newCurveRegistry) external;
+}

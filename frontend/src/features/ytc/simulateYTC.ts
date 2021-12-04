@@ -1,4 +1,5 @@
 import { BigNumber, ethers, Signer } from "ethers";
+import { Provider } from '@ethersproject/providers';
 import _ from "lodash";
 import { GAS_LIMITS } from "../../constants/gasLimits";
 import { ElementAddresses } from "../../types/manual/types";
@@ -96,15 +97,65 @@ export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balan
     }
 }
 
+export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate, simulate}: YTCParameters, userData: YTCInput,  signerOrProvider: Signer | Provider): Promise<YTCOutput> => {
+
+    const returnedVals = await simulate(userData.numberOfCompounds);
+    // Estimate the required amount of gas, this is likely very imprecise
+    // const gasAmountEstimate = await ytc.estimateGas.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0");
+    // TODO this is using the mean of hardcoded gas estimations
+    const gasAmountEstimate = BigNumber.from(GAS_LIMITS[userData.numberOfCompounds])
+
+    const ethGasFees = await gasLimitToEthGasFee(signerOrProvider, gasAmountEstimate);
+
+    const gasFeesInBaseToken = ethToBaseTokenRate * ethGasFees;
+
+    // Convert the result to a number
+    const [ytExposureAbsolute, baseTokensSpentAbsolute]: BigNumber[] = returnedVals.map((val: any) => ethers.BigNumber.from(val));
+
+
+    const remainingTokensAbsolute = BigNumber.from(baseTokenAmountAbsolute).sub(BigNumber.from(baseTokensSpentAbsolute));
+
+    const ytExposureNormalized = parseFloat(ethers.utils.formatUnits(ytExposureAbsolute, yieldTokenDecimals))
+    const remainingTokensNormalized = parseFloat(ethers.utils.formatUnits(remainingTokensAbsolute, baseTokenDecimals))
+    const baseTokensSpentNormalized = parseFloat(ethers.utils.formatUnits(baseTokensSpentAbsolute, baseTokenDecimals))
+
+    return {
+        receivedTokens: {
+            yt: {
+                name: ytName,
+                amount: ytExposureNormalized,
+            },
+            baseTokens: {
+                name: baseTokenName,
+                amount: remainingTokensNormalized
+            }
+        },
+        spentTokens: {
+            baseTokens: {
+                name: baseTokenName,
+                amount: baseTokensSpentNormalized
+            }
+        },
+        gas: {
+            eth: ethGasFees,
+            baseToken: gasFeesInBaseToken,
+        },
+        tranche: {
+            expiration: trancheExpiration,
+        },
+        inputs: userData,
+    }
+}
+
 // Runs the simulateYTC method for a range of compounds, rather than just one
 // param userData, user input data for simulating the transaction
 // param elementAddresses, constant containing the deployment addresses of tokens vaults and pools
 // param compound Range, the lowest, and largest number of compounds for the simulation to execute
 // param signer, Signer of the transaction
 // Returns YTCOutput[], an array of yield token compounding outputs
-export const simulateYTCForCompoundRange = async (userData: YTCInput, constants: ElementAddresses, compoundRange: [number, number], signer: Signer): Promise<YTCOutput[]> => {
+export const simulateYTCForCompoundRange = async (userData: YTCInput, constants: ElementAddresses, compoundRange: [number, number], signerOrProvider: Signer | ethers.providers.Provider): Promise<YTCOutput[]> => {
 
-    const yieldCalculationParameters = await getYTCParameters(userData, constants, signer);
+    const yieldCalculationParameters = await getYTCParameters(userData, constants, signerOrProvider);
 
     const promises =  _.range(compoundRange[0], compoundRange[1] + 1).map((index) => {
         const data: YTCInput = { 
@@ -112,10 +163,10 @@ export const simulateYTCForCompoundRange = async (userData: YTCInput, constants:
             numberOfCompounds: index
         }
 
-        return simulateYTC(
+        return simulateYTCZap(
             yieldCalculationParameters,
             data,
-            signer
+            signerOrProvider
         )
     })
 
@@ -160,8 +211,8 @@ export const getCompoundsFromTargetExposure = (fixedRate: number, targetExposure
 }
 
 //eslint-disable-next-line
-const gasLimitToEthGasFee = async (signer: ethers.Signer, gasAmountEstimate: ethers.BigNumber): Promise<number> => {
-    const {maxFeePerGas, maxPriorityFeePerGas} = await signer.getFeeData();
+const gasLimitToEthGasFee = async (signerOrProvider: ethers.Signer | ethers.providers.Provider, gasAmountEstimate: ethers.BigNumber): Promise<number> => {
+    const {maxFeePerGas, maxPriorityFeePerGas} = await signerOrProvider.getFeeData();
 
     if (!maxFeePerGas || !maxPriorityFeePerGas){
         throw Error('Could not get gas fees')

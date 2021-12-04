@@ -1,4 +1,4 @@
-import { Button, Spinner, Flex, FormLabel, Icon, Text, Tooltip, Collapse } from "@chakra-ui/react";
+import { Button, Flex, FormLabel, Icon, Text, Tooltip, Collapse } from "@chakra-ui/react";
 import { YTCGain, YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { executeYieldTokenCompounding } from "../../../../features/ytc/executeYieldTokenCompounding";
 import { elementAddressesAtom } from "../../../../recoil/element/atom";
@@ -22,6 +22,9 @@ import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { InfoOutlineIcon } from '@chakra-ui/icons';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from "@web3-react/core";
+import { ApproveAndConfirmButton } from "../Calculator/ApproveAndSimulateButton";
+import { ERC20__factory } from "../../../../hardhat/typechain";
+import { getBalance } from "../../../../features/element";
 
 export interface ApeProps {
     baseToken: {
@@ -45,6 +48,7 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
 
     const {baseToken, yieldToken, baseTokenAmount, yieldTokenAmount, userData, gas, inputAmount, gain} = props;
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [balance, setBalance] = useState<number | undefined>(undefined);
     const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
     const elementAddresses = useRecoilValue(elementAddressesAtom);
     const { library, account } = useWeb3React();
@@ -62,10 +66,33 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
         }
     }, [executorRef])
 
+    // get the user balance of the token;
+    useEffect(() => {
+        if (account){
+            const erc20 = ERC20__factory.connect(userData.baseTokenAddress, provider);
+
+            setBalance(undefined);
+            getBalance(account, erc20).then((res) => {
+                setBalance(res);
+            })
+        }
+    }, [userData, account, provider])
+
     // Execute the actual calculation transaction
     const handleExecuteTransaction = () => {
         const signer = provider.getSigner(account || undefined);
-        if (signer){
+        if (!balance || balance < userData.amountCollateralDeposited){
+            setNotification((currentNotifications) => {
+                return [
+                    ...currentNotifications,
+                    {
+                        text: "YTC Failed",
+                        type: "ERROR",
+                        details: "User does not have enough tokens"
+                    }
+                ]
+            })
+        } else if (signer) {
             setIsLoading(true);
             executeYieldTokenCompounding(
                 userData,
@@ -193,7 +220,11 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
                     />
                 </Flex>
             </Card>
-            <Button
+            <ApproveAndConfirmButton
+                isLoading={isLoading}
+                handleExecuteTransaction={handleExecuteTransaction}
+                tokenAddress={userData.baseTokenAddress}
+                tokenName={baseToken.name}
                 id="approve-calculate-button"
                 rounded="full"
                 bgColor="main.primary"
@@ -203,10 +234,7 @@ export const Ape: React.FC<ApeProps> = (props: ApeProps) => {
                 mt="4"
                 p="2"
                 textColor="text.secondary"
-                onClick={handleExecuteTransaction}
-            >
-                {isLoading ? <Spinner/> : "CONFIRM TRANSACTION"}
-            </Button>
+            />
         </Flex>
     )
 }
