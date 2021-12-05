@@ -41,7 +41,7 @@ export const validCoingeckoTokens = Object.keys(COINGECKO_TOKEN_NAME_TRANSLATION
 
 export const deployments = {
     YieldTokenCompounding: "0x3df5229f24040cf0218969c2406b302744edc18b",
-    YTCZap: "0x867fe1461fc8A8A536AB0420FA866eEe19622a7d",
+    YTCZap: "0xbc67ee4f02971953Fc3B42e219E72b776d892746",
     UniswapRouter: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
 }
 
