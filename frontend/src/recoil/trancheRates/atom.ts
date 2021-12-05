@@ -1,4 +1,4 @@
-import { atomFamily, selectorFamily, atom} from 'recoil';
+import { atomFamily, selectorFamily, atom } from 'recoil';
 
 // This is a set of recoil atoms
 // Atoms are pieces of state that can be accessed and or modified by various components through a set of hooks
@@ -48,4 +48,3 @@ export const trancheSelector = selectorFamily<TrancheRatesInterface, string>({
         set(trancheAddressAtom, prev => [...prev, id]);
     }
 });
-
