@@ -1,8 +1,8 @@
 import { Spinner } from "../../../Reusable/Spinner";
 import { Box, Button, Flex, FormLabel, Input, InputGroup, InputRightAddon, Select, Text} from "@chakra-ui/react";
 import { Formik, FormikHelpers, useFormikContext } from "formik";
-import React, { useCallback, useEffect, useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { getActiveTranches, getBalance } from "../../../../features/element";
@@ -25,6 +25,7 @@ import copy from '../../../../constants/copy.json';
 import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from '@ethersproject/providers';
 import { ERC20__factory } from "../../../../hardhat/typechain/factories/ERC20__factory";
+import { useClearSimOnLocationChange, useSetFormikValueToQueryParam, useSetQueryParamToFormikValue } from "../../../../hooks";
 
 interface CalculateProps {
     tokens: Token[];
@@ -46,10 +47,11 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
     const setIsSimulating = useRecoilState(isSimulatingAtom)[1];
     const elementAddresses = useRecoilValue(elementAddressesAtom);
     const { library, account } = useWeb3React();
-    const provider = library as Web3Provider;
-
     const [balance, setBalance] = useState<number | undefined>(undefined);
     const [variableApy, setVariableApy] = useState<number | undefined>(undefined);
+
+
+    const provider = useMemo( () => library as Web3Provider, [library] )
 
     const handleSimulate = (values: FormFields, formikHelpers: FormikHelpers<FormFields>) => {
         const ytcContractAddress = deployments.YieldTokenCompounding;
@@ -161,10 +163,6 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
 
 }
 
-// TOOD this can be moved to a utility
-function useQuery() {
-    return new URLSearchParams(useLocation().search);
-}
 
 
 interface FormProps {
@@ -181,29 +179,17 @@ const Form: React.FC<FormProps> = (props) => {
     const {tokens, onChange, balance, setBalance, setVariableApy} = props;
 
     const [tranches, setTranches] = useState<Tranche[] | undefined>(undefined);
-    const [simulationResults, setSimulationResults] = useRecoilState(simulationResultsAtom);
+    const simulationResults = useRecoilValue(simulationResultsAtom);
     const elementAddresses = useRecoilValue(elementAddressesAtom)
     const history = useHistory();
-    const location = useLocation();
-    const query = useQuery();
     const formik = useFormikContext<FormFields>();
+
 
     const { library, account } = useWeb3React();
     const provider = (library as Web3Provider);
 
     const tokenAddress = formik.values.tokenAddress;
     const setFieldValue = formik.setFieldValue;
-
-
-    const getTokenAddress = useCallback(
-        () => {
-            const token = query.get('base_token') || tokens[0].address;
-            return token;
-        },
-        // TODO this should be resolved not ignored
-        // eslint-disable-next-line
-        [tokens, location],
-    )
 
     const getTokenNameByAddress = useCallback(
         (tokenAddress: string | undefined): string | undefined => {
@@ -228,7 +214,6 @@ const Form: React.FC<FormProps> = (props) => {
         }, [tokenAddress, account, setBalance, provider]
     )
     
-
     const updateTokens = useCallback (
         () => {
             if (tokenAddress){
@@ -240,18 +225,18 @@ const Form: React.FC<FormProps> = (props) => {
         }, [tokenAddress, setTranches, setFieldValue, elementAddresses]
     )
 
-    // if there is a token specified in the query params we want to set the value of the form to it
-    useEffect(() => {
-        if (tokens.length >= 1){
-            const tokenAddress = getTokenAddress();
-            setFieldValue('tokenAddress', tokenAddress)
-        }
-    }, [getTokenAddress, tokens, setFieldValue, location])
 
-    // on location change, reset the simulation results
-    useEffect(() => {
-        setSimulationResults([]);
-    }, [location, setSimulationResults])
+    // if there is a token specified in the query params we want to set the value of the form to it
+    useSetFormikValueToQueryParam('base_token', 'tokenAddress', tokens[0]?.address);
+    useSetFormikValueToQueryParam('tranche', 'trancheAddress', tranches && tranches[0].address)
+    useSetQueryParamToFormikValue('base_token', 'tokenAddress');
+
+
+    useClearSimOnLocationChange();
+    // // on location change, reset the simulation results
+    // useEffect(() => {
+    //     setSimulationResults([]);
+    // }, [location, setSimulationResults])
 
     useEffect(() => {
         updateTokens();
