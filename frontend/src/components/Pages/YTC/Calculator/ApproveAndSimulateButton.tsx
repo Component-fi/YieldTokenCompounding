@@ -123,6 +123,7 @@ export const ApproveAndConfirmButton: React.FC<ApproveAndConfirmButtonProps & Bu
             tokenName={selectedResult.spentTokens.baseTokens.name}
             approvalAddress={deployments.YieldTokenCompounding}
             amount={undefined}
+            insufficientBalance={!sufficientBalance}
             {...rest}
         >
             <Button
