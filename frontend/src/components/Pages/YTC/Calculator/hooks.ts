@@ -7,12 +7,14 @@ import { isSimulatingAtom, simulationResultsAtom } from "../../../../recoil/simu
 import { useQuery } from "../../../../hooks";
 import { deployments } from "../../../../constants/apy-mainnet-constants";
 import { simulateYTCForCompoundRange } from "../../../../features/ytc/simulateYTC";
-import { elementAddressesAtom } from "../../../../recoil/element/atom";
+import { activeTokensSelector, elementAddressesAtom } from "../../../../recoil/element/atom";
 import { useWeb3React } from "@web3-react/core";
 import { YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { Web3Provider } from '@ethersproject/providers';
 import { trancheSelector } from "../../../../recoil/trancheRates/atom";
 import { notificationAtom } from "../../../../recoil/notifications/atom";
+import { ElementAddresses, Token } from "../../../../types/manual/types";
+import { getVariableAPY } from "../../../../features/prices/yearn";
 
 // on location change, reset the simulation results
 export const useClearSimOnLocationChange = () => {
@@ -143,4 +145,39 @@ export const useSimulate = () => {
 
 
     return handleSimulate;
+}
+
+export const useTokenName = () => {
+
+    const activeTokens = useRecoilValue(activeTokensSelector);
+
+    const getTokenName = useCallback(
+        (tokenAddress: string | undefined): string | undefined => {
+            if (!tokenAddress){
+                return undefined;
+            }
+            const token: Token | undefined = activeTokens.find((token) => {
+                return token.address === tokenAddress;
+            })
+            return token?.name || undefined;
+    }, [activeTokens])
+
+    return getTokenName;
+}
+
+export const useVariableAPY = () => {
+    const elementAddresses = useRecoilValue(elementAddressesAtom);
+    const getTokenName = useTokenName();
+
+    return useCallback(async (tokenAddress: string) => {
+        const tokenName = getTokenName(tokenAddress);
+        if (tokenName){
+            try {
+                const variableApy = await getVariableAPY(tokenName, elementAddresses);
+                return variableApy;
+            } catch (error) {
+                console.error(error)
+            }
+        }
+    }, [elementAddressesAtom, getTokenName])
 }

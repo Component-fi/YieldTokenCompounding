@@ -39,64 +39,6 @@ export const TrancheDetails: React.FC<TrancheDetailsProps> = (props) => {
         })
     }, [setTrancheRates])
 
-    useEffect(() => {
-        // get baseTokenName
-        const baseTokenName = getTokenNameByAddress(tokenAddress, elementAddresses.tokens);
-
-        // get variable rate
-        if (baseTokenName){
-            getVariableAPY(baseTokenName, elementAddresses).then((apy) => {
-                handleChangeTrancheRate({
-                    variable: apy
-                })
-            })
-        }
-    }, [handleChangeTrancheRate, elementAddresses, tokenAddress])
-
-    useEffect(() => {
-        // get baseTokenName
-        const baseTokenName = getTokenNameByAddress(tokenAddress, elementAddresses.tokens);
-
-        const signer = provider?.getSigner();
-        if (baseTokenName && signer){
-            getFixedRate(baseTokenName, trancheAddress, elementAddresses, signer).then((fixedRate) => {
-                handleChangeTrancheRate({
-                    fixed: fixedRate
-                })
-            }).catch((error) => {
-                console.error(error);
-            })
-        }
-    }, [handleChangeTrancheRate, provider, trancheAddress, elementAddresses, tokenAddress])
-
-    // set the accruedValue for the tranche
-    useEffect(() => {
-        const signer = provider?.getSigner();
-        if (signer){
-            yieldTokenAccruedValue(elementAddresses, trancheAddress, signer).then((accruedValue) => {
-                handleChangeTrancheRate({
-                    accruedValue: accruedValue,
-                })
-            }).catch((error) => {
-                console.error(error);
-            })
-        }
-    }, [elementAddresses, provider, trancheAddress, handleChangeTrancheRate])
-
-    useEffect(() => {
-        const baseTokenName = getTokenNameByAddress(tokenAddress, elementAddresses.tokens);
-        if (baseTokenName){
-            const trancheDict: {[key: string]: Tranche[]} = elementAddresses.tranches;
-            const tranches: Tranche[] = trancheDict[baseTokenName];
-            const tranche: Tranche | undefined = getTrancheByAddress(trancheAddress, tranches);
-            if (tranche){
-                handleChangeTrancheRate({
-                    daysRemaining: getRemainingTrancheYears(tranche.expiration) * 365
-                })
-            }
-        }
-
-    }, [handleChangeTrancheRate, elementAddresses, tokenAddress, trancheAddress])
 
     return <TrancheDisplay
         {...trancheRate}

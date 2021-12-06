@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import { getBaseTokensWithActiveTranches } from "../../../features/element";
 import { elementAddressesAtom } from "../../../recoil/element/atom";
 import { Token } from "../../../types/manual/types";
 import { Calculator } from "./Calculator";
@@ -20,13 +19,6 @@ export const YTC: React.FC<YTCProps> = (props) => {
     const [baseTokens, setBaseTokens] = useState<Token[]>([]);
     const resultIndex = useRecoilValue(selectedSimulationAtom);
     const simulationResults: YTCOutput[] = useRecoilValue(calculatorGainSelector);
-    const elementAddresses = useRecoilValue(elementAddressesAtom);
-
-    useEffect(() => {
-        getBaseTokensWithActiveTranches(elementAddresses).then((res) => {
-            setBaseTokens(res);
-        })
-    }, [elementAddresses])
 
     return <div>
         <Title
