@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { calculatorGainSelector } from '../../../../recoil/simulationResults/atom'
+import { calculatorGainSelector, selectedSimulationAtom } from '../../../../recoil/simulationResults/atom'
 import { Table, Th, Thead, Flex, Tr, Tbody, FormLabel, Text, Input, InputGroup, InputRightAddon } from '@chakra-ui/react';
 import { YTCOutput } from '../../../../features/ytc/ytcHelpers';
 import Card from '../../../Reusable/Card';
@@ -11,13 +11,11 @@ import { trancheSelector } from '../../../../recoil/trancheRates/atom';
 import copy from '../../../../constants/copy.json';
 
 interface TableProps {
-    onSelect: (index: number | undefined) => void;
-    selected: number | undefined;
 }
 
-const ResultsTable: React.FC<TableProps> = (props) => {
+const ResultsTable: React.FC<TableProps> = () => {
 
-    const {onSelect, selected} = props;
+    const [selected, onSelect] = useRecoilState(selectedSimulationAtom);
 
     const [predictedRate, setPredictedRate] = useRecoilState(predictedRateAtom);
     const simulationResults = useRecoilValue(calculatorGainSelector);
