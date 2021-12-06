@@ -82,7 +82,7 @@ const ExecutionCard: React.FC<ExecutionCardProps> = () => {
                     trancheAddress={selectedResult.inputs.trancheAddress}
                     token={{
                         name: selectedResult.spentTokens.baseTokens.name,
-                        amount: selectedResult.spentTokens.baseTokens.amount
+                        amount: selectedResult.spentTokens.baseTokens.amount + selectedResult.receivedTokens.baseTokens.amount,
                     }}
                 />
             </Flex>
