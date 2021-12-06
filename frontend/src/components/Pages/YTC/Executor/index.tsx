@@ -12,8 +12,6 @@ export interface ExecutionProps { }
 
 export const Execution: React.FC<ExecutionProps> = () => {
 
-    const selectedResult = useRecoilValue(selectedCalculatorGainSelector);
-
     const executorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -24,7 +22,7 @@ export const Execution: React.FC<ExecutionProps> = () => {
 
 
     return (
-        selectedResult ? <Flex
+        <Flex
             ref={executorRef}
             id="execution"
             py={5}
@@ -32,7 +30,7 @@ export const Execution: React.FC<ExecutionProps> = () => {
             gridGap={3}
         >
             <ExecutionCard />
-        </Flex> : <></>
+        </Flex>
     )
 }
 
@@ -50,7 +48,7 @@ const ExecutionCard: React.FC<ExecutionCardProps> = () => {
     }
     const minimumReceived = selectedResult.receivedTokens.yt.amount * (1-(slippageTolerance/100))
 
-    return selectedResult ? <Card>
+    return <Card>
         <Flex
             id="outputs"
             flexDir='column'
@@ -139,5 +137,5 @@ const ExecutionCard: React.FC<ExecutionCardProps> = () => {
                 trancheAddress={selectedResult.inputs.trancheAddress}
             />
         </Flex>
-    </Card> : <></>
+    </Card>
 }

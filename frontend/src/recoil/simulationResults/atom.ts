@@ -63,7 +63,7 @@ export const selectedCalculatorGainSelector = selector({
 
         const selectedSimulation = get(selectedSimulationAtom);
 
-        if (selectedSimulation && calculatedGain.length > selectedSimulation){
+        if (selectedSimulation !== undefined && calculatedGain.length > selectedSimulation){
             return calculatedGain[selectedSimulation];
         } else {
             return undefined;
