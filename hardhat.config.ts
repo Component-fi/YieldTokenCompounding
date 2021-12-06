@@ -84,6 +84,10 @@ const config: HardhatUserConfig = {
       url: `${process.env.GOERLI_PROVIDER_URL}`,
       accounts: [`0x${process.env.PRIVATE_KEY}`]
     },
+    mainnet: {
+      url: `${process.env.MAINNET_PROVIDER_URL}`,
+      accounts: [`0x${process.env.PRIVATE_KEY}`]
+    },
   },
   solidity: {
     compilers: [
