@@ -103,6 +103,7 @@ type ERC20ApprovalProps = {
     approvalAddress?: string,
     tokenAddress?: string,
     tokenName?: string,
+    insufficientBalance?: boolean,
     children: ReactElement,
 } & ButtonProps;
 
@@ -111,7 +112,7 @@ type ERC20ApprovalProps = {
 export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
     const { library, account } = useWeb3React();
     const provider = (library as Web3Provider);
-    const {amount, approvalAddress, tokenAddress, tokenName, children, ...rest} = props;
+    const {amount, approvalAddress, tokenAddress, tokenName, children, insufficientBalance, ...rest} = props;
 
     const [isApproved, setIsApproved] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -178,7 +179,12 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
         setIsLoading={setIsLoading}
         handleApprove={handleApprove}
         handleCheckApproval={handleCheckApproval}
-        approveText={(amount) ? `Approve ${amount} ${tokenName?.toUpperCase()}` : `Approve ${tokenName?.toUpperCase()}` }
+        disabled={insufficientBalance}
+        approveText={
+            !insufficientBalance ?
+                (amount) ? `Approve ${amount} ${tokenName?.toUpperCase()}` : `Approve ${tokenName?.toUpperCase()}` :
+                "Insufficient Balance"
+        }
         provider = {provider}
         {...rest}
     >
