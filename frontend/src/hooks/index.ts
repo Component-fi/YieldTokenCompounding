@@ -1,51 +1,30 @@
-import { useFormikContext } from "formik";
-import { useEffect, useMemo } from "react";
-import { useHistory, useLocation } from "react-router-dom";
-import { useRecoilState } from "recoil";
-import { FormFields } from "../components/Pages/YTC/Calculator";
-import { simulationResultsAtom } from "../recoil/simulationResults/atom";
-
-// on location change, reset the simulation results
-export const useClearSimOnLocationChange = () => {
-    const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
-    const location = useLocation();
-
-    useEffect(() => {
-        setSimulationResults([]);
-    }, [location, setSimulationResults])
-}
-
-
-export const useSetFormikValueToQueryParam = (queryName: string, fieldName: string, defaultValue: string | undefined) => {
-    const query = useQuery();
-    const formik = useFormikContext();
-
-    const value = useMemo(() => query.get(queryName), [queryName, query])
-    const setFieldValue = useMemo(() => formik.setFieldValue, [formik]);
-
-    useEffect(() => {
-            // set the value to either the received value, or the default value
-            setFieldValue(fieldName, (value || defaultValue));
-    }, [setFieldValue, fieldName, value, defaultValue])
-
-}
+import { Web3Provider } from "@ethersproject/providers";
+import { useWeb3React } from "@web3-react/core";
+import { useCallback } from "react";
+import { useLocation } from "react-router-dom";
+import { getBalance } from "../features/element";
+import { ERC20__factory } from "../hardhat/typechain";
 
 // TOOD this can be moved to a utility
-function useQuery() {
+export function useQuery() {
     return new URLSearchParams(useLocation().search);
 }
 
+export const useBalance = (tokenAddress: string | undefined, setBalance: React.Dispatch<React.SetStateAction<number | undefined>>) => {
+    const {account, library} = useWeb3React();
+    const provider = library as Web3Provider;
 
-export const useSetQueryParamToFormikValue = (queryName: string, fieldName: keyof FormFields) => {
-    const history = useHistory();
-    const {values} = useFormikContext<FormFields>();
+    return useCallback(
+        () => {
+            if (account && tokenAddress){
+                const tokenContract = ERC20__factory.connect(tokenAddress, provider)
+                setBalance(undefined);
+                getBalance(account, tokenContract).then((res) => {
+                    setBalance(res);
+                })
+            }
+        },
+        [tokenAddress, account, setBalance, provider]
+    )
 
-    const value: any = useMemo(() => values[fieldName] , [values, fieldName]);
-
-    useEffect(() => {
-        if (value){
-            history.push(`/ytc?${queryName}=${value}`)
-        }
-    }, [value, history, queryName])
 }
-

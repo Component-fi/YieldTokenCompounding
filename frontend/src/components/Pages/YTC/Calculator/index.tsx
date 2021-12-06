@@ -1,31 +1,25 @@
 import { Spinner } from "../../../Reusable/Spinner";
-import { Box, Button, Flex, FormLabel, Input, InputGroup, InputRightAddon, Select, Text} from "@chakra-ui/react";
-import { Formik, FormikHelpers, useFormikContext } from "formik";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { YTCInput } from "../../../../features/ytc/ytcHelpers";
-import { getActiveTranches, getBalance } from "../../../../features/element";
+import { Box, Button, Flex, FormLabel, Input, InputGroup, InputRightAddon, Select as ChakraSelect, Text} from "@chakra-ui/react";
+import { Formik, useFormikContext } from "formik";
+import React, { useCallback, useEffect, useState } from "react";
+import { useRecoilValue } from 'recoil';
+import { getActiveTranches } from "../../../../features/element";
 import { elementAddressesAtom } from "../../../../recoil/element/atom";
-import { isSimulatingAtom, simulationResultsAtom } from "../../../../recoil/simulationResults/atom";
+import { simulationResultsAtom } from "../../../../recoil/simulationResults/atom";
 import { Token, Tranche } from "../../../../types/manual/types";
 import * as Yup from 'yup';
-import { notificationAtom } from "../../../../recoil/notifications/atom";
 import { BaseTokenPriceTag } from "../../../Prices";
 import Card from "../../../Reusable/Card";
-import { simulateYTCForCompoundRange } from "../../../../features/ytc/simulateYTC";
 import { getVariableAPY } from '../../../../features/prices/yearn';
 import { ApproveAndSimulateButton } from "./ApproveAndSimulateButton";
 import { TrancheDetails } from "./Tranche";
 import { TokenIcon } from "../../../Tokens/TokenIcon";
 import { InfoTooltip } from "../../../Reusable/Tooltip";
 import { AdvancedCollapsable } from "./Advanced";
-import { deployments } from "../../../../constants/apy-mainnet-constants";
 import copy from '../../../../constants/copy.json';
 import { useWeb3React } from "@web3-react/core";
-import { Web3Provider } from '@ethersproject/providers';
-import { ERC20__factory } from "../../../../hardhat/typechain/factories/ERC20__factory";
-import { useClearSimOnLocationChange, useSetFormikValueToQueryParam, useSetQueryParamToFormikValue } from "../../../../hooks";
+import { useBalance } from "../../../../hooks";
+import { useClearSimOnFormikChange, useClearSimOnLocationChange, useSetFormikValueToQueryParam, useSetQueryParamToFormikValue, useSimulate } from './hooks';
 
 interface CalculateProps {
     tokens: Token[];
@@ -41,79 +35,8 @@ export interface FormFields {
 
 export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
     const {tokens} = props;
-    const setNotification = useRecoilState(notificationAtom)[1];
-
-    const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
-    const setIsSimulating = useRecoilState(isSimulatingAtom)[1];
-    const elementAddresses = useRecoilValue(elementAddressesAtom);
-    const { library, account } = useWeb3React();
     const [balance, setBalance] = useState<number | undefined>(undefined);
     const [variableApy, setVariableApy] = useState<number | undefined>(undefined);
-
-
-    const provider = useMemo( () => library as Web3Provider, [library] )
-
-    const handleSimulate = (values: FormFields, formikHelpers: FormikHelpers<FormFields>) => {
-        const ytcContractAddress = deployments.YieldTokenCompounding;
-
-        if (
-                !!values.tokenAddress &&
-                !!values.trancheAddress &&
-                !!values.amount &&
-                !!ytcContractAddress &&
-                !!account
-        ){
-            const userData: YTCInput = {
-                baseTokenAddress: values.tokenAddress,
-                amountCollateralDeposited: values.amount,
-                numberOfCompounds: values.compounds ? Math.floor(values.compounds) : 1,
-                trancheAddress: values.trancheAddress,
-                ytcContractAddress,
-                variableApy,
-            }
-
-            setIsSimulating(true);
-
-            let compoundRange: [number, number] = [1, 8];
-            if (values.compounds){
-                if (values.compounds > 0){
-                    compoundRange = [values.compounds-1, values.compounds+1];
-                }
-                if (values.compounds === 1){
-                    compoundRange = [1, 3];
-                }
-                if (values.compounds >= 30){
-                    compoundRange = [28, 30];
-                }
-            }
-            
-            // const signer = provider.getSigner(account);
-            simulateYTCForCompoundRange(userData, elementAddresses, compoundRange, provider).then(
-                (results) => {
-                    setSimulationResults(() => {
-                        return results;
-                    })
-                }
-            ).catch((error) => {
-                setNotification((currentNotifications) => {
-                    return [
-                        ...currentNotifications,
-                        {
-                            text: "Simulation Failed",
-                            details: error.message,
-                            type: "ERROR"
-                        }
-                    ]
-                })
-            }).finally(() => {
-                setIsSimulating(false);
-            })
-        }
-    }
-
-    const handleChange = (e: React.ChangeEvent<any>) => {
-        setSimulationResults([]);
-    }
 
     const initialValues: FormFields = {
         tokenAddress: undefined,
@@ -132,12 +55,12 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
 
             <Formik
                 initialValues={initialValues}
-                onSubmit={handleSimulate}
+                // we will override this lower in the chain
+                onSubmit={() => {}}
                 validationSchema={
                     Yup.object({
                         amount: Yup.number().nullable()
                             .min(0.0000000000000000001, 'Amount must be greater than 0')
-                            // .max((balance ? balance : 0), 'Insufficient balance')
                             .required('An amount of tokens is required'),
                         compounds: Yup.number()
                             .min(1, 'Number of compounds must be 1 or greater')
@@ -151,7 +74,6 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
             >
                 <Form
                     tokens={tokens}
-                    onChange={handleChange}
                     balance={balance}
                     setBalance={setBalance}
                     variableApy={variableApy}
@@ -163,11 +85,8 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
 
 }
 
-
-
 interface FormProps {
     tokens: Token[];
-    onChange: (e: React.ChangeEvent<any>) => void;
     balance: number | undefined,
     setBalance: React.Dispatch<React.SetStateAction<number | undefined>>
     variableApy: number | undefined,
@@ -176,19 +95,21 @@ interface FormProps {
 
 const Form: React.FC<FormProps> = (props) => {
 
-    const {tokens, onChange, balance, setBalance, setVariableApy} = props;
+    const handleSimulate = useSimulate();
+
+    const {tokens, balance, setBalance, setVariableApy} = props;
 
     const [tranches, setTranches] = useState<Tranche[] | undefined>(undefined);
     const simulationResults = useRecoilValue(simulationResultsAtom);
     const elementAddresses = useRecoilValue(elementAddressesAtom)
-    const history = useHistory();
     const formik = useFormikContext<FormFields>();
 
 
-    const { library, account } = useWeb3React();
-    const provider = (library as Web3Provider);
+    const { account } = useWeb3React();
 
     const tokenAddress = formik.values.tokenAddress;
+    const updateBalance = useBalance(tokenAddress, setBalance);
+
     const setFieldValue = formik.setFieldValue;
 
     const getTokenNameByAddress = useCallback(
@@ -202,18 +123,6 @@ const Form: React.FC<FormProps> = (props) => {
             return token?.name || undefined;
     }, [tokens])
 
-    const updateBalance = useCallback(
-        () => {
-            if (tokenAddress && account){
-                const tokenContract = ERC20__factory.connect(tokenAddress, provider)
-                setBalance(undefined);
-                getBalance(account, tokenContract).then((res) => {
-                    setBalance(res);
-                })
-            }
-        }, [tokenAddress, account, setBalance, provider]
-    )
-    
     const updateTokens = useCallback (
         () => {
             if (tokenAddress){
@@ -225,18 +134,11 @@ const Form: React.FC<FormProps> = (props) => {
         }, [tokenAddress, setTranches, setFieldValue, elementAddresses]
     )
 
-
     // if there is a token specified in the query params we want to set the value of the form to it
     useSetFormikValueToQueryParam('base_token', 'tokenAddress', tokens[0]?.address);
-    useSetFormikValueToQueryParam('tranche', 'trancheAddress', tranches && tranches[0].address)
     useSetQueryParamToFormikValue('base_token', 'tokenAddress');
-
-
     useClearSimOnLocationChange();
-    // // on location change, reset the simulation results
-    // useEffect(() => {
-    //     setSimulationResults([]);
-    // }, [location, setSimulationResults])
+    useClearSimOnFormikChange();
 
     useEffect(() => {
         updateTokens();
@@ -258,24 +160,6 @@ const Form: React.FC<FormProps> = (props) => {
             })
         }
     }, [elementAddresses, tokenAddress, getTokenNameByAddress, setVariableApy])
-    // update fixed apy
-    useEffect(() => {
-    })
-
-
-    // custom handler for token input change, as it needs to be added as a query param
-    const handleTokenChange = (event: React.ChangeEvent<any>) => {
-        const value = event.target.value;
-
-        // add the token address as a query param
-        if (value) {
-            history.push(`/ytc?base_token=${value}`)
-            // amount should be set to zero on token change
-            formik.setFieldValue('amount', 0)
-        }
-        
-        formik.handleChange(event);
-    }
 
     // Sets the amount to the user's balance of the base token
     const handleMax: React.MouseEventHandler<HTMLButtonElement> = (event: React.MouseEvent) => {
@@ -285,10 +169,12 @@ const Form: React.FC<FormProps> = (props) => {
 
     const handleChange = (e: React.ChangeEvent<any>) => {
         formik.handleChange(e);
-        onChange(e);
     }
 
-    return <form onSubmit={formik.handleSubmit} onChange={handleChange}>
+    return <form onSubmit={(e) => {
+        e.preventDefault()
+        handleSimulate()
+    }} onChange={handleChange}>
         <Card>
             <Flex
                 id="tranche-select"
@@ -314,14 +200,8 @@ const Form: React.FC<FormProps> = (props) => {
                     gridGap={{base: 2, sm: 6}}
                 >
                     <Select
-                        width="40"
                         name="tokenAddress"
-                        rounded="full"
-                        variant="filled"
-                        bgColor="input_bg"
-                        cursor="pointer"
                         value={formik.values.tokenAddress}
-                        onChange={handleTokenChange}
                     >
                         {tokens.map((token) => {
                             return <option value={token.address} key={token.address}>
@@ -330,14 +210,8 @@ const Form: React.FC<FormProps> = (props) => {
                         })}
                     </Select>
                     <Select
-                        width="40"
                         name="trancheAddress"
-                        rounded="full"
-                        cursor="pointer"
-                        variant="filled"
-                        bgColor="input_bg"
                         value={formik.values.trancheAddress}
-                        onChange={formik.handleChange}
                     >
                         {
                             tranches && tranches.map((tranche: Tranche) => {
@@ -485,4 +359,16 @@ const Form: React.FC<FormProps> = (props) => {
             }}
         />
     </form>
+}
+
+const Select: typeof ChakraSelect= (props) => {
+    return <ChakraSelect
+        width="40"
+        rounded="full"
+        variant="filled"
+        bgColor="input_bg"
+        cursor="pointer"
+        {...props}
+    >
+    </ChakraSelect>
 }
