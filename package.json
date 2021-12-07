@@ -1,6 +1,6 @@
 {
-  "name": "hack-money-ape",
-  "version": "0.1.0",
+  "name": "@component-fi/ytc",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@uniswap/v2-core": "^1.0.1",
