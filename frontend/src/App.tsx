@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import Layout from './components/Layout';
+import Layout from './components/Layout/Layout';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { elementAddressesAtom } from './recoil/element/atom';
 import { fetchElementState } from './recoil/element/fetch';

@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { trancheSelector } from "../../../../recoil/trancheRates/atom";
 import { shortenNumber } from "../../../../utils/shortenNumber";
-import { BaseTokenPriceTag, YTPriceTag } from "../../../Prices";
+import { BaseTokenPriceTag, YTPriceTag } from "../../../Web3/Prices";
 import { DetailItem } from "../../../Reusable/DetailItem";
 import { DetailPane } from "../../../Reusable/DetailPane";
 import { InfoTooltip } from "../../../Reusable/Tooltip";
-import WalletSettings from "../../../Wallet/Settings";
+import WalletSettings from "../../../Web3/Wallet/Settings";
 import copy from '../../../../constants/copy.json';
 
 interface ExecutionDetailsProps {
