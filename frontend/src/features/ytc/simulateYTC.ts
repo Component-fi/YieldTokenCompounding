@@ -5,21 +5,45 @@ import { GAS_LIMITS } from "../../constants/gasLimits";
 import { ElementAddresses } from "../../types/manual/types";
 import { getYTCParameters, YTCInput, YTCOutput, YTCParameters } from "./ytcHelpers";
 
-const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-
-const LACK_OF_LIQUIDITY_MESSAGE = "Error: VM Exception while processing transaction: reverted with reason string 'BAL#001'";
+const LACK_OF_LIQUIDITY_MESSAGE = "execution reverted: BAL#001";
+const ZAP_FAILED_MESSAGE = "execution reverted: Zap Failed";
 
 interface JsonErrorType extends Error {
     code: -32603;
-    message: "Internal JSON-RPC error.";
+    message: string;
     data: {
         code: number,
         message: string,
     };
 }
+
+interface SimulationErrorType extends Error {
+    code: "UNPREDICTABLE_GAS_LIMIT";
+    error: Error;
+}
+
+interface ServerErrorType extends Error {
+    code: -32000;
+}
+
+interface InsufficientFundsErrorType extends Error {
+    code: "INSUFFICIENT_FUNDS";
+    error: Error;
+}
+
 const isJsonErrorType = (error: any): error is JsonErrorType => {
     return (error as JsonErrorType).code === -32603;
 }
+const isSimulationErrorType = (error: any): error is SimulationErrorType => {
+    return (error as SimulationErrorType).code === "UNPREDICTABLE_GAS_LIMIT";
+}
+const isServerErrorType = (error: any): error is ServerErrorType => {
+    return (error as ServerErrorType).code === -32000
+}
+const isInsufficientFundsErrorType = (error: any): error is InsufficientFundsErrorType => {
+    return (error as InsufficientFundsErrorType).code === "INSUFFICIENT_FUNDS";
+}
+
 
 // Simulates a single yield token compounding execution to determine what the output would be
 // No actual transaction is executed
@@ -27,79 +51,37 @@ const isJsonErrorType = (error: any): error is JsonErrorType => {
 // param userData, user input data for simulating the transaction
 // param signer, Signer of the transaction
 // returns YTCOutput, contains both input data, and the results fo the simulation, including yield exposure, gas fees, tokens spent, remaining tokens etc.
-export const simulateYTC = async ({ytc, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate}: YTCParameters, userData: YTCInput, signer: Signer): Promise<YTCOutput> => {
+export const simulateYTCZap = async ({trancheExpiration, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate, simulate}: YTCParameters, userData: YTCInput,  signerOrProvider: Signer | Provider): Promise<YTCOutput> => {
+
+    let returnedVals;
     try{
         // Call the method statically to calculate the estimated return
-        // The last two arguments are to prevent slippage, but this isn't required as it is a simulation and cannot be frontrun
-        var returnedVals = await ytc.callStatic.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0", MAX_UINT_HEX);
+       returnedVals = await simulate(userData.numberOfCompounds);
     } catch (error) {
         // if this is a json rpc error type
         if (isJsonErrorType(error)){
-            const reason = error.data.message;
-
             // Assign a natural language reason for this on chain error
-            if (reason === LACK_OF_LIQUIDITY_MESSAGE){
-                throw new Error("Insufficient liquidity: Principal Pool")
+            if (error.data.message === LACK_OF_LIQUIDITY_MESSAGE){
+                throw new Error("Insufficient liquidity: Principal Pool");
             }
-        } else {
-            throw error
         }
-    }
-
-    // Estimate the required amount of gas, this is likely very imprecise
-    // const gasAmountEstimate = await ytc.estimateGas.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0");
-    // TODO this is using the mean of hardcoded gas estimations
-    const gasAmountEstimate = BigNumber.from(GAS_LIMITS[userData.numberOfCompounds])
-
-    try {
-        var ethGasFees = await gasLimitToEthGasFee(signer, gasAmountEstimate);
-    } catch (error){
-        throw new Error("Could not calculate Gas Fees")
-    }
-
-    const gasFeesInBaseToken = ethToBaseTokenRate * ethGasFees;
-
-    // Convert the result to a number
-    const [ytExposureAbsolute, baseTokensSpentAbsolute]: BigNumber[] = returnedVals.map((val: any) => ethers.BigNumber.from(val));
-
-
-    const remainingTokensAbsolute = BigNumber.from(baseTokenAmountAbsolute).sub(BigNumber.from(baseTokensSpentAbsolute));
-
-    const ytExposureNormalized = parseFloat(ethers.utils.formatUnits(ytExposureAbsolute, yieldTokenDecimals))
-    const remainingTokensNormalized = parseFloat(ethers.utils.formatUnits(remainingTokensAbsolute, baseTokenDecimals))
-    const baseTokensSpentNormalized = parseFloat(ethers.utils.formatUnits(baseTokensSpentAbsolute, baseTokenDecimals))
-
-    return {
-        receivedTokens: {
-            yt: {
-                name: ytName,
-                amount: ytExposureNormalized,
-            },
-            baseTokens: {
-                name: baseTokenName,
-                amount: remainingTokensNormalized
+        if (isSimulationErrorType(error)){
+            if (error.error.message === ZAP_FAILED_MESSAGE) {
+                throw new Error("Not enough token liquidity");
             }
-        },
-        spentTokens: {
-            baseTokens: {
-                name: baseTokenName,
-                amount: baseTokensSpentNormalized
+            if (error.error.message === LACK_OF_LIQUIDITY_MESSAGE){
+                throw new Error("Insufficient liquidity: Principal Pool");
             }
-        },
-        gas: {
-            eth: ethGasFees,
-            baseToken: gasFeesInBaseToken,
-        },
-        tranche: {
-            expiration: trancheExpiration,
-        },
-        inputs: userData,
+        }
+        if (isServerErrorType(error)){
+            console.error()
+        }
+        if (isInsufficientFundsErrorType(error)){
+            throw new Error("I don't think you have that much money");
+        }
+        throw error;
     }
-}
 
-export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExpiration, balancerPoolId, yieldTokenDecimals, baseTokenDecimals, baseTokenName, ytSymbol: ytName, baseTokenAmountAbsolute, ethToBaseTokenRate, simulate}: YTCParameters, userData: YTCInput,  signerOrProvider: Signer | Provider): Promise<YTCOutput> => {
-
-    const returnedVals = await simulate(userData.numberOfCompounds);
     // Estimate the required amount of gas, this is likely very imprecise
     // const gasAmountEstimate = await ytc.estimateGas.compound(userData.numberOfCompounds, trancheAddress, balancerPoolId, baseTokenAmountAbsolute, "0");
     // TODO this is using the mean of hardcoded gas estimations
@@ -109,6 +91,7 @@ export const simulateYTCZap = async ({ytc, ytAddress, trancheAddress, trancheExp
 
     const gasFeesInBaseToken = ethToBaseTokenRate * ethGasFees;
 
+    if (!returnedVals) throw new Error("No results from simulation");
     // Convert the result to a number
     const [ytExposureAbsolute, baseTokensSpentAbsolute]: BigNumber[] = returnedVals.map((val: any) => ethers.BigNumber.from(val));
 
@@ -180,7 +163,6 @@ export const simulateYTCForCompoundRange = async (userData: YTCInput, constants:
 
     if (fulfilledResults.length === 0){
         if (errors.length > 0){
-            console.log(errors[0]);
             throw new Error(errors[0].message)
         }
     }

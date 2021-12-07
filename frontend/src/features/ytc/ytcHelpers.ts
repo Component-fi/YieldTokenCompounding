@@ -125,18 +125,25 @@ export const getYTCParameters = async (userData: YTCInput, elementAddresses: Ele
 
     const amountCollateralDespositedAbsolute = ethers.utils.parseUnits(userData.amountCollateralDeposited.toString(), baseTokenDecimals);
 
+
     // if the suggested amount is greater than the total amount, return the total amount instead
     let amount = amountCollateralDespositedAbsolute;
 
     const ethToBaseToken = await ethToBaseTokenRate(baseTokenName, elementAddresses, signerOrProvider);
+
+
+    // get teh amount of collateral denominated in eth
+    const amountInEthNormalized = parseFloat(userData.amountCollateralDeposited.toString()) / ethToBaseToken;
+    // convert it to the absolute non-decimal value
+    const amountInEthAbsolute = parseEther(amountInEthNormalized.toString())
+    // multiply it by two to allow for slippage
+    const amountInEthAbsoulteTimes2 = amountInEthAbsolute.mul(2);
 
     const zapAddress = deployments.YTCZap;
     const ytcAddress = deployments.YieldTokenCompounding;
     const uniswapAddress = deployments.UniswapRouter;
 
     const ytcZap = new Contract(zapAddress, YTCZap.abi, signerOrProvider);
-
-
 
     let simulate;
     if (isCurveToken(baseTokenName)){
@@ -146,13 +153,13 @@ export const getYTCParameters = async (userData: YTCInput, elementAddresses: Ele
             ownerAddress: ytc.address,
             sellToken: ZERO_ADDRESS,
             poolAddress,
-            sellAmount: ethers.utils.parseEther("3000"),
+            sellAmount: amountInEthAbsoulteTimes2,
             protocol: "curve",
         })
 
-        simulate = async (n: number) => { return await ytcZap.callStatic.compoundZapper(ytcAddress, n, trancheAddress, balancerPoolId, amount, "0", MAX_UINT_HEX, userData.baseTokenAddress, yieldTokenAddress, zapResponse.data, zapResponse.to, ({from: BURN_ADDRESS, value: parseEther("3000")}))};
+        simulate = async (n: number) => { return await ytcZap.callStatic.compoundZapper(ytcAddress, n, trancheAddress, balancerPoolId, amount, "0", MAX_UINT_HEX, userData.baseTokenAddress, yieldTokenAddress, zapResponse.data, zapResponse.to, ({from: BURN_ADDRESS, value: amountInEthAbsoulteTimes2}))};
     } else {
-        simulate = async (n: number) => { return await ytcZap.callStatic.compoundUniswap(ytcAddress, n, trancheAddress, balancerPoolId, amount, "0", MAX_UINT_HEX, userData.baseTokenAddress, yieldTokenAddress, MAX_UINT_HEX, uniswapAddress, ({from: BURN_ADDRESS, value: parseEther("3000")}))};
+        simulate = async (n: number) => { return await ytcZap.callStatic.compoundUniswap(ytcAddress, n, trancheAddress, balancerPoolId, amount, "0", MAX_UINT_HEX, userData.baseTokenAddress, yieldTokenAddress, MAX_UINT_HEX, uniswapAddress, ({from: BURN_ADDRESS, value: amountInEthAbsoulteTimes2}))};
     }
 
     return {
@@ -169,26 +176,7 @@ export const getYTCParameters = async (userData: YTCInput, elementAddresses: Ele
         ethToBaseTokenRate: ethToBaseToken,
         simulate
     }
-
 }
-
-
-
-// This function is not currently used, but could still be valuable if the ux flow is changed slightly
-// Calculates the expected gains from a set of yield token compound simulation, at a specific average variable rate
-// param speculatedVariableRate, the estimated average yield of the underlying vault over the course of the term
-// param ytcOutputs, a set of yield token compounding simulation results to have gains calculated upon
-// Returns YTCOutput[], an aray of yield token compounding results augmented with gain information
-// export const calculateGainsFromSpeculatedRate = (speculatedVariableRate: number, ytcOutputs: YTCOutput[]): YTCOutput[] => {
-//     const rates = ytcOutputs.map((ytcOutput) => {
-//         return {
-//             ...ytcOutput,
-//             gain: calculateGain(ytcOutput.ytExposure, speculatedVariableRate, ytcOutput.trancheExpiration, ytcOutput.baseTokensSpent, 0)
-//         }
-//     })
-
-//     return rates;
-// }
 
 // Calculates the expected gains from a yield token compound simulation
 // param speculatedVariableRate
