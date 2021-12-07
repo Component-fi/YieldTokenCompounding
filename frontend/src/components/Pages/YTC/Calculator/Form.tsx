@@ -1,4 +1,4 @@
-import {Box, Button, Flex, FormLabel, Input, InputGroup, InputRightAddon, Select as ChakraSelect, Spinner, Text} from '@chakra-ui/react';
+import {Box, Button, Flex, FormLabel, Input, InputGroup, InputRightAddon, Select as ChakraSelect, Text} from '@chakra-ui/react';
 import { useFormikContext } from 'formik';
 import { MouseEventHandler, useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
@@ -6,39 +6,48 @@ import { FormFields } from '.';
 import { useBalance } from '../../../../hooks';
 import { activeTokensSelector } from '../../../../recoil/element/atom';
 import { Tranche } from '../../../../types/manual/types';
-import { BaseTokenPriceTag } from '../../../Prices';
+import { BaseTokenPriceTag } from '../../../Web3/Prices';
 import Card from '../../../Reusable/Card';
 import { InfoTooltip } from '../../../Reusable/Tooltip';
-import { TokenIcon } from '../../../Tokens/TokenIcon';
+import { TokenIcon } from '../../../Web3/Tokens/TokenIcon';
 import { AdvancedCollapsable } from './Advanced';
 import { ApproveAndSimulateButton } from './ApproveAndSimulateButton';
 import { useClearSimOnLocationChange, useSimulate, useSetFormikValueToQueryParam, useSetQueryParamToFormikValue, useClearSimOnFormikChange, useTokenName, useTranches } from './hooks';
 import { TrancheDetails } from '../Tranche';
 import copy from '../../../../constants/copy.json';
+import { Spinner } from '../../../Reusable/Spinner';
 
 interface FormProps {}
 
 export const Form: React.FC<FormProps> = () => {
 
+    // get the simulation function based on current context
     const handleSimulate = useSimulate();
 
-    const formik = useFormikContext<FormFields>();
+    const {
+        values,
+        errors,
+        handleChange,
+        setFieldValue,
+        handleBlur,
+    } = useFormikContext<FormFields>();
 
-    const tokenAddress = formik.values.tokenAddress;
+    // fetching the token address and token name
+    const tokenAddress = values.tokenAddress;
     const tokenName = useTokenName(tokenAddress);
 
-    const balance = useBalance(tokenAddress);
     const tokens = useRecoilValue(activeTokensSelector);
 
+    // load the active tranches for the currently selected token
     const tranches: Tranche[] | undefined = useTranches(tokenAddress);
 
-    // if there is a token specified in the query params we want to set the value of the form to it
+    // These two hooks sync up the tokenAddress formik field, with the base_token query parameter
     useSetFormikValueToQueryParam('base_token', 'tokenAddress', tokens[0]?.address);
     useSetQueryParamToFormikValue('base_token', 'tokenAddress');
+
+    // These two hooks clear the simulations on the change of router location, or changes to the form inputs
     useClearSimOnLocationChange();
     useClearSimOnFormikChange();
-
-    const setFieldValue = formik.setFieldValue;
 
     // sets the tranche address to the first value
     useEffect(() => {
@@ -48,16 +57,7 @@ export const Form: React.FC<FormProps> = () => {
     }, [setFieldValue, tranches])
 
 
-    // Sets the amount to the user's balance of the base token
-    const handleMax: React.MouseEventHandler<HTMLButtonElement> = (event: React.MouseEvent) => {
-        event.preventDefault()
-        formik.setFieldValue('amount', balance);
-    }
-
-    const handleChange = (e: React.ChangeEvent<any>) => {
-        formik.handleChange(e);
-    }
-
+    // 
     return <form onSubmit={(e) => {
         e.preventDefault()
         handleSimulate()
@@ -88,7 +88,7 @@ export const Form: React.FC<FormProps> = () => {
                 >
                     <Select
                         name="tokenAddress"
-                        value={formik.values.tokenAddress}
+                        value={values.tokenAddress}
                     >
                         {tokens.map((token) => {
                             return <option value={token.address} key={token.address}>
@@ -98,7 +98,7 @@ export const Form: React.FC<FormProps> = () => {
                     </Select>
                     <Select
                         name="trancheAddress"
-                        value={formik.values.trancheAddress}
+                        value={values.trancheAddress}
                     >
                         {
                             tranches && tranches.map((tranche: Tranche) => {
@@ -109,9 +109,9 @@ export const Form: React.FC<FormProps> = () => {
                         }
                     </Select>
                 </Flex>
-                { formik.values.trancheAddress && formik.values.tokenAddress && <TrancheDetails
-                    trancheAddress={formik.values.trancheAddress}
-                    tokenAddress={formik.values.tokenAddress}
+                { values.trancheAddress && values.tokenAddress && <TrancheDetails
+                    trancheAddress={values.trancheAddress}
+                    tokenAddress={values.tokenAddress}
                 />} 
             </Flex>
         </Card>
@@ -137,27 +137,7 @@ export const Form: React.FC<FormProps> = () => {
                         <InfoTooltip label={copy.tooltips.input_amount} h={3} w={3}/>
                     </Flex>
                 </FormLabel>
-                <Flex
-                    id="amount-header"
-                    flexDir="row"
-                    gridGap={2}
-                    justify="space-between"
-                    alignItems="center"
-                    fontSize="sm"
-                    width="full"
-                >
-                    <Flex
-                        alignItems="center"
-                        gridGap={1}
-                    >
-                        <MaxButton handleMax={handleMax}/>
-                        <Box
-                            id="balance"
-                        >
-                            Balance: {(balance !== undefined) ? balance : <Spinner/>}
-                        </Box>
-                    </Flex>
-                </Flex>
+                <Balance tokenAddress={tokenAddress}/>
                 <Flex
                     id="amount-row"
                     flexDir="row"
@@ -177,10 +157,10 @@ export const Form: React.FC<FormProps> = () => {
                         <Input
                             type="number"
                             name="amount"
-                            onBlur={formik.handleBlur}
-                            value={formik.values.amount}
+                            onBlur={handleBlur}
+                            value={values.amount}
                             placeholder={"0.0"}
-                            onChange={formik.handleChange}
+                            onChange={handleChange}
                             id="amount-input"/>
                         <InputRightAddon
                             bgColor="input_bg"
@@ -207,18 +187,18 @@ export const Form: React.FC<FormProps> = () => {
                 >
                     <BaseTokenPriceTag
                         baseTokenName = {tokenName?.toUpperCase()}
-                        amount = {formik.values.amount}
+                        amount = {values.amount}
                     />
                 </Flex>
             </Flex>
             <AdvancedCollapsable/>
         </Card>
         <ApproveAndSimulateButton
-            formErrors={formik.errors}
-            tokenAddress={formik.values.tokenAddress}
+            formErrors={errors}
+            tokenAddress={values.tokenAddress}
             tokenName={tokenName}
-            trancheAddress={formik.values.trancheAddress}
-            amount={formik.values.amount}
+            trancheAddress={values.trancheAddress}
+            amount={values.amount}
             rounded="full"
             bgColor="main.primary"
             color="text.secondary"
@@ -244,22 +224,54 @@ const Select: typeof ChakraSelect= (props) => {
     </ChakraSelect>
 }
 
-const MaxButton: React.FC<{handleMax: MouseEventHandler<HTMLButtonElement>}> = (props) => {
-    return <Button
-        id="max"
-        onClick={props.handleMax}
-        bg="gray.300"
-        rounded="xl"
+const Balance: React.FC<{tokenAddress: string | undefined}> = (props) => {
+    // fetched the balance for the specific token
+    const balance = useBalance(props.tokenAddress);
+
+    const {setFieldValue} = useFormikContext<FormFields>();
+
+    // Sets the amount to the user's balance of the base token
+    const handleMax: React.MouseEventHandler<HTMLButtonElement> = (event: React.MouseEvent) => {
+        event.preventDefault()
+        setFieldValue('amount', balance);
+    }
+
+
+    return <Flex
+        id="balance-header"
+        flexDir="row"
+        gridGap={2}
+        justify="space-between"
+        alignItems="center"
         fontSize="sm"
-        py={0}
-        h="20px"
-        px={2}
-        _hover={
-            {
-                bg: "gray.400"
-            }
-        }
+        width="full"
     >
-        MAX
-    </Button>
+        <Flex
+            alignItems="center"
+            gridGap={1}
+        >
+            <Button
+                id="max"
+                onClick={handleMax}
+                bg="gray.300"
+                rounded="xl"
+                fontSize="sm"
+                py={0}
+                h="20px"
+                px={2}
+                _hover={
+                    {
+                        bg: "gray.400"
+                    }
+                }
+            >
+                MAX
+            </Button>
+            <Box
+                id="balance-field"
+            >
+                Balance: {(balance !== undefined) ? balance : <Spinner/>}
+            </Box>
+        </Flex>
+    </Flex>
 }

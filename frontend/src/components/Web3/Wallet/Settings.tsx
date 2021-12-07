@@ -2,7 +2,7 @@ import { ButtonGroup } from "@chakra-ui/button";
 import { Popover, PopoverBody, PopoverCloseButton, PopoverContent, PopoverHeader, PopoverTrigger } from "@chakra-ui/popover";
 import React from "react";
 import { useRecoilState } from "recoil";
-import { slippageToleranceAtom } from "../../recoil/transactionSettings/atom";
+import { slippageToleranceAtom } from "../../../recoil/transactionSettings/atom";
 
 interface Props {
     icon: React.ReactElement
