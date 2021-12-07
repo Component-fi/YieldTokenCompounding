@@ -15,10 +15,10 @@ export const elementAddressesAtom = atom({
 
 export const activeTokensSelector = selector<Token[]>({
   key: 'activeTokens',
-  get: async ({get}) => {
+  get: ({get}) => {
     const elementAddresses = get(elementAddressesAtom);
     
-    const activeTokens =  await getBaseTokensWithActiveTranches(elementAddresses);
+    const activeTokens =  getBaseTokensWithActiveTranches(elementAddresses);
 
     return activeTokens;
   }

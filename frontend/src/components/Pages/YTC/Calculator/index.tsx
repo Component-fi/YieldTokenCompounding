@@ -1,14 +1,8 @@
 import { Flex } from "@chakra-ui/react";
 import { Formik } from "formik";
-import React, { useState } from "react";
-import { Token } from "../../../../types/manual/types";
+import React from "react";
 import * as Yup from 'yup';
 import { Form } from "./Form";
-import { useVariableAPY } from "./hooks";
-
-interface CalculateProps {
-    tokens: Token[];
-}
 
 export interface FormFields {
     tokenAddress: string | undefined,
@@ -18,8 +12,7 @@ export interface FormFields {
     percentExposure: number,
 }
 
-export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
-    const [balance, setBalance] = useState<number | undefined>(undefined);
+export const Calculator: React.FC<{}> = () => {
 
     const initialValues: FormFields = {
         tokenAddress: undefined,
@@ -35,7 +28,6 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
             flexDir="column"
             gridGap={3}
         >
-
             <Formik
                 initialValues={initialValues}
                 // we will override this lower in the chain
@@ -55,10 +47,7 @@ export const Calculator: React.FC<CalculateProps> = (props: CalculateProps) => {
                     })
                 }
             >
-                <Form
-                    balance={balance}
-                    setBalance={setBalance}
-                />
+                <Form />
             </Formik>
         </Flex>
     )

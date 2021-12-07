@@ -1,6 +1,6 @@
 import { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
-import { useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { getBalance } from "../features/element";
 import { ERC20__factory } from "../hardhat/typechain";
@@ -10,11 +10,14 @@ export function useQuery() {
     return new URLSearchParams(useLocation().search);
 }
 
-export const useBalance = (tokenAddress: string | undefined, setBalance: React.Dispatch<React.SetStateAction<number | undefined>>) => {
+export const useBalance = (tokenAddress: string | undefined) => {
+
+    const [balance, setBalance] = useState<number | undefined>(undefined);
+
     const {account, library} = useWeb3React();
     const provider = library as Web3Provider;
 
-    return useCallback(
+    useEffect(
         () => {
             if (account && tokenAddress){
                 const tokenContract = ERC20__factory.connect(tokenAddress, provider)
@@ -27,4 +30,5 @@ export const useBalance = (tokenAddress: string | undefined, setBalance: React.D
         [tokenAddress, account, setBalance, provider]
     )
 
+    return balance;
 }

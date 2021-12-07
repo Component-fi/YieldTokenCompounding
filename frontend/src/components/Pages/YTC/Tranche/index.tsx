@@ -1,20 +1,9 @@
-import { useCallback, useEffect } from "react";
-import { getRemainingTrancheYears, getTrancheByAddress } from "../../../../features/element";
-import { getFixedRate } from "../../../../features/element/fixedRate";
-import { getTokenNameByAddress, yieldTokenAccruedValue } from "../../../../features/ytc/ytcHelpers";
-import { TrancheRatesInterface, trancheSelector } from "../../../../recoil/trancheRates/atom";
-import { Tranche } from "../../../../types/manual/types";
+import { TrancheRatesInterface } from "../../../../recoil/trancheRates/atom";
 import { shortenNumber } from "../../../../utils/shortenNumber";
 import { DetailItem } from "../../../Reusable/DetailItem";
-import { useRecoilValue, useRecoilState } from 'recoil';
-import { elementAddressesAtom } from "../../../../recoil/element/atom";
-import { getVariableAPY } from '../../../../features/prices/yearn';
 import { Spinner } from "../../../Reusable/Spinner";
 import { DetailPane } from "../../../Reusable/DetailPane";
-import { useWeb3React } from "@web3-react/core";
-import { Web3Provider } from '@ethersproject/providers';
-
-
+import { useFetchTrancheRates } from "./hooks";
 
 interface TrancheDetailsProps {
     trancheAddress: string,
@@ -25,20 +14,7 @@ interface TrancheDetailsProps {
 export const TrancheDetails: React.FC<TrancheDetailsProps> = (props) => {
     const {trancheAddress, tokenAddress} = props;
 
-    const elementAddresses = useRecoilValue(elementAddressesAtom);
-    const { library } = useWeb3React();
-    const provider = (library as Web3Provider);
-    const [trancheRate, setTrancheRates] = useRecoilState(trancheSelector(trancheAddress));
-
-    const handleChangeTrancheRate = useCallback((rateChange: Partial<TrancheRatesInterface>) => {
-        setTrancheRates((currentValue) => {
-            return {
-                ...currentValue,
-                ...rateChange,
-            }
-        })
-    }, [setTrancheRates])
-
+    const trancheRate = useFetchTrancheRates(trancheAddress, tokenAddress);
 
     return <TrancheDisplay
         {...trancheRate}

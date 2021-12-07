@@ -5,9 +5,9 @@ import { ElementAddresses } from "../../types/manual/types";
 import ERC20 from '../../artifacts/contracts/balancer-core-v2/lib/openzeppelin/ERC20.sol/ERC20.json';
 import { ERC20 as ERC20Type} from '../../hardhat/typechain/ERC20';
 
-export const getYieldTotal = async (elementAddresses: ElementAddresses, trancheAddress: string, signer: Signer): Promise<number> => {
-    const tranche = new Contract(trancheAddress, ITranche.abi, signer) as ITrancheType;
-    const trancheERC20 = new Contract(trancheAddress, ERC20.abi, signer) as ERC20Type;
+export const getYieldTotal = async (elementAddresses: ElementAddresses, trancheAddress: string, signerOrProvider: Signer | ethers.providers.Provider): Promise<number> => {
+    const tranche = new Contract(trancheAddress, ITranche.abi, signerOrProvider) as ITrancheType;
+    const trancheERC20 = new Contract(trancheAddress, ERC20.abi, signerOrProvider) as ERC20Type;
 
     const supply = await tranche.interestSupply();
 

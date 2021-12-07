@@ -13,8 +13,9 @@ import { YTCInput } from "../../../../features/ytc/ytcHelpers";
 import { Web3Provider } from '@ethersproject/providers';
 import { trancheSelector } from "../../../../recoil/trancheRates/atom";
 import { notificationAtom } from "../../../../recoil/notifications/atom";
-import { ElementAddresses, Token } from "../../../../types/manual/types";
+import { Token, Tranche } from "../../../../types/manual/types";
 import { getVariableAPY } from "../../../../features/prices/yearn";
+import { getActiveTranches } from "../../../../features/element";
 
 // on location change, reset the simulation results
 export const useClearSimOnLocationChange = () => {
@@ -147,12 +148,12 @@ export const useSimulate = () => {
     return handleSimulate;
 }
 
-export const useTokenName = () => {
+export const useTokenName = (tokenAddress: string | undefined) => {
 
     const activeTokens = useRecoilValue(activeTokensSelector);
 
-    const getTokenName = useCallback(
-        (tokenAddress: string | undefined): string | undefined => {
+    const getTokenName = useMemo(
+        (): string | undefined => {
             if (!tokenAddress){
                 return undefined;
             }
@@ -160,17 +161,16 @@ export const useTokenName = () => {
                 return token.address === tokenAddress;
             })
             return token?.name || undefined;
-    }, [activeTokens])
+    }, [activeTokens, tokenAddress])
 
     return getTokenName;
 }
 
-export const useVariableAPY = () => {
+export const useVariableAPY = (tokenAddress: string) => {
     const elementAddresses = useRecoilValue(elementAddressesAtom);
-    const getTokenName = useTokenName();
+    const tokenName = useTokenName(tokenAddress);
 
-    return useCallback(async (tokenAddress: string) => {
-        const tokenName = getTokenName(tokenAddress);
+    return useCallback(async () => {
         if (tokenName){
             try {
                 const variableApy = await getVariableAPY(tokenName, elementAddresses);
@@ -179,5 +179,15 @@ export const useVariableAPY = () => {
                 console.error(error)
             }
         }
-    }, [elementAddressesAtom, getTokenName])
+    }, [elementAddresses, tokenName])
+}
+
+export const useTranches = (tokenAddress: string | undefined): Tranche[] | undefined => {
+    const elementAddresses = useRecoilValue(elementAddressesAtom);
+
+    return useMemo(() => {
+        if (tokenAddress){
+            return getActiveTranches(tokenAddress, elementAddresses)
+        }
+    }, [tokenAddress, elementAddresses])
 }

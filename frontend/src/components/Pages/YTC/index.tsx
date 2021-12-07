@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react"
-import { elementAddressesAtom } from "../../../recoil/element/atom";
-import { Token } from "../../../types/manual/types";
+import React from "react"
 import { Calculator } from "./Calculator";
 import { Execution } from "./Executor";
 import { useRecoilValue } from 'recoil';
@@ -16,7 +14,6 @@ interface YTCProps {}
 
 export const YTC: React.FC<YTCProps> = (props) => {
 
-    const [baseTokens, setBaseTokens] = useState<Token[]>([]);
     const resultIndex = useRecoilValue(selectedSimulationAtom);
     const simulationResults: YTCOutput[] = useRecoilValue(calculatorGainSelector);
 
@@ -27,7 +24,6 @@ export const YTC: React.FC<YTCProps> = (props) => {
             infoLink="https://medium.com/@component_general/how-to-yield-token-compound-using-the-ytc-tool-742d140a7c9c"
         />
                     <Calculator
-                        tokens={baseTokens}
                     />
                     {
                         (simulationResults.length > 0) && <>

@@ -203,12 +203,12 @@ export const calculateGain = (ytExposure: number, speculatedVariableRate: number
     }
 }
 
-export const yieldTokenAccruedValue = async (elementAddresses: ElementAddresses, trancheAddress: string, signer: Signer): Promise<number> => {
-    const wrappedPositionTotal = await getUnderlyingTotal(elementAddresses, trancheAddress, signer);
+export const yieldTokenAccruedValue = async (elementAddresses: ElementAddresses, trancheAddress: string, signerOrProvider: Signer | ethers.providers.Provider): Promise<number> => {
+    const wrappedPositionTotal = await getUnderlyingTotal(elementAddresses, trancheAddress, signerOrProvider);
 
-    const principalTotal = await  getPrincipalTotal(elementAddresses, trancheAddress, signer);
+    const principalTotal = await  getPrincipalTotal(elementAddresses, trancheAddress, signerOrProvider);
 
-    const yieldTotal = await getYieldTotal(elementAddresses, trancheAddress, signer);
+    const yieldTotal = await getYieldTotal(elementAddresses, trancheAddress, signerOrProvider);
 
     return (wrappedPositionTotal - principalTotal) / yieldTotal;
 }

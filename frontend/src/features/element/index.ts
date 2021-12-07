@@ -20,7 +20,7 @@ export const getTranches = async (tokenAddress: string, elementState: ElementAdd
     return []
 }
 
-export const getActiveTranches = async (tokenAddress: string, elementState: ElementAddresses): Promise<Tranche[]> => {
+export const getActiveTranches = (tokenAddress: string, elementState: ElementAddresses): Tranche[] => {
     const tokenName = _.findKey(elementState.tokens, (value) => value === tokenAddress)
 
     if (tokenName){
@@ -28,14 +28,14 @@ export const getActiveTranches = async (tokenAddress: string, elementState: Elem
         if (tranches){
             return tranches.filter((tranche: Tranche) => {
                 return isTrancheActive(tranche)
-            })
+            }).sort((a, b) => (a.expiration - b.expiration))
         }
     }
 
     return []
 }
 
-export const getBaseTokens = async (elementState: ElementAddresses): Promise<Token[]> => {
+export const getBaseTokens = (elementState: ElementAddresses): Token[] => {
     const tokens = elementState.tokens;
 
     return Object.entries(tokens).map(([key, value]: [string, string]) => {
@@ -46,11 +46,11 @@ export const getBaseTokens = async (elementState: ElementAddresses): Promise<Tok
     })
 }
 
-export const getBaseTokensWithActiveTranches = async (elementState: ElementAddresses): Promise<any> => {
+export const getBaseTokensWithActiveTranches = (elementState: ElementAddresses): Token[] => {
     const tokens = elementState.tokens;
 
-    const promises = Object.entries(tokens).map(async ([key, value]: [string, string]) => {
-        const tranches = await getActiveTranches(value, elementState)
+    const results = Object.entries(tokens).map(([key, value]: [string, string]) => {
+        const tranches = getActiveTranches(value, elementState)
 
         return {
             name: key,
@@ -59,9 +59,9 @@ export const getBaseTokensWithActiveTranches = async (elementState: ElementAddre
         }
     });
 
-    return (await Promise.all(promises)).filter(({name, address, tranches}) => {
+    return results.filter(({tranches}) => {
         return tranches.length > 0
-    }).map(({name, address, tranches}) => {
+    }).map(({name, address}) => {
         return {
             name,
             address,

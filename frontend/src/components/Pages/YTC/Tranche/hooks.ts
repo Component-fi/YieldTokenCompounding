@@ -1,36 +1,49 @@
-import { getVariableAPY } from "../../../../features/prices/yearn";
+import { Web3Provider } from "@ethersproject/providers";
+import { useWeb3React } from "@web3-react/core";
+import { useCallback, useEffect } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { getFixedRate } from "../../../../features/element/fixedRate";
+import { elementAddressesAtom } from "../../../../recoil/element/atom";
+import { TrancheRatesInterface, trancheSelector } from "../../../../recoil/trancheRates/atom";
 import { useTokenName, useVariableAPY } from "../Calculator/hooks";
+import { yieldTokenAccruedValue } from "../../../../features/ytc/ytcHelpers";
+import { Tranche } from "../../../../types/manual/types";
+import { getRemainingTrancheYears, getTrancheByAddress } from "../../../../features/element";
 
 
-const useUpdateVariableRate = (tokenAddress: string) => {
+export const useFetchTrancheRates = (trancheAddress: string, tokenAddress: string) => {
 
-    const getVariableRate = useVariableAPY();
-    const variable = getVariableRate(tokenAddress)
+    const [trancheRates, setTrancheRates] = useRecoilState(trancheSelector(trancheAddress));
+    const getVariableRate = useVariableAPY(tokenAddress);
+    const elementAddresses = useRecoilValue(elementAddressesAtom);
 
-    handleChangeTrancheRate({
-        variable: apy
-    })
+    const tokenName = useTokenName(tokenAddress)
 
+    const { library } = useWeb3React();
+    const provider = library as Web3Provider;
 
-        getVariableAPY(baseTokenName, elementAddresses).then((apy) => {
+    const handleChangeTrancheRate = useCallback((rateChange: Partial<TrancheRatesInterface>) => {
+        setTrancheRates((currentValue) => {
+            return {
+                ...currentValue,
+                ...rateChange,
+            }
         })
-    }
+    }, [setTrancheRates])
+    
+    useEffect(() => {
+        getVariableRate().then((variable) => {
+            if (variable){
+                handleChangeTrancheRate({
+                    variable,
+                })
+            }
+        })
+    }, [getVariableRate, handleChangeTrancheRate])
 
-        const baseTokenName = getTokenNameByAddress(tokenAddress, elementAddresses.tokens);
-
-        // get variable rate
-        if (baseTokenName){
-        }
-}
-
-const useUpdateFixedRate = () => {
-
-        // get baseTokenName
-        const baseTokenName = getTokenNameByAddress(tokenAddress, elementAddresses.tokens);
-
-        const signer = provider?.getSigner();
-        if (baseTokenName && signer){
-            getFixedRate(baseTokenName, trancheAddress, elementAddresses, signer).then((fixedRate) => {
+    useEffect(() => {
+        if (tokenName){
+            getFixedRate(tokenName, trancheAddress, elementAddresses, provider).then((fixedRate) => {
                 handleChangeTrancheRate({
                     fixed: fixedRate
                 })
@@ -38,13 +51,11 @@ const useUpdateFixedRate = () => {
                 console.error(error);
             })
         }
-}
+    }, [tokenName, trancheAddress, elementAddresses, provider, handleChangeTrancheRate]);
 
-const useUpdateAccruedValue = () => {
-
-        const signer = provider?.getSigner();
-        if (signer){
-            yieldTokenAccruedValue(elementAddresses, trancheAddress, signer).then((accruedValue) => {
+    useEffect(() => {
+        if (provider){
+            yieldTokenAccruedValue(elementAddresses, trancheAddress, provider).then((accruedValue) => {
                 handleChangeTrancheRate({
                     accruedValue: accruedValue,
                 })
@@ -52,13 +63,12 @@ const useUpdateAccruedValue = () => {
                 console.error(error);
             })
         }
-}
+    }, [provider, elementAddresses, trancheAddress, handleChangeTrancheRate])
 
-const useUpdateDaysRemaining = () => {
-        const baseTokenName = getTokenNameByAddress(tokenAddress, elementAddresses.tokens);
-        if (baseTokenName){
+    useEffect(() => {
+        if (tokenName){
             const trancheDict: {[key: string]: Tranche[]} = elementAddresses.tranches;
-            const tranches: Tranche[] = trancheDict[baseTokenName];
+            const tranches: Tranche[] = trancheDict[tokenName];
             const tranche: Tranche | undefined = getTrancheByAddress(trancheAddress, tranches);
             if (tranche){
                 handleChangeTrancheRate({
@@ -66,5 +76,7 @@ const useUpdateDaysRemaining = () => {
                 })
             }
         }
-}
+    }, [tokenName, elementAddresses, handleChangeTrancheRate, trancheAddress])
 
+    return trancheRates;
+}

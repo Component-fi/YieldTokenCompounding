@@ -1,13 +1,10 @@
 import {Box, Button, Flex, FormLabel, Input, InputGroup, InputRightAddon, Select as ChakraSelect, Spinner, Text} from '@chakra-ui/react';
-import { useWeb3React } from '@web3-react/core';
 import { useFormikContext } from 'formik';
-import { MouseEventHandler, useCallback, useEffect, useState, useMemo } from 'react';
+import { MouseEventHandler, useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { FormFields } from '.';
-import { getActiveTranches } from '../../../../features/element';
 import { useBalance } from '../../../../hooks';
-import { activeTokensSelector, elementAddressesAtom } from '../../../../recoil/element/atom';
-import { simulationResultsAtom } from '../../../../recoil/simulationResults/atom';
+import { activeTokensSelector } from '../../../../recoil/element/atom';
 import { Tranche } from '../../../../types/manual/types';
 import { BaseTokenPriceTag } from '../../../Prices';
 import Card from '../../../Reusable/Card';
@@ -15,46 +12,25 @@ import { InfoTooltip } from '../../../Reusable/Tooltip';
 import { TokenIcon } from '../../../Tokens/TokenIcon';
 import { AdvancedCollapsable } from './Advanced';
 import { ApproveAndSimulateButton } from './ApproveAndSimulateButton';
-import { useClearSimOnLocationChange, useSimulate, useSetFormikValueToQueryParam, useSetQueryParamToFormikValue, useClearSimOnFormikChange, useTokenName, useVariableAPY } from './hooks';
-import { TrancheDetails } from './Tranche';
+import { useClearSimOnLocationChange, useSimulate, useSetFormikValueToQueryParam, useSetQueryParamToFormikValue, useClearSimOnFormikChange, useTokenName, useTranches } from './hooks';
+import { TrancheDetails } from '../Tranche';
 import copy from '../../../../constants/copy.json';
 
-interface FormProps {
-    balance: number | undefined,
-    setBalance: React.Dispatch<React.SetStateAction<number | undefined>>
-}
+interface FormProps {}
 
-export const Form: React.FC<FormProps> = (props) => {
+export const Form: React.FC<FormProps> = () => {
 
     const handleSimulate = useSimulate();
 
-    const {balance, setBalance } = props;
-
-    const [tranches, setTranches] = useState<Tranche[] | undefined>(undefined);
-    const simulationResults = useRecoilValue(simulationResultsAtom);
-    const elementAddresses = useRecoilValue(elementAddressesAtom)
     const formik = useFormikContext<FormFields>();
 
-    const { account } = useWeb3React();
-
     const tokenAddress = formik.values.tokenAddress;
-    const getTokenName = useTokenName();
-    const tokenName = useMemo(() => getTokenName(tokenAddress), [tokenAddress, getTokenName]);
+    const tokenName = useTokenName(tokenAddress);
 
-    const updateBalance = useBalance(tokenAddress, setBalance);
-    const setFieldValue = formik.setFieldValue;
+    const balance = useBalance(tokenAddress);
     const tokens = useRecoilValue(activeTokensSelector);
 
-    const updateTokens = useCallback (
-        () => {
-            if (tokenAddress){
-                getActiveTranches(tokenAddress, elementAddresses).then((res) => {
-                    setTranches(res);
-                    setFieldValue('trancheAddress', res[0]?.address);
-                })
-            } 
-        }, [tokenAddress, setTranches, setFieldValue, elementAddresses]
-    )
+    const tranches: Tranche[] | undefined = useTranches(tokenAddress);
 
     // if there is a token specified in the query params we want to set the value of the form to it
     useSetFormikValueToQueryParam('base_token', 'tokenAddress', tokens[0]?.address);
@@ -62,14 +38,15 @@ export const Form: React.FC<FormProps> = (props) => {
     useClearSimOnLocationChange();
     useClearSimOnFormikChange();
 
-    useEffect(() => {
-        updateTokens();
-        updateBalance();
-    }, [tokenAddress, elementAddresses, account, setFieldValue, setBalance, updateTokens, updateBalance])
+    const setFieldValue = formik.setFieldValue;
 
+    // sets the tranche address to the first value
     useEffect(() => {
-        updateBalance();
-    }, [simulationResults, updateBalance])
+        if (tranches){
+            setFieldValue('trancheAddress', tranches[0]?.address);
+        }
+    }, [setFieldValue, tranches])
+
 
     // Sets the amount to the user's balance of the base token
     const handleMax: React.MouseEventHandler<HTMLButtonElement> = (event: React.MouseEvent) => {
@@ -80,8 +57,6 @@ export const Form: React.FC<FormProps> = (props) => {
     const handleChange = (e: React.ChangeEvent<any>) => {
         formik.handleChange(e);
     }
-
-    type NewType = Tranche;
 
     return <form onSubmit={(e) => {
         e.preventDefault()
@@ -126,7 +101,7 @@ export const Form: React.FC<FormProps> = (props) => {
                         value={formik.values.trancheAddress}
                     >
                         {
-                            tranches && tranches.map((tranche: NewType) => {
+                            tranches && tranches.map((tranche: Tranche) => {
                                 return <option value={tranche.address} key={tranche.address}>
                                     {(new Date(tranche.expiration * 1000)).toLocaleDateString()}
                                 </option>
