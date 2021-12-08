@@ -1,6 +1,6 @@
-import axios from 'axios';
-import {BigNumberish} from 'ethers';
-import { ZERO_ADDRESS } from 'constants/static';
+import axios from "axios";
+import { BigNumberish } from "ethers";
+import { ZERO_ADDRESS } from "constants/static";
 
 interface UserZapIn {
   toWhomToIssue: string;
@@ -16,7 +16,7 @@ interface GetZapInData {
   sellAmount: BigNumberish;
   poolAddress: string;
   protocol: string;
-  affiliateAddress?: string,
+  affiliateAddress?: string;
 }
 
 const userZapIn = async ({
@@ -80,23 +80,22 @@ interface ZapSwapDataInput {
 }
 
 export const getZapSwapData = async ({
-    ownerAddress,
-    sellToken,
-    sellAmount,
-    buyToken,
+  ownerAddress,
+  sellToken,
+  sellAmount,
+  buyToken,
 }: ZapSwapDataInput) => {
-
-    const params = {
-        api_key: process.env.REACT_APP_ZAPPER_API_KEY,
-        ownerAddress,
-        buyTokenAddress: buyToken,
-        sellTokenAddress: sellToken,
-        sellAmount: sellAmount.toString(),
-        gasPrice: "250000000000",
-        slippagePercentage: "0.05",
-        network: "ethereum",
-        skipGasEstimate: true,
-    }
+  const params = {
+    api_key: process.env.REACT_APP_ZAPPER_API_KEY,
+    ownerAddress,
+    buyTokenAddress: buyToken,
+    sellTokenAddress: sellToken,
+    sellAmount: sellAmount.toString(),
+    gasPrice: "250000000000",
+    slippagePercentage: "0.05",
+    network: "ethereum",
+    skipGasEstimate: true,
+  };
   const data = await axios
     .get("https://api.zapper.fi/v1/exchange/quote", { params })
     .then((r) => {
@@ -106,10 +105,7 @@ export const getZapSwapData = async ({
       console.log(error.response.data);
     });
 
-    return data;
-}
-
-export {
-  getZapInData,
-  userZapIn,
+  return data;
 };
+
+export { getZapInData, userZapIn };

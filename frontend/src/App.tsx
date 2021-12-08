@@ -1,21 +1,20 @@
-import React, { useEffect } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { Web3ReactProvider } from '@web3-react/core';
-import { Web3Provider } from '@ethersproject/providers';
-import Layout from 'components/Layout/Layout';
-import { elementAddressesAtom } from 'recoil/element/atom';
-import { fetchElementState } from 'recoil/element/fetch';
-import { chainNameAtom } from 'recoil/chain/atom';
+import React, { useEffect } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { Web3ReactProvider } from "@web3-react/core";
+import { Web3Provider } from "@ethersproject/providers";
+import Layout from "components/Layout/Layout";
+import { elementAddressesAtom } from "recoil/element/atom";
+import { fetchElementState } from "recoil/element/fetch";
+import { chainNameAtom } from "recoil/chain/atom";
 
 function App() {
-
   const [, setElementState] = useRecoilState(elementAddressesAtom);
   const chainName = useRecoilValue(chainNameAtom);
 
   function getLibrary(provider: any): Web3Provider {
-    const library = new Web3Provider(provider)
-    library.pollingInterval = 12000
-    return library
+    const library = new Web3Provider(provider);
+    library.pollingInterval = 12000;
+    return library;
   }
 
   // Get the element state file from their github repo
@@ -23,14 +22,14 @@ function App() {
   useEffect(() => {
     fetchElementState(chainName).then((json) => {
       setElementState(json);
-    })
-  }, [chainName, setElementState])
+    });
+  }, [chainName, setElementState]);
 
   return (
     <div className="App">
-        <Web3ReactProvider getLibrary={getLibrary}>
-            <Layout/>
-        </Web3ReactProvider>
+      <Web3ReactProvider getLibrary={getLibrary}>
+        <Layout />
+      </Web3ReactProvider>
     </div>
   );
 }
