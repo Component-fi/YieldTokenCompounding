@@ -2,9 +2,9 @@ import React from "react"
 import { Calculator } from "./Calculator";
 import { Execution } from "./Executor";
 import { useRecoilValue } from 'recoil';
-import { calculatorGainSelector, selectedSimulationAtom } from '../../../recoil/simulationResults/atom';
-import { YTCOutput } from "../../../api/ytc/helpers";
-import { Title } from "../../Layout/Title";
+import { calculatorGainSelector, selectedSimulationAtom } from 'recoil/simulationResults/atom';
+import { YTCOutput } from "api/ytc/helpers";
+import { Title } from "components/Layout/Title";
 import ResultsTable from "./Table";
 import Icon from "@chakra-ui/icon";
 import { Flex } from "@chakra-ui/layout";
@@ -46,15 +46,7 @@ export const YTC: React.FC<YTCProps> = (props) => {
                                         </Flex>
                                         <Execution/>
                                     <ApproveAndConfirmButton
-                                        id="approve-calculate-button"
-                                        rounded="full"
-                                        bgColor="main.primary"
-                                        _hover={{
-                                            bgColor:"main.primary_hover"
-                                        }}
-                                        mt="4"
-                                        p="2"
-                                        textColor="text.secondary"
+                                        id="approve-confirm-button"
                                     />
                                     </Flex>
                                 )

@@ -1,4 +1,4 @@
-import { ElementAddresses } from "../../types/manual/types";
+import { ElementAddresses } from "types/manual/types";
 import _ from 'lodash'
 
 const YEARN_API_ENDPOINT = 'https://api.yearn.finance/v1/chains/1/vaults/all';

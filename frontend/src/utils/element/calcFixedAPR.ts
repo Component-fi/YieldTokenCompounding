@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ONE_YEAR_IN_SECONDS } from "../../constants/time";
+import { ONE_YEAR_IN_SECONDS } from "constants/time";
 
 export function calcFixedAPR(
   spotPrice: number,

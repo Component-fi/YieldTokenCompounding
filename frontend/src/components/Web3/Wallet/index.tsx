@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Text, Flex } from '@chakra-ui/react'
-import { chainNameAtom } from '../../../recoil/chain/atom';
+import { chainNameAtom } from 'recoil/chain/atom';
 import { useRecoilState } from 'recoil';
 import { Modal } from './Modal';
 import { Web3Provider } from '@ethersproject/providers';

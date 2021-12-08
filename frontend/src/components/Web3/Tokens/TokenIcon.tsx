@@ -1,8 +1,8 @@
 import { Flex } from "@chakra-ui/layout";
-import { imageLinkMap } from "../../../constants/apy-mainnet-constants";
-import { elementAddressesAtom } from "../../../recoil/element/atom";
+import { imageLinkMap } from "constants/apy-mainnet-constants";
+import { elementAddressesAtom } from "recoil/element/atom";
 import { useRecoilValue } from 'recoil';
-import { ElementAddresses } from "../../../types/manual/types";
+import { ElementAddresses } from "types/manual/types";
 import Icon from "@chakra-ui/icon";
 import { useEffect, useState } from "react";
 

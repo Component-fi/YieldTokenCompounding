@@ -1,4 +1,4 @@
-import { Title } from "../../Layout/Title"
+import { Title } from "components/Layout/Title"
 import { Flex, Text } from '@chakra-ui/layout';
 
 export const Ladder: React.FC<any> = () => {

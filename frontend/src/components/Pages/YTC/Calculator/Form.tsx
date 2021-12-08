@@ -1,21 +1,39 @@
-import {Box, Button, Flex, FormLabel, Input, InputGroup, InputRightAddon, Select as ChakraSelect, Text} from '@chakra-ui/react';
+import {
+    Box,
+    Button,
+    Flex,
+    FormLabel,
+    Input,
+    InputGroup,
+    InputRightAddon,
+    Text
+} from '@chakra-ui/react';
+import Card from 'components/Reusable/Card';
+import { Spinner } from 'components/Reusable/Spinner';
+import { Select } from 'components/Reusable/Select';
 import { useFormikContext } from 'formik';
-import { MouseEventHandler, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { FormFields } from '.';
-import { useBalance } from '../../../../hooks';
-import { activeTokensSelector } from '../../../../recoil/element/atom';
-import { Tranche } from '../../../../types/manual/types';
-import { BaseTokenPriceTag } from '../../../Web3/Prices';
-import Card from '../../../Reusable/Card';
-import { InfoTooltip } from '../../../Reusable/Tooltip';
-import { TokenIcon } from '../../../Web3/Tokens/TokenIcon';
+import { activeTokensSelector } from 'recoil/element/atom';
+import { Tranche } from 'types/manual/types';
+import { BaseTokenPriceTag } from 'components/Web3/Prices';
+import { InfoTooltip } from 'components/Reusable/Tooltip';
+import { TokenIcon } from 'components/Web3/Tokens/TokenIcon';
 import { AdvancedCollapsable } from './Advanced';
 import { ApproveAndSimulateButton } from './ApproveAndSimulateButton';
-import { useClearSimOnLocationChange, useSimulate, useSetFormikValueToQueryParam, useSetQueryParamToFormikValue, useClearSimOnFormikChange, useTokenName, useTranches } from './hooks';
-import { TrancheDetails } from '../Tranche';
-import copy from '../../../../constants/copy.json';
-import { Spinner } from '../../../Reusable/Spinner';
+import { TrancheDetails } from 'components/Pages/YTC/Tranche';
+import { useBalance } from 'hooks';
+import {
+    useClearSimOnLocationChange,
+    useSimulate,
+    useSetFormikValueToQueryParam,
+    useSetQueryParamToFormikValue,
+    useClearSimOnFormikChange,
+    useTokenName,
+    useTranches
+} from './hooks';
+import copy from 'constants/copy.json';
 
 interface FormProps {}
 
@@ -199,29 +217,8 @@ export const Form: React.FC<FormProps> = () => {
             tokenName={tokenName}
             trancheAddress={values.trancheAddress}
             amount={values.amount}
-            rounded="full"
-            bgColor="main.primary"
-            color="text.secondary"
-            mt="4"
-            p="2"
-            width="full"
-            _hover={{
-                bgColor:"main.primary_hover"
-            }}
         />
     </form>
-}
-
-const Select: typeof ChakraSelect= (props) => {
-    return <ChakraSelect
-        width="40"
-        rounded="full"
-        variant="filled"
-        bgColor="input_bg"
-        cursor="pointer"
-        {...props}
-    >
-    </ChakraSelect>
 }
 
 const Balance: React.FC<{tokenAddress: string | undefined}> = (props) => {

@@ -1,9 +1,9 @@
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { Flex, Tooltip, Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
-import { trancheSelector } from "../../../../recoil/trancheRates/atom";
-import { shortenNumber } from "../../../../utils/shortenNumber";
-import copy from '../../../../constants/copy.json';
+import { trancheSelector } from "recoil/trancheRates/atom";
+import { shortenNumber } from "utils/shortenNumber";
+import copy from 'constants/copy.json';
 
 
 interface ExposureBarProps {

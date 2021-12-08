@@ -1,5 +1,5 @@
 import { ethers, Signer } from "ethers"
-import { ElementAddresses } from "../../types/manual/types";
+import { ElementAddresses } from "types/manual/types";
 import { getRelativePriceFromCoingecko, isCoingeckoToken } from "./coingecko"
 import { getPriceOfCurveLP, isCurveToken } from "./curve"
 

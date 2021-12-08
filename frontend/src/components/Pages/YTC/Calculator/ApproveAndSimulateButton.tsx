@@ -1,16 +1,17 @@
-import { Button, ButtonProps, Spinner } from "@chakra-ui/react";
-import { BalancerApproval, ERC20Approval } from "../../../Web3/Tokens/Approval";
+import { Button as ChakraButton, ButtonProps, Spinner } from "@chakra-ui/react";
+import { BalancerApproval, ERC20Approval } from "components/Web3/Tokens/Approval";
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { isSimulatedSelector, isSimulatingAtom, selectedCalculatorGainSelector, simulationResultsAtom } from "../../../../recoil/simulationResults/atom";
-import { deployments } from "../../../../constants/apy-mainnet-constants";
+import { isSimulatedSelector, isSimulatingAtom, selectedCalculatorGainSelector, simulationResultsAtom } from "recoil/simulationResults/atom";
+import { deployments } from "constants/apy-mainnet-constants";
 import { useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from '@ethersproject/providers';
-import { elementAddressesAtom } from "../../../../recoil/element/atom";
-import { notificationAtom } from "../../../../recoil/notifications/atom";
-import { slippageToleranceAtom } from "../../../../recoil/transactionSettings/atom";
-import { executeYieldTokenCompounding } from "../../../../api/ytc/execute";
-import { useBalance } from "../../../../hooks";
+import { elementAddressesAtom } from "recoil/element/atom";
+import { notificationAtom } from "recoil/notifications/atom";
+import { slippageToleranceAtom } from "recoil/transactionSettings/atom";
+import { executeYieldTokenCompounding } from "api/ytc/execute";
+import { useBalance } from "hooks";
+import { Button } from "components/Reusable/Button";
 
 interface ApproveAndSimulateButtonProps {
     tokenAddress: string | undefined;
@@ -33,7 +34,7 @@ export const ApproveAndSimulateButton: React.FC<ApproveAndSimulateButtonProps & 
                 formErrors={formErrors}
                 {...rest}
             />
-</BalancerApproval>
+    </BalancerApproval>
 }
 
 interface ApproveAndConfirmButtonProps {
@@ -145,8 +146,17 @@ export const SimulateButton: React.FC<SimulateButtonProps & ButtonProps> = (prop
     return <Button
         id="approve-calculate-button"
         type="submit"
-        {...rest}
+        rounded="full"
+        bgColor="main.primary"
+        color="text.secondary"
+        mt="4"
+        p="2"
+        width="full"
+        _hover={{
+            bgColor:"main.primary_hover"
+        }}
         disabled={!areNoErrors}
+        {...rest}
     >
         {
             isSimulating ? 

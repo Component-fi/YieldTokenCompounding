@@ -1,9 +1,9 @@
 import { Box, Flex, Link } from '@chakra-ui/layout';
 import React from 'react';
-import githubLogo from '../../../images/Github/GitHub-Mark-64px.png';
-import twitterLogo from '../../../images/Twitter/Twitter logo/SVG/Logo black.svg';
-import mediumLogo from '../../../images/Medium/03_Symbol/01_Black/SVG/Medium_Symbol_NoPadding.svg';
-import { GITHUB_REPO, MEDIUM, TWITTER } from '../../../constants/static';
+import githubLogo from 'images/Github/GitHub-Mark-64px.png';
+import twitterLogo from 'images/Twitter/Twitter logo/SVG/Logo black.svg';
+import mediumLogo from 'images/Medium/03_Symbol/01_Black/SVG/Medium_Symbol_NoPadding.svg';
+import { GITHUB_REPO, MEDIUM, TWITTER } from 'constants/static';
 
 export const Footer: React.FC<{}> = () => {
     return (

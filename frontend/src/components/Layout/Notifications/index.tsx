@@ -1,5 +1,5 @@
 import { useToast } from "@chakra-ui/toast";
-import { notificationAtom } from "../../../recoil/notifications/atom";
+import { notificationAtom } from "recoil/notifications/atom";
 import { useRecoilValue } from "recoil";
 import { useEffect } from "react";
 import { Box, Link, Text } from "@chakra-ui/layout";

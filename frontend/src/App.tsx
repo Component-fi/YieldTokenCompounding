@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import Layout from './components/Layout/Layout';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { elementAddressesAtom } from './recoil/element/atom';
-import { fetchElementState } from './recoil/element/fetch';
-import { chainNameAtom } from './recoil/chain/atom';
 import { Web3ReactProvider } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
+import Layout from 'components/Layout/Layout';
+import { elementAddressesAtom } from 'recoil/element/atom';
+import { fetchElementState } from 'recoil/element/fetch';
+import { chainNameAtom } from 'recoil/chain/atom';
 
 function App() {
 

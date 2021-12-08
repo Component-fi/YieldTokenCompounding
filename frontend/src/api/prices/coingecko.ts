@@ -1,4 +1,4 @@
-import { COINGECKO_TOKEN_NAME_TRANSLATION, validCoingeckoTokens } from "../../constants/apy-mainnet-constants";
+import { COINGECKO_TOKEN_NAME_TRANSLATION, validCoingeckoTokens } from "constants/apy-mainnet-constants";
 
 export type CoingeckoTokenName = (typeof validCoingeckoTokens[number])
 export const isCoingeckoToken = (x: any): x is CoingeckoTokenName => validCoingeckoTokens.includes(x);
