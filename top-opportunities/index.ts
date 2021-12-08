@@ -1,57 +1,13 @@
-import { deployments } from '../frontend/src/constants/apy-mainnet-constants';
-import { simulateYTCForCompoundRange, simulateYTCZap } from '../frontend/src/features/ytc/simulateYTC';
-import { calculateGain, YTCInput, YTCOutput, yieldTokenAccruedValue, YTCGain } from '../frontend/src/features/ytc/ytcHelpers';
-import mainnetConstants from "../constants/mainnet-constants.json";
-import { getActiveTranches } from '../frontend/src/features/element';
-import { ElementAddresses, Tranche } from '../frontend/src/types/manual/types';
 import hre from 'hardhat';
-import { getTokenPrice } from '../frontend/src/features/prices';
-import { getVariableAPY } from '../frontend/src/features/prices/yearn';
 import {createObjectCsvWriter} from 'csv-writer';
-const csvWriter = createObjectCsvWriter({
-    path: "out.csv",
-    header: [
-        {
-            id: 'tokenName',
-            title: 'Token Name'
-        },
-        {
-            id: 'tokenAddress',
-            title: 'Token Address'
-        },
-        {
-            id: 'compounds',
-            title: 'Number Compounds'
-        },
-        {
-            id: 'trancheAddress',
-            title: 'Tranche Address'
-        },
-        {
-            id: 'expiry',
-            title: 'Expiry'
-        },
-        {
-            id: 'netGain',
-            title: 'Net Gain'
-        },
-        {
-            id: 'roi',
-            title: 'ROI'
-        },
-        {
-            id: 'apr',
-            title: 'APR'
-        },
-        {
-            id: 'spent',
-            title: 'Tokens Spent'
-        }
-    ]
-})
-
-
-const AMOUNT = 50000;
+import mainnetConstants from '../constants/mainnet-constants.json';
+import { ElementAddresses } from '../frontend/src/types/manual/types';
+import { calculateGain, yieldTokenAccruedValue, YTCGain, YTCInput, YTCOutput } from '../frontend/src/api/ytc/helpers';
+import { getTokenPrice } from '../frontend/src/api/prices';
+import { getActiveTranches } from '../frontend/src/api/element';
+import { deployments } from '../frontend/src/constants/apy-mainnet-constants';
+import { simulateYTCForCompoundRange } from '../frontend/src/api/ytc/simulate';
+import { getVariableAPY } from '../frontend/src/api/prices/yearn';
 
 interface TrancheResult {
     address: string;
@@ -65,7 +21,7 @@ interface TokenResult {
     output: any;
 }
 
-const start = async () => {
+const start = async (amount: number) => {
     const constants: ElementAddresses = mainnetConstants;
 
     const tokens = constants.tokens;
@@ -76,7 +32,7 @@ const start = async () => {
 
         const baseTokenPrice = await getTokenPrice(key, constants, provider);
 
-        const baseTokenAmount = AMOUNT/baseTokenPrice;
+        const baseTokenAmount = amount/baseTokenPrice;
 
         const tranches = await getActiveTranches(value, constants);
 
@@ -114,7 +70,7 @@ const start = async () => {
             
             return {
                 address: tranche.address,
-                expiry: (new Date(tranche.expiration * 1000)).toString(),
+                expiry: (new Date(tranche.expiration * 1000)).toDateString(),
                 output: gains,
             }
         })
@@ -161,7 +117,7 @@ const start = async () => {
 }
 
 
-const logResults = (results: TokenResult[]) => {
+const logResults = (results: TokenResult[], amount: string) => {
     const data: any[] = [];
 
     results.map((tokenResult: TokenResult) => {
@@ -178,45 +134,59 @@ const logResults = (results: TokenResult[]) => {
         })
     })
 
+    const date = new Date(Date.now()).toDateString();
+
+    const csvWriter = createObjectCsvWriter({
+        path: `top-opportunities/ytc-${date}-${amount}.csv`,
+        header: [
+            {
+                id: 'tokenName',
+                title: 'Token Name'
+            },
+            {
+                id: 'tokenAddress',
+                title: 'Token Address'
+            },
+            {
+                id: 'compounds',
+                title: 'Number Compounds'
+            },
+            {
+                id: 'trancheAddress',
+                title: 'Tranche Address'
+            },
+            {
+                id: 'expiry',
+                title: 'Expiry'
+            },
+            {
+                id: 'netGain',
+                title: 'Net Gain'
+            },
+            {
+                id: 'roi',
+                title: 'ROI'
+            },
+            {
+                id: 'apr',
+                title: 'APR'
+            },
+            {
+                id: 'spent',
+                title: 'Tokens Spent'
+            }
+        ]
+    })
+
     csvWriter.writeRecords(data);
     
 }
 
-start().then((results) => {
-    logResults(results);
+[10000, 50000, 100000, 500000, 1000000].map((number) => {
+    start(number).then((results) => {
+        logResults(results, number.toString());
+    })
 })
 
 const isFilled = <T extends {}>(v: PromiseSettledResult<T>): v is PromiseFulfilledResult<T> => v.status === 'fulfilled';
 const isRejected = (v: PromiseSettledResult<any>): v is PromiseRejectedResult => v.status === 'rejected';
-
-// function flattenObject(oldObject: any) {
-//     const newObject = {};
-  
-//     flattenHelper(oldObject, newObject, '');
-  
-//     return newObject;
-  
-//     function flattenHelper(currentObject: any, newObject: any, previousKeyName: any) {
-//       for (let key in currentObject) {
-//         let value = currentObject[key];
-  
-//         if (value.constructor !== Object) {
-//           if (previousKeyName == null || previousKeyName == '') {
-//             newObject[key] = value;
-//           } else {
-//             if (key == null || key == '') {
-//               newObject[previousKeyName] = value;
-//             } else {
-//               newObject[previousKeyName + '.' + key] = value;
-//             }
-//           }
-//         } else {
-//           if (previousKeyName == null || previousKeyName == '') {
-//             flattenHelper(value, newObject, key);
-//           } else {
-//             flattenHelper(value, newObject, previousKeyName + '.' + key);
-//           }
-//         }
-//       }
-//     }
-//   }
