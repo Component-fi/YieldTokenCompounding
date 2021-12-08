@@ -1,19 +1,30 @@
 import { Contract, ethers, Signer } from "ethers";
-import ITranche from 'artifacts/contracts/element-finance/ITranche.sol/ITranche.json';
-import { ITranche as ITrancheType} from "hardhat/typechain/ITranche";
+import ITranche from "artifacts/contracts/element-finance/ITranche.sol/ITranche.json";
+import { ITranche as ITrancheType } from "hardhat/typechain/ITranche";
 import { ElementAddresses } from "types/manual/types";
-import ERC20 from 'artifacts/contracts/balancer-core-v2/lib/openzeppelin/ERC20.sol/ERC20.json';
-import { ERC20 as ERC20Type} from 'hardhat/typechain/ERC20';
+import ERC20 from "artifacts/contracts/balancer-core-v2/lib/openzeppelin/ERC20.sol/ERC20.json";
+import { ERC20 as ERC20Type } from "hardhat/typechain/ERC20";
 
+export const getPrincipalTotal = async (
+  elementAddresses: ElementAddresses,
+  trancheAddress: string,
+  signerOrProvider: Signer | ethers.providers.Provider
+): Promise<number> => {
+  const tranche = new Contract(
+    trancheAddress,
+    ITranche.abi,
+    signerOrProvider
+  ) as ITrancheType;
+  const trancheERC20 = new Contract(
+    trancheAddress,
+    ERC20.abi,
+    signerOrProvider
+  ) as ERC20Type;
 
-export const getPrincipalTotal = async (elementAddresses: ElementAddresses, trancheAddress: string, signerOrProvider: Signer | ethers.providers.Provider): Promise<number> => {
-    const tranche = new Contract(trancheAddress, ITranche.abi, signerOrProvider) as ITrancheType;
-    const trancheERC20 = new Contract(trancheAddress, ERC20.abi, signerOrProvider) as ERC20Type;
+  const supply = await tranche.totalSupply();
 
-    const supply = await tranche.totalSupply();
+  const decimals = await trancheERC20.decimals();
 
-    const decimals = await trancheERC20.decimals();
-
-    // normalize the tranche balance and return
-    return parseFloat(ethers.utils.formatUnits(supply, decimals));
-}
+  // normalize the tranche balance and return
+  return parseFloat(ethers.utils.formatUnits(supply, decimals));
+};
