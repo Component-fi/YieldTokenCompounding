@@ -5,7 +5,8 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "./frontend/src"
   },
   "include": ["./scripts", "./test", "./deploy", "./frontend/test", "./frontend/src", "./constants"],
   "files": ["./hardhat.config.ts"]

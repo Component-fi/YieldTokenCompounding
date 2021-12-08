@@ -6,6 +6,7 @@ import "hardhat-deploy";
 import "hardhat-ethernal";
 import "@typechain/hardhat";
 import "@typechain/ethers-v5";
+import "tsconfig-paths/register";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
