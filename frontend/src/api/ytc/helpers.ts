@@ -15,9 +15,7 @@ import YTCZap from "../../artifacts/contracts/YTCZap.sol/YTCZap.json";
 import { getCurveSwapAddress, isCurveToken } from "../prices/curve";
 import { getZapInData } from "../zapper/getTransactionData";
 import { parseEther } from "ethers/lib/utils";
-const MAX_UINT_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-const BURN_ADDRESS = "0x000000000000000000000000000000000000dead";
+import { BURN_ADDRESS, MAX_UINT_HEX, ZERO_ADDRESS } from "../../constants/static";
 
 export interface YTCInput {
     baseTokenAddress: string;

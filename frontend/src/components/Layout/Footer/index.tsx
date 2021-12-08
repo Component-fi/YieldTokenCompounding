@@ -3,10 +3,7 @@ import React from 'react';
 import githubLogo from '../../../images/Github/GitHub-Mark-64px.png';
 import twitterLogo from '../../../images/Twitter/Twitter logo/SVG/Logo black.svg';
 import mediumLogo from '../../../images/Medium/03_Symbol/01_Black/SVG/Medium_Symbol_NoPadding.svg';
-
-const GITHUB_REPO = "https://github.com/Component-fi/YieldTokenCompounding";
-const MEDIUM = "https://medium.com/@component_general";
-const TWITTER = "https://twitter.com/componentfi";
+import { GITHUB_REPO, MEDIUM, TWITTER } from '../../../constants/static';
 
 export const Footer: React.FC<{}> = () => {
     return (

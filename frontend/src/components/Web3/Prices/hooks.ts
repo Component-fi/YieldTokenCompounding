@@ -3,8 +3,8 @@ import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from "react";
 import { elementAddressesAtom } from "../../../recoil/element/atom";
 import { useRecoilValue } from 'recoil';
-import { getTokenPrice } from '../../../features/prices';
-import { getYTCSpotPrice } from '../../../features/element/ytcSpot';
+import { getTokenPrice } from '../../../api/prices';
+import { getYTCSpotPrice } from "../../../api/element/ytcSpot";
 
 export const useBaseTokenPrice = (baseTokenName: string | undefined) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);

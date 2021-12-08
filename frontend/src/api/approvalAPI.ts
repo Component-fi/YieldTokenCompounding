@@ -1,4 +1,4 @@
-import { ERC20 } from "../../hardhat/typechain/ERC20";
+import { ERC20 } from "../hardhat/typechain/ERC20";
 import { ContractReceipt, ethers } from "ethers";
 
 export const sendApproval = async (amount: number | string, approvalAddress: string, tokenContract: ERC20): Promise<ContractReceipt> => {
