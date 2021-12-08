@@ -1,5 +1,6 @@
 import { ElementAddresses } from "types/manual/types";
 import _ from "lodash";
+import axios from "axios";
 
 const YEARN_API_ENDPOINT = "https://api.yearn.finance/v1/chains/1/vaults/all";
 
@@ -12,7 +13,7 @@ export const getVariableAPY = async (
     throw new Error("Could not find yearn vault address");
   }
 
-  const yearnVaultData = await (await fetch(YEARN_API_ENDPOINT)).json();
+  const yearnVaultData = await (await axios.get(YEARN_API_ENDPOINT)).data;
 
   const yearnVaultDetails = _.find(
     yearnVaultData,
