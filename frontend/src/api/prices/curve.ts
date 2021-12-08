@@ -1,13 +1,13 @@
 import { Signer, Contract, utils, ethers } from "ethers";
-import ICurveFi from '../../artifacts/contracts/curve/ICurveFi.sol/ICurveFi.json';
-import {ICurveFi as ICurveType} from '../../hardhat/typechain/ICurveFi';
-import { validCurveTokens } from "../../constants/apy-mainnet-constants";
-import { ERC20 as ERC20Type } from "../../hardhat/typechain/ERC20";
-import { IERC20Minter as IERC20MinterType } from "../../hardhat/typechain/IERC20Minter";
-import ERC20 from '../../artifacts/contracts/balancer-core-v2/lib/openzeppelin/ERC20.sol/ERC20.json';
-import IERC20Minter from '../../artifacts/contracts/curve/IERC20Minter.sol/IERC20Minter.json';
+import ICurveFi from 'artifacts/contracts/curve/ICurveFi.sol/ICurveFi.json';
+import {ICurveFi as ICurveType} from 'hardhat/typechain/ICurveFi';
+import { validCurveTokens } from "constants/apy-mainnet-constants";
+import { ERC20 as ERC20Type } from "hardhat/typechain/ERC20";
+import { IERC20Minter as IERC20MinterType } from "hardhat/typechain/IERC20Minter";
+import ERC20 from 'artifacts/contracts/balancer-core-v2/lib/openzeppelin/ERC20.sol/ERC20.json';
+import IERC20Minter from 'artifacts/contracts/curve/IERC20Minter.sol/IERC20Minter.json';
 import { getRelativePriceFromCoingecko } from "./coingecko";
-import { ElementAddresses } from "../../types/manual/types";
+import { ElementAddresses } from "types/manual/types";
 
 export type CurveTokenName = (typeof validCurveTokens[number])
 export const isCurveToken = (x: any): x is CurveTokenName => {

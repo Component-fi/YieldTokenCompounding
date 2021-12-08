@@ -1,8 +1,8 @@
 import React from 'react';
 import {Button, Flex, Icon, Modal as ChakraModal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text} from '@chakra-ui/react';
-import Card from '../../Reusable/Card';
+import Card from 'components/Reusable/Card';
 import { useWeb3React } from '@web3-react/core';
-import {injected} from '../../../connectors';
+import {injected} from 'connectors';
 
 interface Props {
     isOpen: boolean;

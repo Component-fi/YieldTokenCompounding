@@ -2,14 +2,14 @@ import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { Button, Collapse, Flex, Icon, Text} from "@chakra-ui/react";
 import { useState } from "react";
 import { useRecoilValue } from "recoil";
-import { trancheSelector } from "../../../../recoil/trancheRates/atom";
-import { shortenNumber } from "../../../../utils/shortenNumber";
-import { BaseTokenPriceTag, YTPriceTag } from "../../../Web3/Prices";
-import { DetailItem } from "../../../Reusable/DetailItem";
-import { DetailPane } from "../../../Reusable/DetailPane";
-import { InfoTooltip } from "../../../Reusable/Tooltip";
-import WalletSettings from "../../../Web3/Wallet/Settings";
-import copy from '../../../../constants/copy.json';
+import { trancheSelector } from "recoil/trancheRates/atom";
+import { shortenNumber } from "utils/shortenNumber";
+import { BaseTokenPriceTag, YTPriceTag } from "components/Web3/Prices";
+import { DetailItem } from "components/Reusable/DetailItem";
+import { DetailPane } from "components/Reusable/DetailPane";
+import { InfoTooltip } from "components/Reusable/Tooltip";
+import WalletSettings from "components/Web3/Wallet/Settings";
+import copy from 'constants/copy.json';
 
 interface ExecutionDetailsProps {
     slippageTolerance: number;

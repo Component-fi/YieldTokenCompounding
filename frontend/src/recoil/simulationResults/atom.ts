@@ -1,7 +1,7 @@
 import { atom, selector } from 'recoil'
-import { calculateGain, YTCOutput } from '../../api/ytc/helpers'
-import { predictedRateAtom } from '../predictedRate/atom'
-import { trancheSelector } from '../trancheRates/atom'
+import { calculateGain, YTCOutput } from 'api/ytc/helpers'
+import { predictedRateAtom } from 'recoil/predictedRate/atom'
+import { trancheSelector } from 'recoil/trancheRates/atom'
 // This is a recoil atom
 // Atoms are pieces of state that can be accessed and or modified by various components through a set of hooks
 

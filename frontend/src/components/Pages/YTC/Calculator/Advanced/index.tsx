@@ -2,12 +2,12 @@ import { useState } from "react";
 import {Flex, Button, Collapse, Tabs, TabList, Tab, TabPanels, TabPanel, InputGroup, Input, InputRightAddon, Text, FormLabel} from '@chakra-ui/react'
 import { useFormikContext } from "formik";
 import { useRecoilValue } from "recoil";
-import { trancheSelector } from "../../../../../recoil/trancheRates/atom";
-import { getCompoundsFromTargetExposure } from "../../../../../api/ytc/simulate";
+import { trancheSelector } from "recoil/trancheRates/atom";
+import { getCompoundsFromTargetExposure } from "api/ytc/simulate";
 import { FormFields } from "..";
-import { InfoTooltip } from "../../../../Reusable/Tooltip";
+import { InfoTooltip } from "components/Reusable/Tooltip";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import copy from '../../../../../constants/copy.json';
+import copy from 'constants/copy.json';
 
 export const AdvancedCollapsable: React.FC = () => {
     const [show, setShow] = useState<boolean>(false);

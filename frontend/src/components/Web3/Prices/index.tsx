@@ -1,5 +1,5 @@
 import React from 'react'
-import { shortenNumber } from '../../../utils/shortenNumber';
+import { shortenNumber } from 'utils/shortenNumber';
 import { Text } from '@chakra-ui/react';
 import { useBaseTokenPrice, useYieldTokenPrice } from './hooks';
 

@@ -2,10 +2,9 @@ import { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { getBalance } from "../features/element";
-import { ERC20__factory } from "../hardhat/typechain";
+import { getBalance } from "api/element";
+import { ERC20__factory } from "hardhat/typechain";
 
-// TOOD this can be moved to a utility
 export function useQuery() {
     return new URLSearchParams(useLocation().search);
 }

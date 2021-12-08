@@ -1,12 +1,12 @@
 // calculate the fixed rate of the pToken
 
 import { ethers, Signer } from "ethers";
-import { ElementAddresses, Tranche } from "../../types/manual/types";
-import { getReserves } from "../../utils/element/getReserves";
-import { calcSpotPricePt } from "../../utils/element/calcSpotPrice";
-import { calcFixedAPR } from "../../utils/element/calcFixedAPR";
+import { ElementAddresses, Tranche } from "types/manual/types";
+import { getReserves } from "utils/element/getReserves";
+import { calcSpotPricePt } from "utils/element/calcSpotPrice";
+import { calcFixedAPR } from "utils/element/calcFixedAPR";
 import _ from 'lodash';
-import { ONE_YEAR_IN_SECONDS } from "../../constants/time";
+import { ONE_YEAR_IN_SECONDS } from "constants/time";
 
 // calculate the fixed rate of the pTokens for a tranche
 

@@ -1,17 +1,16 @@
 import React, { useEffect, useRef } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { calculatorGainSelector, selectedSimulationAtom } from '../../../../recoil/simulationResults/atom'
+import { calculatorGainSelector, selectedSimulationAtom } from 'recoil/simulationResults/atom'
 import { Table, Th, Thead, Flex, Tr, Tbody, FormLabel, Text, Input, InputGroup, InputRightAddon } from '@chakra-ui/react';
-import { YTCOutput } from '../../../../api/ytc/helpers';
-import Card from '../../../Reusable/Card';
+import { YTCOutput } from 'api/ytc/helpers';
+import { predictedRateAtom } from 'recoil/predictedRate/atom';
+import { trancheSelector } from 'recoil/trancheRates/atom';
+import copy from 'constants/copy.json';
+import Card from 'components/Reusable/Card';
+import { InfoTooltip } from 'components/Reusable/Tooltip';
 import { ResultsTableRow } from './ResultsTableRow';
-import { InfoTooltip } from '../../../Reusable/Tooltip';
-import { predictedRateAtom } from '../../../../recoil/predictedRate/atom';
-import { trancheSelector } from '../../../../recoil/trancheRates/atom';
-import copy from '../../../../constants/copy.json';
 
-interface TableProps {
-}
+interface TableProps {}
 
 const ResultsTable: React.FC<TableProps> = () => {
 

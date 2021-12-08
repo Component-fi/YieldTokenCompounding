@@ -1,21 +1,21 @@
 import { BigNumber, BigNumberish, Contract, ethers, Signer } from "ethers";
-import YieldTokenCompounding from '../../artifacts/contracts/YieldTokenCompounding.sol/YieldTokenCompounding.json'
-import ITranche from '../../artifacts/contracts/element-finance/ITranche.sol/ITranche.json'
-import {ITranche as ITrancheType} from '../../hardhat/typechain/ITranche';
-import ERC20 from '../../artifacts/contracts/balancer-core-v2/lib/openzeppelin/ERC20.sol/ERC20.json'
-import {ERC20 as ERC20Type} from '../../hardhat/typechain/ERC20';
-import { ElementAddresses, Tranche } from "../../types/manual/types";
-import { getRemainingTrancheYears, getTrancheByAddress } from "../element";
-import { getTokenPrice } from "../prices";
-import { getUnderlyingTotal } from "../element/wrappedPositionAmount";
-import { getPrincipalTotal } from "../element/principalTotal";
-import { getYieldTotal } from "../element/yieldTotal";
-import { deployments } from "../../constants/apy-mainnet-constants";
-import YTCZap from "../../artifacts/contracts/YTCZap.sol/YTCZap.json";
-import { getCurveSwapAddress, isCurveToken } from "../prices/curve";
-import { getZapInData } from "../zapper/getTransactionData";
+import YieldTokenCompounding from 'artifacts/contracts/YieldTokenCompounding.sol/YieldTokenCompounding.json'
+import ITranche from 'artifacts/contracts/element-finance/ITranche.sol/ITranche.json'
+import {ITranche as ITrancheType} from 'hardhat/typechain/ITranche';
+import ERC20 from 'artifacts/contracts/balancer-core-v2/lib/openzeppelin/ERC20.sol/ERC20.json'
+import {ERC20 as ERC20Type} from 'hardhat/typechain/ERC20';
+import { ElementAddresses, Tranche } from "types/manual/types";
+import { getRemainingTrancheYears, getTrancheByAddress } from "api/element";
+import { getTokenPrice } from "api/prices";
+import { getUnderlyingTotal } from "api/element/wrappedPositionAmount";
+import { getPrincipalTotal } from "api/element/principalTotal";
+import { getYieldTotal } from "api/element/yieldTotal";
+import { deployments } from "constants/apy-mainnet-constants";
+import YTCZap from "artifacts/contracts/YTCZap.sol/YTCZap.json";
+import { getCurveSwapAddress, isCurveToken } from "api/prices/curve";
+import { getZapInData } from "api/zapper/getTransactionData";
 import { parseEther } from "ethers/lib/utils";
-import { BURN_ADDRESS, MAX_UINT_HEX, ZERO_ADDRESS } from "../../constants/static";
+import { BURN_ADDRESS, MAX_UINT_HEX, ZERO_ADDRESS } from "constants/static";
 
 export interface YTCInput {
     baseTokenAddress: string;

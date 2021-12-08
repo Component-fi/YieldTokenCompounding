@@ -1,7 +1,7 @@
 import { Tr, Td, Tooltip } from "@chakra-ui/react";
-import { YTCOutput } from "../../../../api/ytc/helpers";
-import { shortenNumber } from "../../../../utils/shortenNumber";
-import { BaseTokenPriceTag } from "../../../Web3/Prices";
+import { YTCOutput } from "api/ytc/helpers";
+import { shortenNumber } from "utils/shortenNumber";
+import { BaseTokenPriceTag } from "components/Web3/Prices";
 
 interface ResultsTableRowInterface {
     baseTokenName: string;
