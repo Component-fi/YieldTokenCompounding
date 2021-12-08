@@ -1,5 +1,6 @@
 import React, { ReactElement, useCallback, useEffect, useState } from "react";
-import { Button, ButtonProps, Spinner } from "@chakra-ui/react";
+import { ButtonProps, Spinner } from "@chakra-ui/react";
+import { Button } from "components/Reusable/Button";
 import { checkApproval, sendApproval } from "api/approvalAPI";
 import { BigNumber, ContractReceipt, utils, providers } from "ethers";
 import { notificationAtom } from "recoil/notifications/atom";
