@@ -5,6 +5,7 @@ import { useRecoilValue } from "recoil";
 import { ElementAddresses } from "types/manual/types";
 import Icon from "@chakra-ui/icon";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 const UNISWAP_IMAGE_URL =
   "https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/";
@@ -34,7 +35,7 @@ export const TokenIcon: React.FC<TokenIconInterface> = (props) => {
           // then check if uniswap image library has one
           const uniswapTokenUrl =
             UNISWAP_IMAGE_URL + tokenAddress + "/logo.png";
-          fetch(uniswapTokenUrl).then((response) => {
+          axios.get(uniswapTokenUrl).then((response) => {
             if (response.status !== 404) {
               setTokenUrl(uniswapTokenUrl);
             } else {

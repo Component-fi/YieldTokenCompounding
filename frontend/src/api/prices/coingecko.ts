@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
   COINGECKO_TOKEN_NAME_TRANSLATION,
   validCoingeckoTokens,
@@ -19,8 +20,8 @@ export const getRelativePriceFromCoingecko = async (
   const params = `?ids=${token1}&vs_currencies=${token2}`;
 
   const jsonResponse = await (
-    await fetch(`${COINGECKO_API_URL}${params}`)
-  ).json();
+    await axios.get(`${COINGECKO_API_URL}${params}`)
+  ).data;
 
   if (!jsonResponse) {
     throw new Error("Could not get price from coingecko");
