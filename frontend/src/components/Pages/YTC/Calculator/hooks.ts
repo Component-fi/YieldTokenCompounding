@@ -6,15 +6,15 @@ import { FormFields } from "./index";
 import { isSimulatingAtom, simulationResultsAtom } from "../../../../recoil/simulationResults/atom";
 import { useQuery } from "../../../../hooks";
 import { deployments } from "../../../../constants/apy-mainnet-constants";
-import { simulateYTCForCompoundRange } from "../../../../features/ytc/simulateYTC";
+import { simulateYTCForCompoundRange } from "../../../../api/ytc/simulate";
 import { activeTokensSelector, elementAddressesAtom } from "../../../../recoil/element/atom";
 import { useWeb3React } from "@web3-react/core";
-import { YTCInput } from "../../../../features/ytc/ytcHelpers";
+import { YTCInput } from "../../../../api/ytc/helpers";
 import { Web3Provider } from '@ethersproject/providers';
 import { trancheSelector } from "../../../../recoil/trancheRates/atom";
 import { notificationAtom } from "../../../../recoil/notifications/atom";
 import { Token, Tranche } from "../../../../types/manual/types";
-import { getVariableAPY } from "../../../../features/prices/yearn";
+import { getVariableAPY } from "../../../../api/prices/yearn";
 import { getActiveTranches } from "../../../../features/element";
 
 // on location change, reset the simulation results

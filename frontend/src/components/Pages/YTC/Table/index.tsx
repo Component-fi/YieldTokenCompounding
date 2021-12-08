@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { calculatorGainSelector, selectedSimulationAtom } from '../../../../recoil/simulationResults/atom'
 import { Table, Th, Thead, Flex, Tr, Tbody, FormLabel, Text, Input, InputGroup, InputRightAddon } from '@chakra-ui/react';
-import { YTCOutput } from '../../../../features/ytc/ytcHelpers';
+import { YTCOutput } from '../../../../api/ytc/helpers';
 import Card from '../../../Reusable/Card';
 import { ResultsTableRow } from './ResultsTableRow';
 import { InfoTooltip } from '../../../Reusable/Tooltip';

@@ -3,7 +3,7 @@ import {Flex, Button, Collapse, Tabs, TabList, Tab, TabPanels, TabPanel, InputGr
 import { useFormikContext } from "formik";
 import { useRecoilValue } from "recoil";
 import { trancheSelector } from "../../../../../recoil/trancheRates/atom";
-import { getCompoundsFromTargetExposure } from "../../../../../features/ytc/simulateYTC";
+import { getCompoundsFromTargetExposure } from "../../../../../api/ytc/simulate";
 import { FormFields } from "..";
 import { InfoTooltip } from "../../../../Reusable/Tooltip";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";

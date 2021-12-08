@@ -1,6 +1,6 @@
 import { ContractReceipt, ethers, Signer } from "ethers";
 import { ElementAddresses } from "../../types/manual/types";
-import { getYTCParameters, YTCInput } from "./ytcHelpers";
+import { getYTCParameters, YTCInput } from "./helpers";
 import { YieldTokenCompounding as YieldTokenCompoundingType } from "../../hardhat/typechain/YieldTokenCompounding";
 
 

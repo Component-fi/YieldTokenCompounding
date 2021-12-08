@@ -3,7 +3,7 @@ import { Calculator } from "./Calculator";
 import { Execution } from "./Executor";
 import { useRecoilValue } from 'recoil';
 import { calculatorGainSelector, selectedSimulationAtom } from '../../../recoil/simulationResults/atom';
-import { YTCOutput } from "../../../features/ytc/ytcHelpers";
+import { YTCOutput } from "../../../api/ytc/helpers";
 import { Title } from "../../Layout/Title";
 import ResultsTable from "./Table";
 import Icon from "@chakra-ui/icon";

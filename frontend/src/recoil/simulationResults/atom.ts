@@ -1,5 +1,5 @@
 import { atom, selector } from 'recoil'
-import { calculateGain, YTCOutput } from '../../features/ytc/ytcHelpers'
+import { calculateGain, YTCOutput } from '../../api/ytc/helpers'
 import { predictedRateAtom } from '../predictedRate/atom'
 import { trancheSelector } from '../trancheRates/atom'
 // This is a recoil atom

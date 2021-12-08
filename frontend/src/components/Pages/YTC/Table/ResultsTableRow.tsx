@@ -1,5 +1,5 @@
 import { Tr, Td, Tooltip } from "@chakra-ui/react";
-import { YTCOutput } from "../../../../features/ytc/ytcHelpers";
+import { YTCOutput } from "../../../../api/ytc/helpers";
 import { shortenNumber } from "../../../../utils/shortenNumber";
 import { BaseTokenPriceTag } from "../../../Web3/Prices";
 

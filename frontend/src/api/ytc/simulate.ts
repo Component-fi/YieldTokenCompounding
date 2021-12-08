@@ -3,7 +3,7 @@ import { Provider } from '@ethersproject/providers';
 import _ from "lodash";
 import { GAS_LIMITS } from "../../constants/gasLimits";
 import { ElementAddresses } from "../../types/manual/types";
-import { getYTCParameters, YTCInput, YTCOutput, YTCParameters } from "./ytcHelpers";
+import { getYTCParameters, YTCInput, YTCOutput, YTCParameters } from "./helpers";
 
 const LACK_OF_LIQUIDITY_MESSAGE = "execution reverted: BAL#001";
 const ZAP_FAILED_MESSAGE = "execution reverted: Zap Failed";

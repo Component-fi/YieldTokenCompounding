@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { ElementAddresses, Token, Tranche } from "../../types/manual/types";
 import { ERC20 } from '../../hardhat/typechain/ERC20';
-import { isTrancheActive } from '../ytc/ytcHelpers';
+import { isTrancheActive } from '../ytc/helpers';
 import { ethers } from 'ethers';
 import { ONE_YEAR_IN_MILLISECONDS } from '../../constants/time';
 
