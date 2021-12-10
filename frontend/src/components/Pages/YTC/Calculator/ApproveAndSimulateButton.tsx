@@ -1,4 +1,4 @@
-import { Button as ChakraButton, ButtonProps, Spinner } from "@chakra-ui/react";
+import { ButtonProps, Spinner } from "@chakra-ui/react";
 import {
   BalancerApproval,
   ERC20Approval,

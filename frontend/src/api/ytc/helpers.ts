@@ -11,11 +11,11 @@ import { getUnderlyingTotal } from "api/element/wrappedPositionAmount";
 import { getPrincipalTotal } from "api/element/principalTotal";
 import { getYieldTotal } from "api/element/yieldTotal";
 import { deployments } from "constants/apy-mainnet-constants";
-import YTCZap from "artifacts/contracts/YTCZap.sol/YTCZap.json";
 import { getCurveSwapAddress, isCurveToken } from "api/prices/curve";
 import { getZapInData } from "api/zapper/getTransactionData";
 import { parseEther } from "ethers/lib/utils";
 import { BURN_ADDRESS, MAX_UINT_HEX, ZERO_ADDRESS } from "constants/static";
+import { YTCZap__factory } from "hardhat/typechain";
 
 export interface YTCInput {
   baseTokenAddress: string;
@@ -177,7 +177,7 @@ export const getYTCParameters = async (
   const ytcAddress = deployments.YieldTokenCompounding;
   const uniswapAddress = deployments.UniswapRouter;
 
-  const ytcZap = new Contract(zapAddress, YTCZap.abi, signerOrProvider);
+  const ytcZap = YTCZap__factory.connect(zapAddress, signerOrProvider);
 
   let simulate;
   if (isCurveToken(baseTokenName)) {
@@ -282,19 +282,16 @@ export const yieldTokenAccruedValue = async (
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<number> => {
   const wrappedPositionTotal = await getUnderlyingTotal(
-    elementAddresses,
     trancheAddress,
     signerOrProvider
   );
 
   const principalTotal = await getPrincipalTotal(
-    elementAddresses,
     trancheAddress,
     signerOrProvider
   );
 
   const yieldTotal = await getYieldTotal(
-    elementAddresses,
     trancheAddress,
     signerOrProvider
   );

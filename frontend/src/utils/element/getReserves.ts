@@ -15,13 +15,8 @@
  */
 
 import { Provider } from "@ethersproject/providers";
-import { BigNumber, Signer, Contract } from "ethers";
-import { Vault as VaultType } from "../../hardhat/typechain/Vault";
-import Vault from "../../artifacts/contracts/balancer-core-v2/vault/Vault.sol/Vault.json";
-import { BasePool as BasePoolType } from "../../hardhat/typechain/BasePool";
-import BasePool from "../../artifacts/contracts/balancer-core-v2/pools/BasePool.sol/BasePool.json";
-import { ERC20 as ERC20type } from "../../hardhat/typechain/ERC20";
-import ERC20 from "../../artifacts/contracts/balancer-core-v2/lib/openzeppelin/ERC20.sol/ERC20.json";
+import { BigNumber, Signer } from "ethers";
+import { BasePool__factory, ERC20__factory, Vault__factory } from "hardhat/typechain";
 
 export interface ReservesResult {
   /**
@@ -52,21 +47,16 @@ export async function getReserves(
   balancerVaultAddress: string,
   signerOrProvider: Signer | Provider
 ): Promise<ReservesResult> {
-  const vaultAbi = Vault.abi;
 
-  const balancerVault = new Contract(
+  const balancerVault = Vault__factory.connect(
     balancerVaultAddress,
-    vaultAbi,
     signerOrProvider
-  ) as VaultType;
+  );
 
-  const poolAbi = BasePool.abi;
-
-  const poolContract = new Contract(
+  const poolContract = BasePool__factory.connect(
     poolAddress,
-    poolAbi,
     signerOrProvider
-  ) as BasePoolType;
+  );
 
   const totalSupply = await poolContract.totalSupply();
 
@@ -76,13 +66,10 @@ export async function getReserves(
   const decimals: number[] = [];
   await Promise.all(
     poolTokens.tokens.map(async (token) => {
-      const erc20Abi = ERC20.abi;
-
-      const poolTokenContract = new Contract(
+      const poolTokenContract = ERC20__factory.connect(
         token,
-        erc20Abi,
         signerOrProvider
-      ) as ERC20type;
+      )
       const poolTokenDecimals = await poolTokenContract.decimals();
       decimals.push(poolTokenDecimals);
     })

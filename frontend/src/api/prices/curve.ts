@@ -1,13 +1,8 @@
-import { Signer, Contract, utils, ethers } from "ethers";
-import ICurveFi from "artifacts/contracts/curve/ICurveFi.sol/ICurveFi.json";
-import { ICurveFi as ICurveType } from "hardhat/typechain/ICurveFi";
+import { Signer, utils, ethers } from "ethers";
 import { validCurveTokens } from "constants/apy-mainnet-constants";
-import { ERC20 as ERC20Type } from "hardhat/typechain/ERC20";
-import { IERC20Minter as IERC20MinterType } from "hardhat/typechain/IERC20Minter";
-import ERC20 from "artifacts/contracts/balancer-core-v2/lib/openzeppelin/ERC20.sol/ERC20.json";
-import IERC20Minter from "artifacts/contracts/curve/IERC20Minter.sol/IERC20Minter.json";
 import { getRelativePriceFromCoingecko } from "./coingecko";
 import { ElementAddresses } from "types/manual/types";
+import { ERC20__factory, ICurveFi__factory, IERC20Minter__factory } from "hardhat/typechain";
 
 export type CurveTokenName = typeof validCurveTokens[number];
 export const isCurveToken = (x: any): x is CurveTokenName => {
@@ -87,13 +82,10 @@ const getCurveVirtualPrice = async (
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<number> => {
   // get the curve pool contract
-  const curveAbi = ICurveFi.abi;
-  // get the number of decimals
-  const curveContract = new Contract(
+  const curveContract = ICurveFi__factory.connect(
     tokenAddress,
-    curveAbi,
     signerOrProvider
-  ) as ICurveType;
+  );
 
   const virtualPriceAbsolute = await curveContract.get_virtual_price();
 
@@ -110,25 +102,20 @@ const getTriCryptoPrice = async (
   tokenAddress: string,
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<number> => {
-  const curveAbi = ICurveFi.abi;
 
-  const curveContract = new Contract(
+  const curveContract = ICurveFi__factory.connect(
     tokenAddress,
-    curveAbi,
     signerOrProvider
-  ) as ICurveType;
+  );
 
   const lpTokenAddress = await curveContract.token();
 
   const usdtBalanceAbsolute = await curveContract.balances(0);
 
-  const erc20Abi = ERC20.abi;
-
-  const erc20Contract = new Contract(
+  const erc20Contract = ERC20__factory.connect(
     lpTokenAddress,
-    erc20Abi,
     signerOrProvider
-  ) as ERC20Type;
+  );
 
   const totalSupplyAbsolute = await erc20Contract.totalSupply();
 
@@ -153,13 +140,10 @@ export const getCurveSwapAddress = async (
   tokenAddress: string,
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<string> => {
-  const erc20MinterAbi = IERC20Minter.abi;
-
-  const erc20Contract = new Contract(
+  const erc20Contract = IERC20Minter__factory.connect(
     tokenAddress,
-    erc20MinterAbi,
     signerOrProvider
-  ) as IERC20MinterType;
+  );
 
   try {
     const minter = await erc20Contract.minter();
