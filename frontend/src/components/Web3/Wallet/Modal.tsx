@@ -2,6 +2,7 @@ import React from "react";
 import {
   Button,
   Flex,
+  FlexProps,
   Icon,
   Modal as ChakraModal,
   ModalBody,
@@ -13,7 +14,8 @@ import {
 } from "@chakra-ui/react";
 import Card from "components/Reusable/Card";
 import { useWeb3React } from "@web3-react/core";
-import { injected } from "connectors";
+import { injected, walletconnect } from "connectors";
+import walletConnectLogo from "images/walletconnect.svg";
 
 interface Props {
   isOpen: boolean;
@@ -25,8 +27,8 @@ export const Modal = (props: Props) => {
 
   const web3React = useWeb3React();
 
-  const handleConnect = async () => {
-    web3React.activate(injected);
+  const handleConnect = async (connector: any) => {
+    web3React.activate(connector);
   };
 
   const handleDisconnect = () => {
@@ -64,9 +66,9 @@ export const Modal = (props: Props) => {
               </Flex>
             </Content>
           ) : (
-            <Content title="Connect Wallet">
+            <Content title="Connect Wallet" gridGap={1}>
               <Button
-                onClick={handleConnect}
+                onClick={() => handleConnect(injected)}
                 flexDir="column"
                 height={100}
                 p={5}
@@ -203,6 +205,22 @@ export const Modal = (props: Props) => {
                 </Icon>
                 <Text>Web Wallet</Text>
               </Button>
+              <Button
+                onClick={() => handleConnect(walletconnect)}
+                flexDir="column"
+                height={100}
+                p={5}
+                bgColor="main.primary"
+                color="text.secondary"
+                _hover={{
+                  bgColor: "main.primary_hover",
+                }}
+              >
+                <Flex h={16} w={16}>
+                  <img src={walletConnectLogo} alt="Wallet Connect"/>
+                </Flex>
+                <Text>Wallet Connect</Text>
+              </Button>
             </Content>
           )}
         </Card>
@@ -216,8 +234,8 @@ interface ContentProps {
   children: React.ReactElement | React.ReactElement[];
 }
 
-const Content: React.FC<ContentProps> = (props) => {
-  const { children, title } = props;
+const Content: React.FC<ContentProps & FlexProps> = (props) => {
+  const { children, title, ...rest } = props;
 
   return (
     <>
@@ -226,7 +244,7 @@ const Content: React.FC<ContentProps> = (props) => {
       </ModalHeader>
       <ModalCloseButton />
       <ModalBody>
-        <Flex justifyContent="center" alignItems="center">
+        <Flex justifyContent="center" alignItems="center" {...rest}>
           {children}
         </Flex>
       </ModalBody>

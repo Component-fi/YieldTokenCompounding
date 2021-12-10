@@ -18,6 +18,8 @@ export const Wallet = (props: Props) => {
   useEffect(() => {
     const provider = web3React.library as Web3Provider;
 
+    console.log(provider);
+
     provider?.getNetwork().then(({ name }) => {
       if (name === "homestead") {
         setChainName("mainnet");

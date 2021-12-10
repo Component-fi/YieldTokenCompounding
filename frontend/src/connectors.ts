@@ -1,10 +1,15 @@
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 
+const RPC_URLS = {
+  1: process.env.REACT_APP_MAINNET_RPC as string,
+}
+
 export const injected = new InjectedConnector({
   supportedChainIds: [1, 31337],
 });
 // TODO only use wallet connect if valid
 export const walletconnect = new WalletConnectConnector({
-  rpc: { 1: process.env.WALLET_CONNECT_KEY || "" },
+  rpc: { 1: RPC_URLS[1]},
+  qrcode: true
 });
