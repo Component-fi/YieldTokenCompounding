@@ -27,7 +27,7 @@ const TrancheDisplay: React.FC<TrancheRatesInterface> = (props) => {
       <DetailItem
         name="Fixed Rate:"
         value={
-          fixed ? (
+          fixed !== undefined ? (
             `${shortenNumber(fixed)}%`
           ) : (
             <>
@@ -39,7 +39,7 @@ const TrancheDisplay: React.FC<TrancheRatesInterface> = (props) => {
       <DetailItem
         name="Variable Rate:"
         value={
-          variable ? (
+          variable !== undefined ? (
             `${shortenNumber(variable)}%`
           ) : (
             <>
@@ -51,7 +51,7 @@ const TrancheDisplay: React.FC<TrancheRatesInterface> = (props) => {
       <DetailItem
         name="Days Remaining:"
         value={
-          daysRemaining ? (
+          daysRemaining !== undefined ? (
             shortenNumber(daysRemaining)
           ) : (
             <>
@@ -63,7 +63,7 @@ const TrancheDisplay: React.FC<TrancheRatesInterface> = (props) => {
       <DetailItem
         name="Yield Accrued to Date:"
         value={
-          accruedValue ? (
+          accruedValue !== undefined ? (
             `${shortenNumber(accruedValue * 100)}%`
           ) : (
             <>

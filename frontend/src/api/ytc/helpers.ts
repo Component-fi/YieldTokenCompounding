@@ -277,7 +277,6 @@ export const calculateGain = (
 };
 
 export const yieldTokenAccruedValue = async (
-  elementAddresses: ElementAddresses,
   trancheAddress: string,
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<number> => {
@@ -296,7 +295,15 @@ export const yieldTokenAccruedValue = async (
     signerOrProvider
   );
 
-  return (wrappedPositionTotal - principalTotal) / yieldTotal;
+  const accruedValue = (wrappedPositionTotal - principalTotal) / yieldTotal;
+
+
+  // if the value is lower than 0.001% we'll show zero
+  if (Math.abs(accruedValue) < 0.00001){
+    return 0;
+  }
+
+  return accruedValue
 };
 
 export const isTrancheActive = (tranche: Tranche): boolean => {

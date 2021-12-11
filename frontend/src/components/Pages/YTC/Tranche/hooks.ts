@@ -75,7 +75,7 @@ export const useFetchTrancheRates = (
 
   useEffect(() => {
     if (provider) {
-      yieldTokenAccruedValue(elementAddresses, trancheAddress, provider)
+      yieldTokenAccruedValue(trancheAddress, provider)
         .then((accruedValue) => {
           handleChangeTrancheRate({
             accruedValue: accruedValue,
