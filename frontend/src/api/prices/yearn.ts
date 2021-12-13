@@ -22,10 +22,10 @@ export const getVariableAPY = async (
 
   // The curve pools for some reason don't have a weekly average available, so instead we rely on their computed net_apr
   try {
-    const variableApy = yearnVaultDetails.apy.points.week_ago;
-    return variableApy * 100;
-  } catch {
     const netApy = yearnVaultDetails.apy.net_apy;
     return netApy * 100;
+  } catch {
+    const variableApy = yearnVaultDetails.apy.points.week_ago;
+    return variableApy * 100;
   }
 };

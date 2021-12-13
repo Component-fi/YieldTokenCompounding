@@ -45,7 +45,7 @@ export const useFetchTrancheRates = (
 
   useEffect(() => {
     getVariableRate().then((variable) => {
-      if (variable) {
+      if (variable !== undefined) {
         handleChangeTrancheRate({
           variable,
         });
