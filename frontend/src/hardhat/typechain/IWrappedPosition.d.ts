@@ -35,6 +35,7 @@ interface IWrappedPositionInterface extends ethers.utils.Interface {
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
+    "vault()": FunctionFragment;
     "withdraw(address,uint256,uint256)": FunctionFragment;
     "withdrawUnderlying(address,uint256,uint256)": FunctionFragment;
   };
@@ -94,6 +95,7 @@ interface IWrappedPositionInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "vault", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "withdraw",
     values: [string, BigNumberish, BigNumberish]
@@ -135,6 +137,7 @@ interface IWrappedPositionInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "withdrawUnderlying",
@@ -273,6 +276,8 @@ export class IWrappedPosition extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    vault(overrides?: CallOverrides): Promise<[string]>;
+
     withdraw(
       sender: string,
       _shares: BigNumberish,
@@ -355,6 +360,8 @@ export class IWrappedPosition extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  vault(overrides?: CallOverrides): Promise<string>;
+
   withdraw(
     sender: string,
     _shares: BigNumberish,
@@ -436,6 +443,8 @@ export class IWrappedPosition extends BaseContract {
       amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    vault(overrides?: CallOverrides): Promise<string>;
 
     withdraw(
       sender: string,
@@ -558,6 +567,8 @@ export class IWrappedPosition extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    vault(overrides?: CallOverrides): Promise<BigNumber>;
+
     withdraw(
       sender: string,
       _shares: BigNumberish,
@@ -646,6 +657,8 @@ export class IWrappedPosition extends BaseContract {
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    vault(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
       sender: string,

@@ -373,6 +373,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "vault",
+    outputs: [
+      {
+        internalType: "contract IYearnVault",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
