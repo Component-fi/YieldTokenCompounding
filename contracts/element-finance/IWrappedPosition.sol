@@ -2,9 +2,12 @@
 pragma solidity ^0.7.0;
 
 import "./IERC20Permit.sol";
+import "./IYearnVault.sol";
 
 interface IWrappedPosition is IERC20Permit {
     function token() external view returns (IERC20);
+
+    function vault() external view returns (IYearnVault);
 
     function balanceOfUnderlying(address who) external view returns (uint256);
 
