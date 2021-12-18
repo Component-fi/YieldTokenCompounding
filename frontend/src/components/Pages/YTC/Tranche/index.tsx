@@ -22,6 +22,8 @@ export const TrancheDetails: React.FC<TrancheDetailsProps> = (props) => {
 const TrancheDisplay: React.FC<TrancheRatesInterface> = (props) => {
   const { variable, fixed, daysRemaining, accruedValue } = props;
 
+  console.log(variable);
+
   return (
     <DetailPane>
       <DetailItem

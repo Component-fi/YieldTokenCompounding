@@ -1,24 +1,31 @@
-import { ElementAddresses } from "types/manual/types";
 import _ from "lodash";
 import axios from "axios";
+import { ITranche__factory, IWrappedPosition__factory } from "hardhat/typechain";
+import { ethers, Signer } from "ethers";
 
 const YEARN_API_ENDPOINT = "https://api.yearn.finance/v1/chains/1/vaults/all";
 
 export const getVariableAPY = async (
-  baseTokenName: string,
-  elementAddresses: ElementAddresses
+  trancheAddress: string,
+  signerOrProvider: Signer | ethers.providers.Provider
 ) => {
-  const yearnVaultAddress = elementAddresses.vaults.yearn[baseTokenName];
+  const yearnVaultAddress = await getYearnVaultAddress(trancheAddress, signerOrProvider);
+  console.log(yearnVaultAddress);
+
   if (!yearnVaultAddress) {
     throw new Error("Could not find yearn vault address");
   }
 
   const yearnVaultData = await (await axios.get(YEARN_API_ENDPOINT)).data;
 
+  console.log('data', yearnVaultData)
+
   const yearnVaultDetails = _.find(
     yearnVaultData,
     (vault) => vault.address === yearnVaultAddress
   );
+
+  console.log('vault details', yearnVaultDetails);
 
   // The curve pools for some reason don't have a weekly average available, so instead we rely on their computed net_apr
   try {
@@ -29,3 +36,13 @@ export const getVariableAPY = async (
     return variableApy * 100;
   }
 };
+
+const getYearnVaultAddress = async (trancheAddress: string, signerOrProvider: Signer | ethers.providers.Provider): Promise<string> => {
+  const tranche = ITranche__factory.connect(trancheAddress, signerOrProvider);
+
+  const wrappedPosition = await tranche.position();
+  
+  const wrappedPositionContract = IWrappedPosition__factory.connect(wrappedPosition, signerOrProvider);
+
+  return wrappedPositionContract.vault();
+}

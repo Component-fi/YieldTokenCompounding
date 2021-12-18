@@ -23,7 +23,7 @@ export const useFetchTrancheRates = (
   const [trancheRates, setTrancheRates] = useRecoilState(
     trancheSelector(trancheAddress)
   );
-  const getVariableRate = useVariableAPY(tokenAddress);
+  const getVariableRate = useVariableAPY(trancheAddress);
   const elementAddresses = useRecoilValue(elementAddressesAtom);
 
   const tokenName = useTokenName(tokenAddress);

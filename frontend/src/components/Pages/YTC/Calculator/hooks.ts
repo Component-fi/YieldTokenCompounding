@@ -189,20 +189,20 @@ export const useTokenName = (tokenAddress: string | undefined) => {
   return getTokenName;
 };
 
-export const useVariableAPY = (tokenAddress: string) => {
-  const elementAddresses = useRecoilValue(elementAddressesAtom);
-  const tokenName = useTokenName(tokenAddress);
+export const useVariableAPY = (trancheAddress: string) => {
+  const { library } = useWeb3React();
+  const provider = library as Web3Provider;
 
   return useCallback(async () => {
-    if (tokenName) {
+    // if (tokenName) {
       try {
-        const variableApy = await getVariableAPY(tokenName, elementAddresses);
+        const variableApy = await getVariableAPY(trancheAddress, provider);
         return variableApy;
       } catch (error) {
-        console.error(error);
+        console.error('variable APY error', error);
       }
-    }
-  }, [elementAddresses, tokenName]);
+    // }
+  }, [trancheAddress, provider]);
 };
 
 export const useTranches = (
