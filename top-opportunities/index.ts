@@ -50,8 +50,8 @@ const start = async (amount: number) => {
 
             const compoundRange = await simulateYTCForCompoundRange(userData, constants, [1,29], provider)
 
-            const accruedValue = await yieldTokenAccruedValue(constants, tranche.address, provider);
-            const variableRate = await getVariableAPY(key, constants);
+            const accruedValue = await yieldTokenAccruedValue(tranche.address, provider);
+            const variableRate = await getVariableAPY(tranche.address, provider);
 
 
             const gains = compoundRange.map((output: YTCOutput) => ({
