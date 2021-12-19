@@ -10,7 +10,6 @@ export const getVariableAPY = async (
   signerOrProvider: Signer | ethers.providers.Provider
 ) => {
   const yearnVaultAddress = await getYearnVaultAddress(trancheAddress, signerOrProvider);
-  console.log(yearnVaultAddress);
 
   if (!yearnVaultAddress) {
     throw new Error("Could not find yearn vault address");
@@ -18,14 +17,10 @@ export const getVariableAPY = async (
 
   const yearnVaultData = await (await axios.get(YEARN_API_ENDPOINT)).data;
 
-  console.log('data', yearnVaultData)
-
   const yearnVaultDetails = _.find(
     yearnVaultData,
     (vault) => vault.address === yearnVaultAddress
   );
-
-  console.log('vault details', yearnVaultDetails);
 
   // The curve pools for some reason don't have a weekly average available, so instead we rely on their computed net_apr
   try {
