@@ -1,6 +1,11 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Title } from 'components/Layout/Title'
 import { Button, Input } from '@chakra-ui/react';
+import { simulateAllTranches } from 'api/ytc/simulateTranches';
+import { useWeb3React } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
+import { elementAddressesAtom } from 'recoil/element/atom';
+import { useRecoilValue } from 'recoil';
 
 interface Props {
 }
@@ -8,6 +13,17 @@ interface Props {
 const TopOpportunities = (props: Props) => {
     const [amount, setAmount] = useState<number>(0);
     const [results, setResults] = useState<any[]>([]);
+
+    const { library } = useWeb3React();
+    const provider = library as Web3Provider;
+    const elementAddresses = useRecoilValue(elementAddressesAtom);
+
+    const handleClick = useCallback(() => {
+        simulateAllTranches(amount, provider, elementAddresses).then((response) => {
+            setResults(response)
+            console.log(response)
+        })
+    }, [amount, provider, elementAddresses])
 
     return (
         <div>
@@ -22,6 +38,7 @@ const TopOpportunities = (props: Props) => {
                 onChange={(e) => setAmount(parseInt(e.target.value))}
             />
             <Button
+                onClick={handleClick}
             >
                 Simulate
             </Button>

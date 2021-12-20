@@ -30,7 +30,7 @@ export const simulateAllTranches = async (amount: number, signerOrProvider: Sign
 
         const baseTokenAmount = amount/baseTokenPrice;
 
-        const tranches = await getActiveTranches(value, constants);
+        const tranches = getActiveTranches(value, constants);
 
         const tranchePromise: Promise<TrancheResult>[] = tranches.map(async (tranche, trancheIndex) => {
 
