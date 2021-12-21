@@ -1,1 +1,1 @@
-declare module 'use-wallet';
+declare module "use-wallet";
