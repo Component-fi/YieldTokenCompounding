@@ -4,7 +4,7 @@
     "input_amount": "Yield Token Compounding requires collateral of the base token during the ytc transaction. Only a portion of these tokens will be spent, and the rest will be returned to you when the transaction is complete.",
     "advanced_options": "The simulator will by default run with 1-8 compounds. Advanced options allow you to change this by selecting either the number of compounds you want to simulate",
     "estimated_variable_rate": "This has no effect on your transaction. Input the average APY that you expect from the vault over the course of the term. This is used to estimate the expected gain for your position.",
-    "number_of_compounds": "This has no effect on your transaction. Input the average APY that you expect from the vault over the course of the term. This ius used to estimate the expected gain for your position.",
+    "number_of_compounds": "Select the number of iterations you would like to execute. The more compounds the larger the yield token position.",
     "yield_tokens": "The number of yTokens that you would receive",
     "tokens_spent": "The number of base tokens that are consumed to purchase yTokens",
     "estimated_gain": "This is the estimated return by the end of the tranche term including gas costs.  This assumes that the current variable yield is the average variable yield over the course of the terms.",
