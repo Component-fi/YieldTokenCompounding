@@ -15,7 +15,9 @@
     "deploy:hardhat": "npx hardhat compile && npx hardhat typechain && npx hardhat deploy && npx hardhat react",
     "deploy:goerli": "npx hardhat compile --network goerli && npx hardhat deploy --network goerli && npx hardhat typechain --network goerli && npx hardhat react --network goerli",
     "start": "npx hardhat node",
-    "build": "npx hardhat compile && npx hardhat typechain"
+    "build": "npx hardhat compile && npx hardhat typechain",
+    "install-all": "npm ci & cd frontend && npm ci",
+    "build-all": "npm run build && cd frontend && npm run build"
   },
   "browserslist": {
     "production": [
