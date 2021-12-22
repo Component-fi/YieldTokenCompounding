@@ -11,6 +11,8 @@
 # production
 /build
 /frontend/build
+/frontend/src/hardhat
+/frontend/src/artifacts
 
 # misc
 .DS_Store
