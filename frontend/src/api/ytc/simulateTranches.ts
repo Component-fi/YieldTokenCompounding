@@ -20,7 +20,7 @@ export interface TokenResult {
 }
 
 
-export const simulateAllTranches = async (amount: number, signerOrProvider: Signer | providers.Provider , constants: ElementAddresses) => {
+export const simulateAllTranches = async (amount: number, signerOrProvider: Signer | providers.Provider , constants: ElementAddresses): Promise<SimulationResult[]> => {
 
     const tokens = constants.tokens;
 
@@ -109,7 +109,34 @@ export const simulateAllTranches = async (amount: number, signerOrProvider: Sign
         }
     }
 
-    return fulfilledResults;
+    return flattenResults(fulfilledResults);
+}
+
+export interface SimulationResult extends YTCGain {
+    trancheAddress: string;
+    expiry: string;
+    tokenName: string;
+    tokenAddress: string;
+}
+
+const flattenResults = (results: TokenResult[]): SimulationResult[] => {
+    const data: any[] = [];
+
+    results.forEach((tokenResult: TokenResult) => {
+        tokenResult.output.forEach((trancheResult: TrancheResult) => {
+            trancheResult.output.forEach((compoundResult: YTCGain) => {
+                data.push({
+                    ...compoundResult,
+                    trancheAddress: trancheResult.address,
+                    expiry: trancheResult.expiry,
+                    tokenName: tokenResult.name,
+                    tokenAddress: tokenResult.address,
+                })
+            })
+        })
+    })
+
+    return data;
 }
 
 const isFilled = <T extends {}>(v: PromiseSettledResult<T>): v is PromiseFulfilledResult<T> => v.status === 'fulfilled';

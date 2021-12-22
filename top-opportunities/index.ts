@@ -2,27 +2,9 @@ import hre from 'hardhat';
 import {createObjectCsvWriter} from 'csv-writer';
 import mainnetConstants from '../constants/mainnet-constants.json';
 import { ElementAddresses } from '../frontend/src/types/manual/types';
-import { YTCGain } from '../frontend/src/api/ytc/helpers';
-import { TokenResult, TrancheResult, simulateAllTranches } from '../frontend/src/api/ytc/simulateTranches';
+import { simulateAllTranches, SimulationResult } from '../frontend/src/api/ytc/simulateTranches';
 
-
-
-const logResults = (results: TokenResult[], amount: string) => {
-    const data: any[] = [];
-
-    results.map((tokenResult: TokenResult) => {
-        tokenResult.output.map((trancheResult: TrancheResult) => {
-            trancheResult.output.map((compoundResult: YTCGain) => {
-                data.push({
-                    ...compoundResult,
-                    trancheAddress: trancheResult.address,
-                    expiry: trancheResult.expiry,
-                    tokenName: tokenResult.name,
-                    tokenAddress: tokenResult.address,
-                })
-            })
-        })
-    })
+const logResults = (results: SimulationResult[], amount: string) => {
 
     const date = new Date(Date.now()).toDateString();
 
@@ -68,7 +50,7 @@ const logResults = (results: TokenResult[], amount: string) => {
         ]
     })
 
-    csvWriter.writeRecords(data);
+    csvWriter.writeRecords(results);
     
 }
 

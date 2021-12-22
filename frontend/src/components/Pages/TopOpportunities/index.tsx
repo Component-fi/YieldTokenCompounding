@@ -6,6 +6,7 @@ import { useWeb3React } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 import { elementAddressesAtom } from 'recoil/element/atom';
 import { useRecoilValue } from 'recoil';
+import { DataTable } from './Table';
 
 interface Props {
 }
@@ -42,6 +43,9 @@ const TopOpportunities = (props: Props) => {
             >
                 Simulate
             </Button>
+            {
+                results.length > 0 && <DataTable data={results}/>
+            }
         </div>
     )
 }
