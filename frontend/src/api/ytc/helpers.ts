@@ -157,7 +157,17 @@ export const getYTCParameters = async (
   );
 
   // if the suggested amount is greater than the total amount, return the total amount instead
-  let amount = amountCollateralDespositedAbsolute;
+  let amount: BigNumber;
+  if (signerOrProvider instanceof Signer){
+    const userCollateralBalance = await baseToken.balanceOf(await signerOrProvider.getAddress())
+    if (userCollateralBalance.lt(amountCollateralDespositedAbsolute)){
+      amount = userCollateralBalance;
+    } else {
+      amount = amountCollateralDespositedAbsolute;
+    }
+  } else {
+    amount = amountCollateralDespositedAbsolute;
+  }
 
   const ethToBaseToken = await ethToBaseTokenRate(
     baseTokenName,
