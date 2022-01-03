@@ -7,11 +7,11 @@ import { notificationAtom } from "recoil/notifications/atom";
 import { useRecoilState } from "recoil";
 import { deployments } from "constants/apy-mainnet-constants";
 import { useWeb3React } from "@web3-react/core";
-import { injected } from "connectors";
 import { Web3Provider } from "@ethersproject/providers";
 import { ERC20__factory } from "hardhat/typechain/factories/ERC20__factory";
 import { YieldTokenCompounding__factory } from "hardhat/typechain/factories/YieldTokenCompounding__factory";
 import { MAX_UINT_HEX } from "constants/static";
+import { walletModalAtom } from "recoil/walletModal/atom";
 
 type AbstractApprovalProps = {
   approveText: string;
@@ -42,7 +42,7 @@ const AbstractApproval: React.FC<AbstractApprovalProps> = (props) => {
     ...rest
   } = props;
 
-  const { activate } = useWeb3React();
+  const openWalletModal = useRecoilState(walletModalAtom)[1];
 
   useEffect(() => {
     if (provider) {
@@ -86,7 +86,7 @@ const AbstractApproval: React.FC<AbstractApprovalProps> = (props) => {
 
   if (!provider) {
     return (
-      <Button {...rest} onClick={() => activate(injected)}>
+      <Button {...rest} onClick={() => openWalletModal(true)}>
         CONNECT YOUR WALLET
       </Button>
     );
