@@ -178,10 +178,12 @@ export const getYTCParameters = async (
   // get teh amount of collateral denominated in eth
   const amountInEthNormalized =
     parseFloat(userData.amountCollateralDeposited.toString()) / ethToBaseToken;
+
   // convert it to the absolute non-decimal value
-  const amountInEthAbsolute = parseEther(amountInEthNormalized.toString());
+  const amountInEthAbsolute = parseEther(amountInEthNormalized.toFixed(6).toString());
   // multiply it by two to allow for slippage
   const amountInEthAbsoulteTimes2 = amountInEthAbsolute.mul(2);
+
 
   const zapAddress = deployments.YTCZap;
   const ytcAddress = deployments.YieldTokenCompounding;
