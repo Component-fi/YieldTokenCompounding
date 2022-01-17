@@ -88,8 +88,6 @@ export const executeYieldTokenCompounding = async (
     maximumSlippageBaseTokensAbsolute
   );
 
-  console.log(maximumSpentAbsolute.toString());
-
   const ytc: YieldTokenCompoundingType =
     yieldCalculationParameters.ytc as YieldTokenCompoundingType;
 

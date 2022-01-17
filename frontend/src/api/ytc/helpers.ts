@@ -157,7 +157,17 @@ export const getYTCParameters = async (
   );
 
   // if the suggested amount is greater than the total amount, return the total amount instead
-  let amount = amountCollateralDespositedAbsolute;
+  let amount: BigNumber;
+  if (signerOrProvider instanceof Signer){
+    const userCollateralBalance = await baseToken.balanceOf(await signerOrProvider.getAddress())
+    if (userCollateralBalance.lt(amountCollateralDespositedAbsolute)){
+      amount = userCollateralBalance;
+    } else {
+      amount = amountCollateralDespositedAbsolute;
+    }
+  } else {
+    amount = amountCollateralDespositedAbsolute;
+  }
 
   const ethToBaseToken = await ethToBaseTokenRate(
     baseTokenName,
@@ -168,10 +178,12 @@ export const getYTCParameters = async (
   // get teh amount of collateral denominated in eth
   const amountInEthNormalized =
     parseFloat(userData.amountCollateralDeposited.toString()) / ethToBaseToken;
+
   // convert it to the absolute non-decimal value
-  const amountInEthAbsolute = parseEther(amountInEthNormalized.toString());
+  const amountInEthAbsolute = parseEther(amountInEthNormalized.toFixed(6).toString());
   // multiply it by two to allow for slippage
   const amountInEthAbsoulteTimes2 = amountInEthAbsolute.mul(2);
+
 
   const zapAddress = deployments.YTCZap;
   const ytcAddress = deployments.YieldTokenCompounding;
