@@ -35,20 +35,19 @@ export const useBaseTokenPrice = (baseTokenName: string | undefined) => {
 };
 
 export const useYieldTokenPrice = (
-  baseTokenName: string | undefined,
   trancheAddress: string | undefined
 ) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [price, setPrice] = useState<number>(0);
+  const [price, setPrice] = useState<number | undefined>(undefined);
 
   const { library } = useWeb3React();
   const provider = library as Web3Provider;
   const elementAddresses = useRecoilValue(elementAddressesAtom);
 
   useEffect(() => {
-    if (baseTokenName && trancheAddress && provider) {
+    if (trancheAddress && provider) {
       setIsLoading(true);
-      getYTCSpotPrice(baseTokenName, trancheAddress, elementAddresses, provider)
+      getYTCSpotPrice(trancheAddress, elementAddresses, provider)
         .then((price) => {
           setPrice(price);
         })
@@ -59,7 +58,7 @@ export const useYieldTokenPrice = (
           setIsLoading(false);
         });
     }
-  }, [provider, baseTokenName, trancheAddress, elementAddresses]);
+  }, [provider, trancheAddress, elementAddresses]);
 
   return { price, isLoading };
 };

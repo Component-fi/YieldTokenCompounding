@@ -39,13 +39,15 @@ export const trancheSelector = selectorFamily<TrancheRatesInterface, string>({
   get:
     (id: string) =>
     ({ get }) => {
-      const atom = get(trancheRatesAtoms(id));
+      const lowerCaseId = id.toLowerCase()
+      const atom = get(trancheRatesAtoms(lowerCaseId));
       return atom;
     },
   set:
     (id: string) =>
     ({ set }, newTranche) => {
-      set(trancheRatesAtoms(id), newTranche);
-      set(trancheAddressAtom, (prev) => [...prev, id]);
+      const lowerCaseId = id.toLowerCase()
+      set(trancheRatesAtoms(lowerCaseId), newTranche);
+      set(trancheAddressAtom, (prev) => [...prev, lowerCaseId]);
     },
 });

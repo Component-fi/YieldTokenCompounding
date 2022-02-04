@@ -5,18 +5,20 @@ import { calcSpotPriceYt } from "utils/element/calcSpotPrice";
 import { getReserves } from "utils/element/getReserves";
 
 export const getYTCSpotPrice = async (
-  tokenName: string,
   trancheAddress: string,
   elementAddresses: ElementAddresses,
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<number> => {
-  const tranche = _.find(
-    elementAddresses.tranches[tokenName],
-    (tranche: Tranche) => tranche.address === trancheAddress
-  );
-  const balancerAddress = elementAddresses.balancerVault;
+  // remove the use of tokenName
 
-  const tokenAddress = elementAddresses.tokens[tokenName];
+  const flat = _.flatten(Object.values(elementAddresses.tranches))
+
+  const tranche = _.find(
+    flat,
+    (tranche: Tranche) => tranche.address.toLowerCase() === trancheAddress.toLowerCase()
+  );
+
+  const balancerAddress = elementAddresses.balancerVault;
 
   if (!tranche) {
     throw new Error("Cannot find tranche pool");
@@ -34,7 +36,7 @@ export const getYTCSpotPrice = async (
   // It does return the token address in tokens in the same index as it's balance in "balance"
   let baseTokenReserve;
   let yTReserve;
-  if (reserves.tokens[0] === tokenAddress) {
+  if (Object.values(elementAddresses.tokens).includes(reserves.tokens[0])) {
     [baseTokenReserve, yTReserve] = reserves.balances;
   } else {
     [yTReserve, baseTokenReserve] = reserves.balances;

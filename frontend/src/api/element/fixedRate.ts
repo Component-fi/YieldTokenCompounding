@@ -18,7 +18,7 @@ export const getFixedRate = async (
 ): Promise<number> => {
   const tranche = _.find(
     elementAddresses.tranches[tokenName],
-    (tranche: Tranche) => tranche.address === trancheAddress
+    (tranche: Tranche) => tranche.address.toLowerCase() === trancheAddress.toLowerCase()
   );
   const balancerAddress = elementAddresses.balancerVault;
 
@@ -43,7 +43,7 @@ export const getFixedRate = async (
   // The getReserves function does not return the base/pt reserves in a particular order
   let baseTokenReserve;
   let pTReserve;
-  if (reserves.tokens[0] === tokenAddress) {
+  if (reserves.tokens[0].toLowerCase() === tokenAddress.toLowerCase()) {
     [baseTokenReserve, pTReserve] = reserves.balances;
   } else {
     [pTReserve, baseTokenReserve] = reserves.balances;
@@ -57,6 +57,8 @@ export const getFixedRate = async (
     tParamSeconds,
     reserves.decimals[0]
   );
+
+  console.log('spot', spot);
 
   return calcFixedAPR(spot, timeRemainingSeconds);
 };

@@ -23,6 +23,7 @@ export const useFetchTrancheRates = (
   const [trancheRates, setTrancheRates] = useRecoilState(
     trancheSelector(trancheAddress)
   );
+  console.log(trancheRates);
   const getVariableRate = useVariableAPY(trancheAddress);
   const elementAddresses = useRecoilValue(elementAddressesAtom);
 

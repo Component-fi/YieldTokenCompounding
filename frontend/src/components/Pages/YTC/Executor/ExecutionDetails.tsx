@@ -201,7 +201,7 @@ interface TextAndTooltipProps {
   tooltip: string;
 }
 
-const TextAndTooltip: React.FC<TextAndTooltipProps> = (props) => {
+export const TextAndTooltip: React.FC<TextAndTooltipProps> = (props) => {
   const { text, tooltip } = props;
 
   return (

@@ -9,6 +9,7 @@ import Header from "./Header";
 import { Notifications } from "./Notifications";
 import { YTC } from "../Pages/YTC";
 import { Alert } from "../Reusable/Alert";
+import { Users } from "components/Pages/Position/layout";
 
 export const Layout = () => {
   const [open, setOpen] = useRecoilState(disclaimerAtom);
@@ -38,6 +39,9 @@ export const Layout = () => {
           <Header />
           <Box pt={4} px={1} mx="auto" maxW="lg" w="full" flexGrow={1}>
             <Switch>
+              <Route path="/position">
+                <Users />
+              </Route>
               <Route path="/">
                 <YTC />
               </Route>

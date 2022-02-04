@@ -37,11 +37,11 @@ interface YTPriceTagProps {
 export const YTPriceTag: React.FC<YTPriceTagProps> = (props) => {
   const { amount, baseTokenName, trancheAddress } = props;
 
-  const { price } = useYieldTokenPrice(baseTokenName, trancheAddress);
+  const { price } = useYieldTokenPrice(trancheAddress);
 
   return (
     <BaseTokenPriceTag
-      amount={amount ? price * amount : undefined}
+      amount={amount && price ? price * amount : undefined}
       baseTokenName={baseTokenName}
     />
   );

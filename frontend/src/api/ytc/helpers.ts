@@ -192,6 +192,7 @@ export const getYTCParameters = async (
   const ytcZap = YTCZap__factory.connect(zapAddress, signerOrProvider);
 
   let simulate;
+
   if (isCurveToken(baseTokenName)) {
     const poolAddress = await getCurveSwapAddress(
       userData.baseTokenAddress,
@@ -207,6 +208,23 @@ export const getYTCParameters = async (
     });
 
     simulate = async (n: number) => {
+
+      const tx = await ytcZap.populateTransaction.compoundZapper(
+        ytcAddress,
+        n,
+        trancheAddress,
+        balancerPoolId,
+        amount,
+        "0",
+        MAX_UINT_HEX,
+        userData.baseTokenAddress,
+        yieldTokenAddress,
+        zapResponse.data,
+        zapResponse.to,
+        { from: BURN_ADDRESS, value: amountInEthAbsoulteTimes2 }
+      );
+      console.log('data', tx.data);
+      console.log('value', amountInEthAbsoulteTimes2);
       return await ytcZap.callStatic.compoundZapper(
         ytcAddress,
         n,

@@ -85,6 +85,7 @@ export const simulateYTCZap = async (
     }
     if (isSimulationErrorType(error)) {
       if (error.error.message === ZAP_FAILED_MESSAGE) {
+        console.error(error);
         throw new Error("Not enough token liquidity");
       }
       if (error.error.message === LACK_OF_LIQUIDITY_MESSAGE) {
@@ -200,7 +201,10 @@ export const simulateYTCForCompoundRange = async (
 
   const errors: Error[] = results
     .filter(isRejected)
-    .map((result: PromiseRejectedResult) => result.reason);
+    .map((result: PromiseRejectedResult) => {
+      console.error(result);
+      return result.reason
+    });
 
   if (fulfilledResults.length === 0) {
     if (errors.length > 0) {

@@ -36,6 +36,7 @@ interface ITrancheInterface extends ethers.utils.Interface {
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "underlying()": FunctionFragment;
+    "unlockTimestamp()": FunctionFragment;
     "withdrawInterest(uint256,address)": FunctionFragment;
     "withdrawPrincipal(uint256,address)": FunctionFragment;
   };
@@ -100,6 +101,10 @@ interface ITrancheInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "unlockTimestamp",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "withdrawInterest",
     values: [BigNumberish, string]
   ): string;
@@ -141,6 +146,10 @@ interface ITrancheInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "underlying", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "unlockTimestamp",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "withdrawInterest",
     data: BytesLike
@@ -278,6 +287,8 @@ export class ITranche extends BaseContract {
 
     underlying(overrides?: CallOverrides): Promise<[string]>;
 
+    unlockTimestamp(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     withdrawInterest(
       _amount: BigNumberish,
       _destination: string,
@@ -354,6 +365,8 @@ export class ITranche extends BaseContract {
 
   underlying(overrides?: CallOverrides): Promise<string>;
 
+  unlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
+
   withdrawInterest(
     _amount: BigNumberish,
     _destination: string,
@@ -429,6 +442,8 @@ export class ITranche extends BaseContract {
     ): Promise<boolean>;
 
     underlying(overrides?: CallOverrides): Promise<string>;
+
+    unlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdrawInterest(
       _amount: BigNumberish,
@@ -545,6 +560,8 @@ export class ITranche extends BaseContract {
 
     underlying(overrides?: CallOverrides): Promise<BigNumber>;
 
+    unlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
+
     withdrawInterest(
       _amount: BigNumberish,
       _destination: string,
@@ -627,6 +644,8 @@ export class ITranche extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     underlying(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    unlockTimestamp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdrawInterest(
       _amount: BigNumberish,

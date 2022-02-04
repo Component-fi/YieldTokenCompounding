@@ -11,6 +11,8 @@ interface ITranche is IERC20Permit {
     function position() external view returns (IWrappedPosition);
     function underlying() external view returns (IERC20);
 
+	function unlockTimestamp() external view returns (uint256);
+
     function deposit(uint256 _shares, address destination)
         external
         returns (uint256, uint256);

@@ -181,7 +181,7 @@ export const useTokenName = (tokenAddress: string | undefined) => {
       return undefined;
     }
     const token: Token | undefined = activeTokens.find((token) => {
-      return token.address === tokenAddress;
+      return token.address.toLowerCase() === tokenAddress.toLowerCase();
     });
     return token?.name || undefined;
   }, [activeTokens, tokenAddress]);
