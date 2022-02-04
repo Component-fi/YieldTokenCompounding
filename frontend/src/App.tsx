@@ -6,6 +6,10 @@ import Layout from "components/Layout/Layout";
 import { elementAddressesAtom } from "recoil/element/atom";
 import { fetchElementState } from "recoil/element/fetch";
 import { chainNameAtom } from "recoil/chain/atom";
+import { ApolloProvider } from "@apollo/client";
+import { clientInit } from "apolloClientInit";
+
+const client = clientInit();
 
 function App() {
   const [, setElementState] = useRecoilState(elementAddressesAtom);
@@ -28,7 +32,9 @@ function App() {
   return (
     <div className="App">
       <Web3ReactProvider getLibrary={getLibrary}>
-        <Layout />
+        <ApolloProvider client={client}>
+          <Layout />
+        </ApolloProvider>
       </Web3ReactProvider>
     </div>
   );
