@@ -10,6 +10,7 @@ import { Notifications } from "./Notifications";
 import { YTC } from "../Pages/YTC";
 import { Alert } from "../Reusable/Alert";
 import { Users } from "components/Pages/Position/layout";
+import FixedRatesPage from "components/Pages/FixedRates";
 
 export const Layout = () => {
   const [open, setOpen] = useRecoilState(disclaimerAtom);
@@ -41,6 +42,9 @@ export const Layout = () => {
             <Switch>
               <Route path="/position">
                 <Users />
+              </Route>
+              <Route path="/fixed">
+                <FixedRatesPage/>
               </Route>
               <Route path="/">
                 <YTC />
