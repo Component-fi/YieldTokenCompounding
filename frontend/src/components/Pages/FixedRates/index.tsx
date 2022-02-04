@@ -196,6 +196,8 @@ const Pool: React.FC<PoolType> = (props) => {
                             minute: "MMM DD, YYYY"
                         }
                     },
+                },
+                y: {
                     suggestedMin: 0
                 }
             }
