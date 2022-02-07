@@ -32,6 +32,7 @@
     "graphql2chartjs": "^0.3.1",
     "hardhat": "^2.6.3",
     "husky": "^7.0.4",
+    "lightweight-charts": "^3.7.0",
     "lint-staged": "^12.1.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
