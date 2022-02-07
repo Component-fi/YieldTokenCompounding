@@ -1,61 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {gql} from '@apollo/client';
-import { useQuery, useApolloClient } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Flex, Select } from '@chakra-ui/react';
-import { Line } from 'react-chartjs-2';
-import 'chartjs-adapter-moment';
-import {
-  Chart,
-  ArcElement,
-  LineElement,
-  BarElement,
-  PointElement,
-  BarController,
-  BubbleController,
-  DoughnutController,
-  LineController,
-  PieController,
-  PolarAreaController,
-  RadarController,
-  ScatterController,
-  CategoryScale,
-  LinearScale,
-  LogarithmicScale,
-  RadialLinearScale,
-  TimeScale,
-  TimeSeriesScale,
-  Decimation,
-  Filler,
-  Legend,
-  Title,
-  Tooltip
-} from 'chart.js';
-
-Chart.register(
-  ArcElement,
-  LineElement,
-  BarElement,
-  PointElement,
-  BarController,
-  BubbleController,
-  DoughnutController,
-  LineController,
-  PieController,
-  PolarAreaController,
-  RadarController,
-  ScatterController,
-  CategoryScale,
-  LinearScale,
-  LogarithmicScale,
-  RadialLinearScale,
-  TimeScale,
-  TimeSeriesScale,
-  Decimation,
-  Filler,
-  Legend,
-  Title,
-  Tooltip
-);
+import { useCandlestickChart, useDailyData } from './hooks';
 
 type Props = {};
 
@@ -80,26 +27,6 @@ const GET_ASSET_TERMS_FIXED_RATES = gql`
     }
 `
 
-const GET_PAGINATED_STATE = gql`
-    query FixedRateStates(
-        $poolId: String!,
-        $lastTimestamp: String!,
-    ){
-        principalPoolStates(
-            first: 1000, 
-            where: {
-                pool: $poolId
-                timestamp_gt: $lastTimestamp
-            }
-        ){
-            timestamp{
-                id
-            }
-            fixedRate
-        }
-    }
-`
-
 interface Assets {
     baseTokens: {
         id: string;
@@ -112,18 +39,12 @@ interface Rates {
     principalPools: PoolType[]
 }
 
-interface State {
-    timestamp: {
-        id: string;
-    }
-    fixedRate: number;
-}
-
 interface PoolType {
     pToken: {
-        name: "string"
+        name: string;
+        expiration: string;
     };
-    id: string
+    id: string;
 }
 
 interface Vars {
@@ -167,100 +88,57 @@ const FixedRates: React.FC<{baseTokenId: string}> = (props) => {
             }
         }
     )
+    const [selection, setSelection] = useState<PoolType>()
 
     if (loading) return <p>Loading...</p>
     if (error) return <p>Error: {error.message}</p>
 
-    if (data) return <Flex flexDir="column" gridGap={5} p={10}>
-        {
-            data.principalPools.map((pool: PoolType) => (
-                <Pool {...pool}/>
-            ))
-        }
-    </Flex>
+    console.log(data);
 
+    if (data) return <>
+        <Select
+            onChange={
+                (e: React.ChangeEvent<HTMLSelectElement>) => setSelection(data.principalPools[parseInt(e.target.value)])
+            }
+        >
+            {
+                data.principalPools.map((pool: PoolType, i: number) => (
+                    <option value={i}>{pool.pToken.name}</option>
+                ))
+            }
+        </Select>
+        {selection && <Pool id={selection.id} pToken={selection.pToken}/>}
+    </>
     return <></>
 }
 
 const Pool: React.FC<PoolType> = (props) => {
+    return <TradingViewChart principalPoolId={props.id}/>
+}
 
-    const [states, setStates] = useState<State[]>([])
-    const [isLoading, setIsLoading] = useState<boolean>(true)
 
-    const apollo = useApolloClient();
+const TradingViewChart = (props: {principalPoolId: string}) => {
+    // Convert the data to Open, High, Low, Close format
+    const {ref, candleStickSeries} = useCandlestickChart();
+
+    const {data, loading } = useDailyData(props.principalPoolId);
+
+    console.log(data);
 
     useEffect(() => {
-        console.log('running useEffect');
-        const query = (lastTimestamp: string) => {
-            console.log('running query with poolId', props.id)
-            apollo.query({
-                query: GET_PAGINATED_STATE,
-                variables: {
-                    poolId: props.id,
-                    lastTimestamp: lastTimestamp
-                }
-            }).then((results: {
-                data: {
-                    principalPoolStates: State[]
-                }
-            }) => {
-                console.log('results', results);
-                let states = results.data.principalPoolStates;
-
-                if (states.length === 0){
-                    setIsLoading(false);
-                } else {
-                    setStates((currentState) => ([...currentState, ...states]));
-                    let lastTimestamp = states[states.length - 1].timestamp.id;
-                    query(lastTimestamp);
-                }
-            })
-        }
-
-        query("");
-    }, [setStates, apollo, props.id, setIsLoading])
-
-
-    const data = useMemo(() => 
-    {
-        if (isLoading){
-            return [];
-        }
-        return states.map((state: State) => {
-            return {
-                x: parseInt(state.timestamp.id) * 1000,
-                y: state.fixedRate
+        if (candleStickSeries && !loading){
+            if (data){
+                console.log(data);
+                candleStickSeries.setData(
+                    data
+                )
             }
-        })
-    }, [states, isLoading])
+        }
+    }, [candleStickSeries, data, loading])
 
-    return <Line
-        data={{
-            datasets: [
-                {
-                    data: data,
-                    label: props.pToken.name
-                }
-            ]
-        }}
-        options={{
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        displayFormats: {
-                            hour: "MMM DD, YYYY",
-                            day: "MMM DD, YYYY",
-                            minute: "MMM DD, YYYY"
-                        }
-                    },
-                },
-                y: {
-                    suggestedMin: 0
-                }
-            }
-        }}
-    />
+    return <Flex ref={ref} w="full" h="300px">
+    </Flex>
 }
+
 
 export default FixedRatesPage;
