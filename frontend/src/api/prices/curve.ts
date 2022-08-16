@@ -1,8 +1,8 @@
 import { Signer, utils, ethers } from "ethers";
-import { validCurveTokens } from "constants/apy-mainnet-constants";
+import { validCurveTokens } from "@/constants/apy-mainnet-constants";
 import { getRelativePriceFromCoingecko } from "./coingecko";
-import { ElementAddresses } from "types/manual/types";
-import { ERC20__factory, ICurveFi__factory, IERC20Minter__factory } from "hardhat/typechain";
+import { ElementAddresses } from "@/types/manual/types";
+import { ERC20__factory, ICurveFi__factory, IERC20Minter__factory } from "@/hardhat/typechain";
 
 export type CurveTokenName = typeof validCurveTokens[number];
 export const isCurveToken = (x: any): x is CurveTokenName => {

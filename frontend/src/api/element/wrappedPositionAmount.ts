@@ -1,6 +1,6 @@
 // Find the total amount of tokens in the underlying wrapped position
 import { ethers, Signer } from "ethers";
-import { ERC20__factory, ITranche__factory, IWrappedPosition__factory } from "hardhat/typechain";
+import { ERC20__factory, ITranche__factory, IWrappedPosition__factory } from "@/hardhat/typechain";
 
 export const getUnderlyingTotal = async (
   trancheAddress: string,

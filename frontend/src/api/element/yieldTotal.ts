@@ -1,5 +1,5 @@
 import { ethers, Signer } from "ethers";
-import { ERC20__factory, ITranche__factory } from "hardhat/typechain";
+import { ERC20__factory, ITranche__factory } from "@/hardhat/typechain";
 
 export const getYieldTotal = async (
   trancheAddress: string,

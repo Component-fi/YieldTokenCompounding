@@ -8,20 +8,20 @@ import { FormFields } from "./index";
 import {
   isSimulatingAtom,
   simulationResultsAtom,
-} from "recoil/simulationResults/atom";
-import { useQuery } from "hooks";
-import { deployments } from "constants/apy-mainnet-constants";
-import { simulateYTCForCompoundRange } from "api/ytc/simulate";
+} from "@/recoil/simulationResults/atom";
+import { useQuery } from "@/hooks";
+import { deployments } from "@/constants/apy-mainnet-constants";
+import { simulateYTCForCompoundRange } from "@/api/ytc/simulate";
 import {
   activeTokensSelector,
   elementAddressesAtom,
-} from "recoil/element/atom";
-import { YTCInput } from "api/ytc/helpers";
-import { trancheSelector } from "recoil/trancheRates/atom";
-import { notificationAtom } from "recoil/notifications/atom";
-import { Token, Tranche } from "types/manual/types";
-import { getVariableAPY } from "api/prices/yearn";
-import { getActiveTranches } from "api/element";
+} from "@/recoil/element/atom";
+import { YTCInput } from "@/api/ytc/helpers";
+import { trancheSelector } from "@/recoil/trancheRates/atom";
+import { notificationAtom } from "@/recoil/notifications/atom";
+import { Token, Tranche } from "@/types/manual/types";
+import { getVariableAPY } from "@/api/prices/yearn";
+import { getActiveTranches } from "@/api/element";
 
 // on location change, reset the simulation results
 export const useClearSimOnLocationChange = () => {

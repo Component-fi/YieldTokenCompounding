@@ -1,17 +1,17 @@
 import React, { ReactElement, useCallback, useEffect, useState } from "react";
 import { ButtonProps, Spinner } from "@chakra-ui/react";
-import { Button } from "components/Reusable/Button";
-import { checkApproval, sendApproval } from "api/approvalAPI";
+import { Button } from "@/components/Reusable/Button";
+import { checkApproval, sendApproval } from "@/api/approvalAPI";
 import { BigNumber, ContractReceipt, utils, providers } from "ethers";
-import { notificationAtom } from "recoil/notifications/atom";
+import { notificationAtom } from "@/recoil/notifications/atom";
 import { useRecoilState } from "recoil";
-import { deployments } from "constants/apy-mainnet-constants";
+import { deployments } from "@/constants/apy-mainnet-constants";
 import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
-import { ERC20__factory } from "hardhat/typechain/factories/ERC20__factory";
-import { YieldTokenCompounding__factory } from "hardhat/typechain/factories/YieldTokenCompounding__factory";
-import { MAX_UINT_HEX } from "constants/static";
-import { walletModalAtom } from "recoil/walletModal/atom";
+import { ERC20__factory } from "@/hardhat/typechain/factories/ERC20__factory";
+import { YieldTokenCompounding__factory } from "@/hardhat/typechain/factories/YieldTokenCompounding__factory";
+import { MAX_UINT_HEX } from "@/constants/static";
+import { walletModalAtom } from "@/recoil/walletModal/atom";
 
 type AbstractApprovalProps = {
   approveText: string;

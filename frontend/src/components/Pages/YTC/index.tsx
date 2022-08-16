@@ -5,9 +5,9 @@ import { useRecoilValue } from "recoil";
 import {
   calculatorGainSelector,
   selectedSimulationAtom,
-} from "recoil/simulationResults/atom";
-import { YTCOutput } from "api/ytc/helpers";
-import { Title } from "components/Layout/Title";
+} from "@/recoil/simulationResults/atom";
+import { YTCOutput } from "@/api/ytc/helpers";
+import { Title } from "@/components/Layout/Title";
 import ResultsTable from "./Table";
 import Icon from "@chakra-ui/icon";
 import { Flex } from "@chakra-ui/layout";
