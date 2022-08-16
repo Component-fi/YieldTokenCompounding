@@ -1,8 +1,8 @@
 import { ethers, Signer } from "ethers";
 import _ from "lodash";
-import { ElementAddresses, Tranche } from "types/manual/types";
-import { calcSpotPriceYt } from "utils/element/calcSpotPrice";
-import { getReserves } from "utils/element/getReserves";
+import { ElementAddresses, Tranche } from "@/types/manual/types";
+import { calcSpotPriceYt } from "@/utils/element/calcSpotPrice";
+import { getReserves } from "@/utils/element/getReserves";
 
 export const getYTCSpotPrice = async (
   tokenName: string,

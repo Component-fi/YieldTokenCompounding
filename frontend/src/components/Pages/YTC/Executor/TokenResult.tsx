@@ -1,6 +1,6 @@
 import { Flex } from "@chakra-ui/react";
-import { shortenNumber } from "utils/shortenNumber";
-import { BaseTokenPriceTag, YTPriceTag } from "components/Web3/Prices";
+import { shortenNumber } from "@/utils/shortenNumber";
+import { BaseTokenPriceTag, YTPriceTag } from "@/components/Web3/Prices";
 
 interface TokenResultProps {
   token: {

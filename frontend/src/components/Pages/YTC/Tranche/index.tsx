@@ -1,8 +1,8 @@
-import { TrancheRatesInterface } from "recoil/trancheRates/atom";
-import { shortenNumber } from "utils/shortenNumber";
-import { DetailItem } from "components/Reusable/DetailItem";
-import { Spinner } from "components/Reusable/Spinner";
-import { DetailPane } from "components/Reusable/DetailPane";
+import { TrancheRatesInterface } from "@/recoil/trancheRates/atom";
+import { shortenNumber } from "@/utils/shortenNumber";
+import { DetailItem } from "@/components/Reusable/DetailItem";
+import { Spinner } from "@/components/Reusable/Spinner";
+import { DetailPane } from "@/components/Reusable/DetailPane";
 import { useFetchTrancheRates } from "./hooks";
 
 interface TrancheDetailsProps {

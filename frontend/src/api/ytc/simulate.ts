@@ -1,8 +1,8 @@
 import { BigNumber, ethers, Signer } from "ethers";
 import { Provider } from "@ethersproject/providers";
 import _ from "lodash";
-import { GAS_LIMITS } from "constants/gasLimits";
-import { ElementAddresses } from "types/manual/types";
+import { GAS_LIMITS } from "@/constants/gasLimits";
+import { ElementAddresses } from "@/types/manual/types";
 import {
   getYTCParameters,
   YTCInput,

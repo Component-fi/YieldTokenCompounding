@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import Wallet from "components/Web3/Wallet";
-import WalletSettings from "components/Web3/Wallet/Settings";
-import componentLogo from "images/Logo_Dot_Color_Main_Orange.svg";
+import Wallet from "@/components/Web3/Wallet";
+import WalletSettings from "@/components/Web3/Wallet/Settings";
+import componentLogo from "@/images/Logo_Dot_Color_Main_Orange.svg";
 import { Flex, Icon } from "@chakra-ui/react";
 
 export const Header = () => {

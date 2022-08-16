@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import {
   calculatorGainSelector,
   selectedSimulationAtom,
-} from "recoil/simulationResults/atom";
+} from "@/recoil/simulationResults/atom";
 import {
   Table,
   Th,
@@ -17,12 +17,12 @@ import {
   InputGroup,
   InputRightAddon,
 } from "@chakra-ui/react";
-import { YTCOutput } from "api/ytc/helpers";
-import { predictedRateAtom } from "recoil/predictedRate/atom";
-import { trancheSelector } from "recoil/trancheRates/atom";
-import copy from "constants/copy.json";
-import Card from "components/Reusable/Card";
-import { InfoTooltip } from "components/Reusable/Tooltip";
+import { YTCOutput } from "@/api/ytc/helpers";
+import { predictedRateAtom } from "@/recoil/predictedRate/atom";
+import { trancheSelector } from "@/recoil/trancheRates/atom";
+import copy from "@/constants/copy.json";
+import Card from "@/components/Reusable/Card";
+import { InfoTooltip } from "@/components/Reusable/Tooltip";
 import { ResultsTableRow } from "./ResultsTableRow";
 
 interface TableProps {}

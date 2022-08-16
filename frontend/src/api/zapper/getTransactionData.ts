@@ -1,6 +1,6 @@
 import axios from "axios";
 import { BigNumberish } from "ethers";
-import { ZERO_ADDRESS } from "constants/static";
+import { ZERO_ADDRESS } from "@/constants/static";
 
 interface UserZapIn {
   toWhomToIssue: string;

@@ -1,6 +1,6 @@
 import { ethers, Signer } from "ethers";
-import {ITranche__factory} from "hardhat/typechain/factories/ITranche__factory";
-import { ERC20__factory } from "hardhat/typechain";
+import {ITranche__factory} from "@/hardhat/typechain/factories/ITranche__factory";
+import { ERC20__factory } from "@/hardhat/typechain";
 
 export const getPrincipalTotal = async (
   trancheAddress: string,

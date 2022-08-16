@@ -1,9 +1,9 @@
 import { Flex, FormLabel } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import { useEffect, useRef } from "react";
-import { slippageToleranceAtom } from "recoil/transactionSettings/atom";
-import { selectedCalculatorGainSelector } from "recoil/simulationResults/atom";
-import Card from "components/Reusable/Card";
+import { slippageToleranceAtom } from "@/recoil/transactionSettings/atom";
+import { selectedCalculatorGainSelector } from "@/recoil/simulationResults/atom";
+import Card from "@/components/Reusable/Card";
 import { TokenResult } from "./TokenResult";
 import { ExecutionDetails } from "./ExecutionDetails";
 import { ExposureBar } from "./ExposureBar";
