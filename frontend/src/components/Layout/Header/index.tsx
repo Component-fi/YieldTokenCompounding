@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import Wallet from "@/components/Web3/Wallet";
 import WalletSettings from "@/components/Web3/Wallet/Settings";
+// @ts-ignore
 import componentLogo from "@/images/Logo_Dot_Color_Main_Orange.svg";
 import { Flex, Icon } from "@chakra-ui/react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export const Header = () => {
   return (
@@ -46,7 +47,8 @@ export const Header = () => {
         gridGap={1}
       >
         <WalletSettings icon={<GearIcon />} />
-        <Wallet />
+        {/*<Wallet />*/}
+        <ConnectButton/>
       </Flex>
     </Flex>
   );

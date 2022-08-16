@@ -12,14 +12,13 @@ import {
 } from "@/recoil/simulationResults/atom";
 import { deployments } from "@/constants/apy-mainnet-constants";
 import { useState } from "react";
-import { useWeb3React } from "@web3-react/core";
-import { Web3Provider } from "@ethersproject/providers";
 import { elementAddressesAtom } from "@/recoil/element/atom";
 import { notificationAtom } from "@/recoil/notifications/atom";
 import { slippageToleranceAtom } from "@/recoil/transactionSettings/atom";
 import { executeYieldTokenCompounding } from "@/api/ytc/execute";
 import { useBalance } from "@/hooks";
 import { Button } from "@/components/Reusable/Button";
+import { useSigner } from "wagmi";
 
 interface ApproveAndSimulateButtonProps {
   tokenAddress: string | undefined;
@@ -58,8 +57,7 @@ export const ApproveAndConfirmButton: React.FC<
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
   const elementAddresses = useRecoilValue(elementAddressesAtom);
-  const { library, account } = useWeb3React();
-  const provider = library as Web3Provider;
+  const {data: signer} = useSigner()
   const setNotification = useRecoilState(notificationAtom)[1];
 
   const slippageTolerance = useRecoilValue(slippageToleranceAtom);
@@ -79,7 +77,6 @@ export const ApproveAndConfirmButton: React.FC<
 
   // Execute the actual calculation transaction
   const handleExecuteTransaction = () => {
-    const signer = provider.getSigner(account || undefined);
     if (
       !balance ||
       balance < selectedResult?.inputs.amountCollateralDeposited

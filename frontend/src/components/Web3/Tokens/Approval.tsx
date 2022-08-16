@@ -6,12 +6,13 @@ import { BigNumber, ContractReceipt, utils, providers } from "ethers";
 import { notificationAtom } from "@/recoil/notifications/atom";
 import { useRecoilState } from "recoil";
 import { deployments } from "@/constants/apy-mainnet-constants";
-import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 import { ERC20__factory } from "@/hardhat/typechain/factories/ERC20__factory";
 import { YieldTokenCompounding__factory } from "@/hardhat/typechain/factories/YieldTokenCompounding__factory";
 import { MAX_UINT_HEX } from "@/constants/static";
 import { walletModalAtom } from "@/recoil/walletModal/atom";
+import { useAccount, useProvider, useSigner } from "wagmi";
+import { YieldTokenCompounding } from "@/hardhat/typechain";
 
 type AbstractApprovalProps = {
   approveText: string;
@@ -119,8 +120,9 @@ type ERC20ApprovalProps = {
 
 // An implementation of the approval button specifically for erc20 tokens
 export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
-  const { library, account } = useWeb3React();
-  const provider = library as Web3Provider;
+  const { address, isConnected } = useAccount()
+  const {data: signer} = useSigner();
+  const provider = useProvider()
   const {
     amount,
     approvalAddress,
@@ -135,8 +137,7 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCheckApproval = useCallback(async () => {
-    const signer = provider?.getSigner(account || undefined);
-    if (tokenAddress && approvalAddress && signer && account) {
+    if (tokenAddress && approvalAddress && signer && isConnected) {
       const tokenContract = ERC20__factory.connect(tokenAddress, signer);
       if (tokenContract) {
         let absoluteAmount;
@@ -148,7 +149,7 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
         } else {
           absoluteAmount = MAX_UINT_HEX;
         }
-        checkApproval(absoluteAmount, approvalAddress, account, tokenContract)
+        checkApproval(absoluteAmount, approvalAddress, address as string, tokenContract)
           .then((result) => {
             if (result) {
               setIsApproved(true);
@@ -161,12 +162,11 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
           });
       }
     }
-  }, [account, amount, approvalAddress, provider, tokenAddress]);
+  }, [address, isConnected, amount, approvalAddress, provider, tokenAddress]);
 
   const handleApprove: () => Promise<ContractReceipt> =
     useCallback(async () => {
-      const signer = provider?.getSigner(account || undefined);
-      if (approvalAddress && tokenAddress && signer && account) {
+      if (approvalAddress && tokenAddress && signer && isConnected) {
         setIsLoading(true);
 
         // send the approval request
@@ -195,7 +195,8 @@ export const ERC20Approval: React.FC<ERC20ApprovalProps> = (props) => {
       approvalAddress,
       handleCheckApproval,
       provider,
-      account,
+      isConnected,
+      address
     ]);
 
   return (
@@ -229,18 +230,22 @@ interface BalancerApprovalProps {
 
 // An implementation of the approval button specifically for approving a balancer pool to use funds from the YTC contract
 export const BalancerApproval: React.FC<BalancerApprovalProps> = (props) => {
-  const { library } = useWeb3React();
-  const provider = library as Web3Provider;
-  const signer = provider?.getSigner();
-  const ytc = YieldTokenCompounding__factory.connect(
-    deployments.YieldTokenCompounding,
-    signer
-  );
-
   const { trancheAddress, children, ...rest } = props;
 
+  const { data: signer } = useSigner()
+  const provider = useProvider()
   const [isApproved, setIsApproved] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  let ytc: YieldTokenCompounding | undefined= undefined;
+  if (signer){
+    ytc = YieldTokenCompounding__factory.connect(
+      deployments.YieldTokenCompounding,
+      signer
+    );
+  } else {
+    ytc = undefined;
+  }
 
   const handleCheckApproval = useCallback(async () => {
     if (trancheAddress && ytc) {
@@ -262,7 +267,7 @@ export const BalancerApproval: React.FC<BalancerApprovalProps> = (props) => {
         const tx = await ytc.approveTranchePTOnBalancer(trancheAddress);
         if (tx) {
           const receipt = await tx.wait();
-          handleCheckApproval();
+          await handleCheckApproval();
           return receipt;
         }
       }

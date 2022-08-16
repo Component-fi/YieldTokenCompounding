@@ -2,7 +2,6 @@ import { useFormikContext } from "formik";
 import { useCallback, useEffect, useMemo } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 import { FormFields } from "./index";
 import {
@@ -22,6 +21,7 @@ import { notificationAtom } from "@/recoil/notifications/atom";
 import { Token, Tranche } from "@/types/manual/types";
 import { getVariableAPY } from "@/api/prices/yearn";
 import { getActiveTranches } from "@/api/element";
+import { useAccount, useProvider } from "wagmi";
 
 // on location change, reset the simulation results
 export const useClearSimOnLocationChange = () => {
@@ -80,8 +80,8 @@ export const useSimulate = () => {
   const setSimulationResults = useRecoilState(simulationResultsAtom)[1];
   const setNotification = useRecoilState(notificationAtom)[1];
 
-  const { account, library } = useWeb3React();
-  const provider = library as Web3Provider;
+  const {isConnected} = useAccount();
+  const provider = useProvider();
 
   const { values } = useFormikContext<FormFields>();
   const { variable } = useRecoilValue(
@@ -97,7 +97,7 @@ export const useSimulate = () => {
       !!values.trancheAddress &&
       !!values.amount &&
       !!ytcContractAddress &&
-      !!account
+      isConnected
     ) {
       const userData: YTCInput = {
         baseTokenAddress: values.tokenAddress,
@@ -161,7 +161,7 @@ export const useSimulate = () => {
     }
   }, [
     values,
-    account,
+    isConnected,
     elementAddresses,
     provider,
     setIsSimulating,
@@ -190,8 +190,7 @@ export const useTokenName = (tokenAddress: string | undefined) => {
 };
 
 export const useVariableAPY = (trancheAddress: string) => {
-  const { library } = useWeb3React();
-  const provider = library as Web3Provider;
+  const provider = useProvider();
 
   return useCallback(async () => {
     // if (tokenName) {

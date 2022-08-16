@@ -50,7 +50,7 @@ const ExecutionCard: React.FC<ExecutionCardProps> = () => {
       >
         <FormLabel
           flexDir="row"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
           alignSelf="center"
         >

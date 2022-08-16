@@ -1,21 +1,52 @@
 import React, { useEffect } from "react";
+import '@/utils/polyfill'
 import { useRecoilState, useRecoilValue } from "recoil";
-import { Web3ReactProvider } from "@web3-react/core";
-import { Web3Provider } from "@ethersproject/providers";
+import '@rainbow-me/rainbowkit/styles.css'
 import Layout from "@/components/Layout/Layout";
 import { elementAddressesAtom } from "@/recoil/element/atom";
 import { fetchElementState } from "@/recoil/element/fetch";
 import { chainNameAtom } from "@/recoil/chain/atom";
+import {
+  getDefaultWallets,
+  RainbowKitProvider
+} from "@rainbow-me/rainbowkit";
+import {
+  chain,
+  configureChains,
+  createClient,
+  WagmiConfig,
+} from 'wagmi';
+import {
+  publicProvider
+} from 'wagmi/providers/public';
+import {
+  WalletConnectConnector
+} from 'wagmi/connectors/walletConnect'
 
 function App() {
   const [, setElementState] = useRecoilState(elementAddressesAtom);
   const chainName = useRecoilValue(chainNameAtom);
 
-  function getLibrary(provider: any): Web3Provider {
-    const library = new Web3Provider(provider);
-    library.pollingInterval = 12000;
-    return library;
-  }
+  const { chains, provider } = configureChains(
+    [chain.mainnet],
+    [publicProvider()]
+  )
+
+  const { connectors } = getDefaultWallets(({
+    appName: "Yield Token Compounding",
+    chains
+  }))
+
+  const client = createClient({
+    autoConnect: true,
+    connectors: [...connectors(), new WalletConnectConnector({
+      chains,
+      options: {
+        qrcode: true
+      }
+    })],
+    provider,
+  })
 
   // Get the element state file from their github repo
   // TODO this is reliant on the github repository
@@ -27,9 +58,11 @@ function App() {
 
   return (
     <div className="App">
-      <Web3ReactProvider getLibrary={getLibrary}>
-        <Layout />
-      </Web3ReactProvider>
+      <WagmiConfig client={client}>
+        <RainbowKitProvider chains={ chains }>
+          <Layout />
+        </RainbowKitProvider>
+      </WagmiConfig>
     </div>
   );
 }

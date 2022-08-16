@@ -1,5 +1,4 @@
 import { Web3Provider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
 import { useCallback, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { getFixedRate } from "@/api/element/fixedRate";
@@ -15,6 +14,7 @@ import {
 import { yieldTokenAccruedValue } from "@/api/ytc/helpers";
 import { Tranche } from "@/types/manual/types";
 import { getRemainingTrancheYears, getTrancheByAddress } from "@/api/element";
+import { useProvider } from "wagmi";
 
 export const useFetchTrancheRates = (
   trancheAddress: string,
@@ -28,8 +28,7 @@ export const useFetchTrancheRates = (
 
   const tokenName = useTokenName(tokenAddress);
 
-  const { library } = useWeb3React();
-  const provider = library as Web3Provider;
+  const provider = useProvider()
 
   const handleChangeTrancheRate = useCallback(
     (rateChange: Partial<TrancheRatesInterface>) => {
