@@ -36,7 +36,7 @@ export const AdvancedCollapsable: React.FC = () => {
         <InfoTooltip label={copy.tooltips.advanced_options} h={3} w={3} />
       </Button>
       <Collapse in={show}>
-        <FormLabel mt={3} flexDir="row" justify="center" alignItems="center">
+        <FormLabel mt={3} flexDir="row" justifyContent="center" alignItems="center">
           <Text textAlign="center">Number of Compounds</Text>
         </FormLabel>
         <NumberCompoundsField />

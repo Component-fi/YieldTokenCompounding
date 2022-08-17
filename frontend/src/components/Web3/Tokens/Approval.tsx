@@ -26,7 +26,7 @@ type AbstractApprovalProps = {
   handleApprove: () => Promise<ContractReceipt>;
 } & ButtonProps;
 
-// An approval button that checks whether or not a wallet is connected, then checks whether a specific token has been approved
+// An approval button that checks whether a wallet is connected, then checks whether a specific token has been approved
 // If the token has not been approved, the button will trigger an approval transaction
 // At the moment it is hardcoded for maxint approval
 const AbstractApproval: React.FC<AbstractApprovalProps> = (props) => {

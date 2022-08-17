@@ -10,8 +10,8 @@ export const DetailItem: React.FC<DetailItemProps> = (props) => {
 
   return (
     <Flex flexDir="row" justify="space-between" gridGap={4} alignItems="center">
-      <Text>{name}</Text>
-      <Text>{value}</Text>
+      <div>{name}</div>
+      <div>{value}</div>
     </Flex>
   );
 };

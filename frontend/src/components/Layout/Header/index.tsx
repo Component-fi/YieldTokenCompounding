@@ -38,11 +38,11 @@ export const Header = () => {
       </Flex>
       <Flex
         flexDir="row"
-        justify={{
+        justifyContent={{
           base: "center",
           md: "end",
         }}
-        items="center"
+        alignItems="center"
         flex={{ md: 1 }}
         gridGap={1}
       >
