@@ -10,12 +10,6 @@ import { getTokenPrice } from "@/api/prices";
 import { getUnderlyingTotal } from "@/api/element/wrappedPositionAmount";
 import { getPrincipalTotal } from "@/api/element/principalTotal";
 import { getYieldTotal } from "@/api/element/yieldTotal";
-import { deployments } from "@/constants/apy-mainnet-constants";
-import { getCurveSwapAddress, isCurveToken } from "@/api/prices/curve";
-import { getZapInData } from "@/api/zapper/getTransactionData";
-import { parseEther } from "ethers/lib/utils";
-import { BURN_ADDRESS, MAX_UINT_HEX, ZERO_ADDRESS } from "@/constants/static";
-import { YTCZap__factory } from "@/hardhat/typechain";
 import { calculateYtcReturn } from "@/api/ytc/calculate";
 
 export interface YTCInput {
@@ -178,22 +172,6 @@ export const getYTCParameters = async (
     signerOrProvider
   );
 
-  // get teh amount of collateral denominated in eth
-  const amountInEthNormalized =
-    parseFloat(userData.amountCollateralDeposited.toString()) / ethToBaseToken;
-
-  // convert it to the absolute non-decimal value
-  const amountInEthAbsolute = parseEther(amountInEthNormalized.toFixed(6).toString());
-  // multiply it by two to allow for slippage
-  const amountInEthAbsoulteTimes2 = amountInEthAbsolute.mul(2);
-
-
-  const zapAddress = deployments.YTCZap;
-  const ytcAddress = deployments.YieldTokenCompounding;
-  const uniswapAddress = deployments.UniswapRouter;
-
-  const ytcZap = YTCZap__factory.connect(zapAddress, signerOrProvider);
-
   let simulate;
     simulate = async (n: number) => {
       return await calculateYtcReturn(
@@ -207,22 +185,6 @@ export const getYTCParameters = async (
       elementAddresses,
         signerOrProvider
       )
-  //   simulate = async (n: number) => {
-  //     return await ytcZap.callStatic.compoundUniswap(
-  //       ytcAddress,
-  //       n,
-  //       trancheAddress,
-  //       balancerPoolId,
-  //       amount,
-  //       "0",
-  //       MAX_UINT_HEX,
-  //       userData.baseTokenAddress,
-  //       yieldTokenAddress,
-  //       MAX_UINT_HEX,
-  //       uniswapAddress,
-  //       { from: BURN_ADDRESS, value: amountInEthAbsoulteTimes2 }
-  //     );
-  //   };
   }
 
   return {
