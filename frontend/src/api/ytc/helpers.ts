@@ -16,6 +16,7 @@ import { getZapInData } from "@/api/zapper/getTransactionData";
 import { parseEther } from "ethers/lib/utils";
 import { BURN_ADDRESS, MAX_UINT_HEX, ZERO_ADDRESS } from "@/constants/static";
 import { YTCZap__factory } from "@/hardhat/typechain";
+import { calculateYtcReturn } from "@/api/ytc/calculate";
 
 export interface YTCInput {
   baseTokenAddress: string;
@@ -119,6 +120,8 @@ export const getYTCParameters = async (
 
   const trancheAddress = trancheDetails.address;
   const balancerPoolId = trancheDetails.ptPool.poolId;
+  const balancerPoolAddress = trancheDetails.ptPool.address;
+  const timeStretch = trancheDetails.ptPool.timeStretch;
 
   // Load contracts
   const ytc = new ethers.Contract(
@@ -192,53 +195,34 @@ export const getYTCParameters = async (
   const ytcZap = YTCZap__factory.connect(zapAddress, signerOrProvider);
 
   let simulate;
-  if (isCurveToken(baseTokenName)) {
-    const poolAddress = await getCurveSwapAddress(
-      userData.baseTokenAddress,
-      signerOrProvider
-    );
-
-    const zapResponse = await getZapInData({
-      ownerAddress: ytc.address,
-      sellToken: ZERO_ADDRESS,
-      poolAddress,
-      sellAmount: amountInEthAbsoulteTimes2,
-      protocol: "curve",
-    });
-
     simulate = async (n: number) => {
-      return await ytcZap.callStatic.compoundZapper(
-        ytcAddress,
+      return await calculateYtcReturn(
         n,
-        trancheAddress,
-        balancerPoolId,
         amount,
-        "0",
-        MAX_UINT_HEX,
         userData.baseTokenAddress,
-        yieldTokenAddress,
-        zapResponse.data,
-        zapResponse.to,
-        { from: BURN_ADDRESS, value: amountInEthAbsoulteTimes2 }
-      );
-    };
-  } else {
-    simulate = async (n: number) => {
-      return await ytcZap.callStatic.compoundUniswap(
-        ytcAddress,
-        n,
         trancheAddress,
-        balancerPoolId,
-        amount,
-        "0",
-        MAX_UINT_HEX,
-        userData.baseTokenAddress,
-        yieldTokenAddress,
-        MAX_UINT_HEX,
-        uniswapAddress,
-        { from: BURN_ADDRESS, value: amountInEthAbsoulteTimes2 }
-      );
-    };
+        timeStretch,
+        trancheExpiration,
+      balancerPoolAddress,
+      elementAddresses,
+        signerOrProvider
+      )
+  //   simulate = async (n: number) => {
+  //     return await ytcZap.callStatic.compoundUniswap(
+  //       ytcAddress,
+  //       n,
+  //       trancheAddress,
+  //       balancerPoolId,
+  //       amount,
+  //       "0",
+  //       MAX_UINT_HEX,
+  //       userData.baseTokenAddress,
+  //       yieldTokenAddress,
+  //       MAX_UINT_HEX,
+  //       uniswapAddress,
+  //       { from: BURN_ADDRESS, value: amountInEthAbsoulteTimes2 }
+  //     );
+  //   };
   }
 
   return {

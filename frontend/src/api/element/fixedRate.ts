@@ -36,9 +36,9 @@ export const getFixedRate = async (
     signerOrProvider
   );
 
-  const tParamSeconds = ptPool.timeStretch * ONE_YEAR_IN_SECONDS;
+  const tParamSeconds = getTParamSeconds(ptPool.timeStretch);
 
-  const timeRemainingSeconds = tranche.expiration - new Date().getTime() / 1000;
+  const timeRemainingSeconds = getTimeRemainingSeconds(tranche.expiration);
 
   // The getReserves function does not return the base/pt reserves in a particular order
   let baseTokenReserve;
@@ -60,3 +60,11 @@ export const getFixedRate = async (
 
   return calcFixedAPR(spot, timeRemainingSeconds);
 };
+
+export const getTParamSeconds = (timeStretch: number): number => {
+  return timeStretch * ONE_YEAR_IN_SECONDS;
+}
+
+export const getTimeRemainingSeconds = (expiration: number): number => {
+  return expiration - new Date().getTime() / 1000
+}

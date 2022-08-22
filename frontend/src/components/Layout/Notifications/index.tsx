@@ -13,8 +13,6 @@ export const Notifications = () => {
       const notificationLength = notification.length;
       const latestNotification = notification[notificationLength - 1];
 
-      console.log(latestNotification);
-
       toast({
         position: "bottom-right",
         render: () => (
