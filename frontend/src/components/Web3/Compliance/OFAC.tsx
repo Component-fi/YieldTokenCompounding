@@ -1,6 +1,5 @@
 import {
   Modal, ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
@@ -22,7 +21,6 @@ export const OFACModal: React.FC<Props> = (props) => {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Ineligible Account</ModalHeader>
-          <ModalCloseButton />
           <ModalBody>
             This account is not eligible to use this website.
 
