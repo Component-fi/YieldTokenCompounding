@@ -6,6 +6,7 @@ import { Modal } from "./Modal";
 import { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
 import { walletModalAtom } from "@/recoil/walletModal/atom";
+import { OFACModal } from "@/components/Web3/Compliance/OFAC";
 
 interface Props {}
 
@@ -34,6 +35,7 @@ export const Wallet = (props: Props) => {
 
   return (
     <div>
+      <OFACModal account={web3React.account}/>
       <Modal isOpen={isOpen} setIsOpen={setIsOpen} />
       {web3React.active ? (
         <Flex justifyContent="space-between" alignItems="center">
