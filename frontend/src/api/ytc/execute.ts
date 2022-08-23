@@ -1,7 +1,7 @@
 import { ContractReceipt, ethers, Signer } from "ethers";
-import { ElementAddresses } from "types/manual/types";
+import { ElementAddresses } from "@/types/manual/types";
 import { getYTCParameters, YTCInput } from "./helpers";
-import { YieldTokenCompounding as YieldTokenCompoundingType } from "hardhat/typechain/YieldTokenCompounding";
+import { YieldTokenCompounding as YieldTokenCompoundingType } from "@/hardhat/typechain/YieldTokenCompounding";
 
 // Executes the compound method on the YTC contract
 // param userData, input data selected by the user, token, number of compounds, amount of collateral

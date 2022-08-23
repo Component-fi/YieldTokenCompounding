@@ -12,10 +12,10 @@ import {
   ModalOverlay,
   Text,
 } from "@chakra-ui/react";
-import Card from "components/Reusable/Card";
+import Card from "@/components/Reusable/Card";
 import { useWeb3React } from "@web3-react/core";
-import { injected, walletconnect } from "connectors";
-import walletConnectLogo from "images/walletconnect.svg";
+import { injected, walletconnect } from "@/connectors";
+import walletConnectLogo from "@/images/walletconnect.svg";
 
 interface Props {
   isOpen: boolean;

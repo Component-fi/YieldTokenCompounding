@@ -1,5 +1,5 @@
 import { Flex, Text } from "@chakra-ui/layout";
-import { Title } from "components/Layout/Title";
+import { Title } from "@/components/Layout/Title";
 
 export const Decollateralize: React.FC<any> = () => {
   return (

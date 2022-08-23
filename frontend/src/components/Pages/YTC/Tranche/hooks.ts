@@ -2,19 +2,19 @@ import { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
 import { useCallback, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { getFixedRate } from "api/element/fixedRate";
-import { elementAddressesAtom } from "recoil/element/atom";
+import { getFixedRate } from "@/api/element/fixedRate";
+import { elementAddressesAtom } from "@/recoil/element/atom";
 import {
   TrancheRatesInterface,
   trancheSelector,
-} from "recoil/trancheRates/atom";
+} from "@/recoil/trancheRates/atom";
 import {
   useTokenName,
   useVariableAPY,
-} from "components/Pages/YTC/Calculator/hooks";
-import { yieldTokenAccruedValue } from "api/ytc/helpers";
-import { Tranche } from "types/manual/types";
-import { getRemainingTrancheYears, getTrancheByAddress } from "api/element";
+} from "@/components/Pages/YTC/Calculator/hooks";
+import { yieldTokenAccruedValue } from "@/api/ytc/helpers";
+import { Tranche } from "@/types/manual/types";
+import { getRemainingTrancheYears, getTrancheByAddress } from "@/api/element";
 
 export const useFetchTrancheRates = (
   trancheAddress: string,

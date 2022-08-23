@@ -8,22 +8,22 @@ import {
   InputRightAddon,
   Text,
 } from "@chakra-ui/react";
-import Card from "components/Reusable/Card";
-import { Spinner } from "components/Reusable/Spinner";
-import { Select } from "components/Reusable/Select";
+import Card from "@/components/Reusable/Card";
+import { Spinner } from "@/components/Reusable/Spinner";
+import { Select } from "@/components/Reusable/Select";
 import { useFormikContext } from "formik";
 import { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { FormFields } from ".";
-import { activeTokensSelector } from "recoil/element/atom";
-import { Tranche } from "types/manual/types";
-import { BaseTokenPriceTag } from "components/Web3/Prices";
-import { InfoTooltip } from "components/Reusable/Tooltip";
-import { TokenIcon } from "components/Web3/Tokens/TokenIcon";
+import { activeTokensSelector } from "@/recoil/element/atom";
+import { Tranche } from "@/types/manual/types";
+import { BaseTokenPriceTag } from "@/components/Web3/Prices";
+import { InfoTooltip } from "@/components/Reusable/Tooltip";
+import { TokenIcon } from "@/components/Web3/Tokens/TokenIcon";
 import { AdvancedCollapsable } from "./Advanced";
 import { ApproveAndSimulateButton } from "./ApproveAndSimulateButton";
-import { TrancheDetails } from "components/Pages/YTC/Tranche";
-import { useBalance } from "hooks";
+import { TrancheDetails } from "@/components/Pages/YTC/Tranche";
+import { useBalance } from "@/hooks";
 import {
   useClearSimOnLocationChange,
   useSimulate,
@@ -33,7 +33,7 @@ import {
   useTokenName,
   useTranches,
 } from "./hooks";
-import copy from "constants/copy.json";
+import copy from "@/constants/copy.json";
 
 interface FormProps {}
 

@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { Button, Text, Flex } from "@chakra-ui/react";
-import { chainNameAtom } from "recoil/chain/atom";
+import { chainNameAtom } from "@/recoil/chain/atom";
 import { useRecoilState } from "recoil";
 import { Modal } from "./Modal";
 import { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
-import { walletModalAtom } from "recoil/walletModal/atom";
+import { walletModalAtom } from "@/recoil/walletModal/atom";
 
 interface Props {}
 

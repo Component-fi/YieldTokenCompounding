@@ -5,8 +5,10 @@ import { atom } from "recoil";
 // This atom simply contains the name of the chain that the application is connected to
 
 const initial = (() => {
-  if (process.env.REACT_APP_NETWORK) {
-    return process.env.REACT_APP_NETWORK;
+  // @ts-ignore
+  if (import.meta.env.VITE_APP_NETWORK) {
+    // @ts-ignore
+    return import.meta.env.VITE_APP_NETWORK;
   } else {
     return "mainnet";
   }

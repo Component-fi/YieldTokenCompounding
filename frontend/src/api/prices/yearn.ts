@@ -1,6 +1,6 @@
 import _ from "lodash";
 import axios from "axios";
-import { ITranche__factory, IWrappedPosition__factory } from "hardhat/typechain";
+import { ITranche__factory, IWrappedPosition__factory } from "@/hardhat/typechain";
 import { ethers, Signer } from "ethers";
 
 const YEARN_API_ENDPOINT = "https://api.yearn.finance/v1/chains/1/vaults/all";

@@ -1,7 +1,7 @@
 import { atom, selector } from "recoil";
-import constants from "hardhat/mainnet-constants.json";
-import { getBaseTokensWithActiveTranches } from "api/element";
-import { Token } from "types/manual/types";
+import constants from "@/hardhat/mainnet-constants.json";
+import { getBaseTokensWithActiveTranches } from "@/api/element";
+import { Token } from "@/types/manual/types";
 
 // This is a recoil atom
 // Atoms are pieces of state that can be accessed and or modified by various components through a set of hooks

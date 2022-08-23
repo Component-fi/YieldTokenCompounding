@@ -16,7 +16,7 @@
 
 import { Provider } from "@ethersproject/providers";
 import { BigNumber, Signer } from "ethers";
-import { BasePool__factory, ERC20__factory, Vault__factory } from "hardhat/typechain";
+import { BasePool__factory, ERC20__factory, Vault__factory } from "@/hardhat/typechain";
 
 export interface ReservesResult {
   /**

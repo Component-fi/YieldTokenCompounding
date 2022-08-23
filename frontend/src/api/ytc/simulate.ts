@@ -1,8 +1,8 @@
 import { BigNumber, ethers, Signer } from "ethers";
 import { Provider } from "@ethersproject/providers";
 import _ from "lodash";
-import { GAS_LIMITS } from "constants/gasLimits";
-import { ElementAddresses } from "types/manual/types";
+import { GAS_LIMITS } from "@/constants/gasLimits";
+import { ElementAddresses } from "@/types/manual/types";
 import {
   getYTCParameters,
   YTCInput,
@@ -76,6 +76,7 @@ export const simulateYTCZap = async (
     // Call the method statically to calculate the estimated return
     returnedVals = await simulate(userData.numberOfCompounds);
   } catch (error) {
+    console.error(error)
     // if this is a json rpc error type
     if (isJsonErrorType(error)) {
       // Assign a natural language reason for this on chain error
@@ -107,10 +108,12 @@ export const simulateYTCZap = async (
     GAS_LIMITS[userData.numberOfCompounds]
   );
 
+
   const ethGasFees = await gasLimitToEthGasFee(
     signerOrProvider,
     gasAmountEstimate
   );
+
 
   const gasFeesInBaseToken = ethToBaseTokenRate * ethGasFees;
 
@@ -179,7 +182,10 @@ export const simulateYTCForCompoundRange = async (
     signerOrProvider
   );
 
-  const promises = _.range(compoundRange[0], compoundRange[1] + 1).map(
+  // TODO fix me
+  // FIXME
+  // const promises = _.range(compoundRange[0], compoundRange[1] + 1).map(
+   const promises = _.range(compoundRange[0], compoundRange[1] + 1).map(
     (index) => {
       const data: YTCInput = {
         ...userData,
