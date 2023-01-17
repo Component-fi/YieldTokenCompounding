@@ -14,38 +14,40 @@
  * limitations under the License.
  */
 
+import Decimal from "decimal.js";
+
 export function calcSwapOutGivenInCCPoolUnsafe(
-  xAmount: string,
-  xReserves: string,
-  yReserves: string,
-  totalSupply: string,
+  xAmount: Decimal,
+  xReserves: Decimal,
+  yReserves: Decimal,
+  totalSupply: Decimal,
   timeRemainingSeconds: number,
   tParamSeconds: number,
   baseAssetIn: boolean
-): number {
+): Decimal {
   const tS = +totalSupply;
   const amountX = +xAmount;
 
-  let xR = +xReserves + tS;
-  let yR = +yReserves;
+  let xR = xReserves.add(tS);
+  let yR = yReserves;
 
   if (baseAssetIn) {
-    xR = +xReserves;
-    yR = +yReserves + tS;
+    xR = xReserves;
+    yR = yReserves.add(tS);
   }
 
   const t = timeRemainingSeconds / tParamSeconds;
 
-  const xBefore = xR ** (1 - t);
-  const yBefore = yR ** (1 - t);
+  const xBefore = xR.pow(1 - t);
+  const yBefore = yR.pow(1 - t);
 
-  const xAfter = (xR + amountX) ** (1 - t);
-  const exponent = (1 / (1 - t))
+  const xAfter = xR.add(amountX).pow(1 - t);
+  const exponent = 1 / (1 - t)
 
   // this is the real equation, make ascii art for it
-  const yAfter = (xBefore + yBefore - xAfter) ** exponent;
+  const yAfter = xBefore.add(yBefore).sub(xAfter).pow(exponent);
 
-  const amountY = yR - yAfter;
+  const amountY = yR.sub(yAfter);
 
   return amountY;
 }

@@ -11,6 +11,7 @@ import { getUnderlyingTotal } from "@/api/element/wrappedPositionAmount";
 import { getPrincipalTotal } from "@/api/element/principalTotal";
 import { getYieldTotal } from "@/api/element/yieldTotal";
 import { calculateYtcReturn } from "@/api/ytc/calculate";
+import Decimal from "decimal.js";
 
 export interface YTCInput {
   baseTokenAddress: string;
@@ -69,7 +70,7 @@ export interface YTCParameters {
   ytSymbol: string;
   ytAddress: string;
   ethToBaseTokenRate: number;
-  simulate: (n: number) => Promise<any[]>;
+  simulate: (n: number) => Promise<[BigNumber, BigNumber]>;
 }
 
 // helper function to retrieve parameters required for running the YTC transaction
@@ -176,13 +177,13 @@ export const getYTCParameters = async (
     simulate = async (n: number) => {
       return await calculateYtcReturn(
         n,
-        amount,
+        new Decimal(amount.toString()),
         userData.baseTokenAddress,
         trancheAddress,
         timeStretch,
         trancheExpiration,
-      balancerPoolAddress,
-      elementAddresses,
+        balancerPoolAddress,
+        elementAddresses,
         signerOrProvider
       )
   }
