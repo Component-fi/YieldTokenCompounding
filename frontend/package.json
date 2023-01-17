@@ -17,6 +17,7 @@
     "@web3-react/walletconnect-connector": "^6.2.8",
     "axios": "^0.24.0",
     "chai": "^4.3.4",
+    "decimal.js": "^10.4.3",
     "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.6",

@@ -1,11 +1,11 @@
-import { BigNumber, ethers, Signer } from "ethers";
-import { calcSwapOutGivenInCCPoolUnsafe } from "@/api/element/calcPoolSwap";
-import { ElementAddresses } from "@/types/manual/types";
-import { getReserves, ReservesResult } from "@/utils/element/getReserves";
-import { getTimeRemainingSeconds, getTParamSeconds } from "@/api/element/fixedRate";
-import { WAD } from "@/constants/static";
-import { yieldTokenAccruedValue } from "@/api/ytc/helpers";
-import _ from "lodash";
+import { BigNumber, ethers, Signer } from "ethers"
+import { calcSwapOutGivenInCCPoolUnsafe } from "@/api/element/calcPoolSwap"
+import { ElementAddresses } from "@/types/manual/types"
+import { getReserves, ReservesResult } from "@/utils/element/getReserves"
+import { getTimeRemainingSeconds, getTParamSeconds } from "@/api/element/fixedRate"
+import { WAD } from "@/constants/static"
+import { yieldTokenAccruedValue } from "@/api/ytc/helpers"
+import _ from "lodash"
 import Decimal from 'decimal.js'
 // in order to recurse the new value of n must reduce by 1, and the amount must be the number of base tokens received
 // TODO add element fees on yield
@@ -24,22 +24,23 @@ export const calculateYtcReturn = async (
   const reserves = await getReserves(balancerPoolAddress, elementAddresses.balancerVault, signerOrProvider)
 
   const normalizeDecimals = (reserves: ReservesResult, index: number): Decimal => {
-    const decimal = reserves.decimals[index];
-    const decDiff = WAD - decimal;
-    const reserve = new Decimal(reserves.balances[index].toString()).mul(10 ** decDiff)
-    return reserve;
+    const decimal = reserves.decimals[index]
+    const decDiff = WAD - decimal
+    // reserve
+    return new Decimal(reserves.balances[index].toString()).mul(10 ** decDiff) 
+    
   }
 
-  const recursiveFunction = memoizedRecursive(reserves, discount, expiration, timeStretch);
+  const recursiveFunction = memoizedRecursive(reserves, discount, expiration, timeStretch)
 
-  let xReserves = new Decimal(0);
-  let yReserves = new Decimal(0);
-  let xDecimals: number = WAD;
-  let yDecimals: number = WAD;
+  let xReserves = new Decimal(0)
+  let yReserves = new Decimal(0)
+  let xDecimals: number = WAD
+  let yDecimals: number = WAD
   reserves.tokens.forEach((token, index) => {
     if(token.toLowerCase() === baseTokenAddress.toLowerCase()){
       yReserves = normalizeDecimals(reserves, index)
-      yDecimals = reserves.decimals[index];
+      yDecimals = reserves.decimals[index]
     } else {
       xReserves = normalizeDecimals(reserves, index)
       xDecimals = reserves.decimals[index]
@@ -47,27 +48,15 @@ export const calculateYtcReturn = async (
   })
   const amountAbs = amount.mul(10 ** (WAD - yDecimals))
 
-  // console.log({res: +yReserves / 10**WAD});
-
   const [resultAmount, resultBaseTokensSpent] = await recursiveFunction(
     n,
     amountAbs,
     xReserves,
     yReserves
-  );
+  )
 
   const resultAmountDec = resultAmount.div(10 ** (WAD-yDecimals))
   const resultBaseTokensSpentDec = resultBaseTokensSpent.div(10**(WAD-yDecimals))
-  const fixedResultAmountDec = resultAmountDec.toNumber().toFixed()
-  const fixedResultBaseTokensSpentDec = resultBaseTokensSpentDec.toNumber().toFixed()
-
-  console.log({
-    fixedResultBigNumber: fixedResultAmountDec,
-    unfixedResultBigNumber: resultAmountDec.toString(),
-    fixedResultBaseToken: fixedResultBaseTokensSpentDec,
-    unfixedResultBaseToken: resultBaseTokensSpentDec.toString(),
-  })
-
   return [BigNumber.from(resultAmountDec.toHex()), BigNumber.from(resultBaseTokensSpentDec.toHex())]
 }
 
@@ -100,22 +89,21 @@ const memoizedRecursive = _.memoize(
       }
       const baseTokensSpent =_amount.sub(baseTokensExpectedRaw)
 
-
       if (_n===1){
-        return [_amount, baseTokensSpent];
+        return [_amount, baseTokensSpent]
       } else {
-        const newXReserves = _xReserves.add(_amount);
-        const newYReserves = _yReserves.sub(baseTokensExpectedRaw);
-        const newAmount = baseTokensExpectedRaw;
+        const newXReserves = _xReserves.add(_amount)
+        const newYReserves = _yReserves.sub(baseTokensExpectedRaw)
+        const newAmount = baseTokensExpectedRaw
         const [resultAmount, resultBaseTokensSpent] = await recursiveFunction(
           _n-1,
           newAmount,
           newXReserves,
           newYReserves,
-        );
-        return [_amount.add(resultAmount), baseTokensSpent.add(resultBaseTokensSpent)];
+        )
+        return [_amount.add(resultAmount), baseTokensSpent.add(resultBaseTokensSpent)]
       }
     })
-    return recursiveFunction;
+    return recursiveFunction
   }
 )

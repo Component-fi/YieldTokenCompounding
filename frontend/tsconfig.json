@@ -20,7 +20,7 @@
     "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@/*":["src/*"]
+      "@/*":["./src/*"]
     }
   },
   "include": [
