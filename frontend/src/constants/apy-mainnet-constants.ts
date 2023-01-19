@@ -25,8 +25,15 @@ export const COINGECKO_TOKEN_NAME_TRANSLATION: { [key: string]: string } = {
   steth: "lido-staked-ether",
   usd: "usd",
   eur: "eur",
-  "bb-a-usd": "balancer-boosted-aave-usdt",
 };
+
+export const ELEMENT_SPECIFIC_TOKENS = [
+  "bb-a-usd",
+]
+
+export const ELEMENT_SPECIFIC_PRICE_ORACLES = {
+  "bb-a-usd": "0x557F483E13c94a02cBFeFe1D27a781c4221f37f5",
+}
 
 // TODO this list needs to be updated every time that element deploys a new curve token
 // This could potentially be resolved by using the element finance tokenlist
