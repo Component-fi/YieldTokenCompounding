@@ -10,13 +10,9 @@ export const isElementSpecificToken = (baseTokenNameLowercase: string) => (
 export const getPriceValueFromContract = async (
   contractAddress: string,
 ): Promise<number> =>  {
-  console.log("getPriceValueFromContract")
-  if (contractAddress) {
-    const valueOracleContract = new ethers.Contract(contractAddress, ['function value() public view returns (uint256 _value, bytes data)'], getDefaultProvider())
-    const value: {_value: BigNumber, data: string} = await valueOracleContract.value()
-    const price = value._value.div(String(10 ** WAD)).toNumber()
-    return price
-  }
+  const valueOracleContract = new ethers.Contract(contractAddress, ['function value() public view returns (uint256 _value, bytes data)'], getDefaultProvider())
+  const value: {_value: BigNumber, data: string} = await valueOracleContract.value()
+  const price = value._value.div(String(10 ** WAD)).toNumber()
 
-  return 0
+  return price
 }
