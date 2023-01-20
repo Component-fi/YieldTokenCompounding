@@ -71,7 +71,7 @@ export const simulateYTCZap = async (
   userData: YTCInput,
   signerOrProvider: Signer | Provider
 ): Promise<YTCOutput> => {
-  let returnedVals;
+  let returnedVals: [BigNumber, BigNumber];
   try {
     // Call the method statically to calculate the estimated return
     returnedVals = await simulate(userData.numberOfCompounds);

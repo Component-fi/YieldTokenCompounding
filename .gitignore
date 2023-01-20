@@ -11,6 +11,7 @@
 # production
 /build
 /frontend/build
+/frontend/dist
 
 # misc
 .DS_Store
@@ -25,6 +26,7 @@ yarn-debug.log*
 yarn-error.log*
 
 node_modules
+.idea
 
 #Hardhat files
 cache

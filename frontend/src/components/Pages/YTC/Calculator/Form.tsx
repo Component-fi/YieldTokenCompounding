@@ -133,7 +133,7 @@ export const Form: React.FC<FormProps> = () => {
           alignItems="center"
           gridGap={1}
         >
-          <FormLabel flexDir="row" justify="center" alignItems="center">
+          <FormLabel flexDir="row" justifyContent="center" alignItems="center">
             <Flex flexDir="row" alignItems="center" gridGap={2}>
               Input Amount
               <InfoTooltip label={copy.tooltips.input_amount} h={3} w={3} />
