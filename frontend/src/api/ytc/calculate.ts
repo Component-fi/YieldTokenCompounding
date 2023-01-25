@@ -37,6 +37,7 @@ export const calculateYtcReturn = async (
   let yReserves = new Decimal(0)
   let xDecimals: number = WAD
   let yDecimals: number = WAD
+
   reserves.tokens.forEach((token, index) => {
     if(token.toLowerCase() === baseTokenAddress.toLowerCase()){
       yReserves = normalizeDecimals(reserves, index)
@@ -46,6 +47,7 @@ export const calculateYtcReturn = async (
       xDecimals = reserves.decimals[index]
     }
   })
+
   const amountAbs = amount.mul(10 ** (WAD - yDecimals))
 
   const [resultAmount, resultBaseTokensSpent] = await recursiveFunction(
@@ -57,7 +59,8 @@ export const calculateYtcReturn = async (
 
   const resultAmountDec = resultAmount.div(10 ** (WAD-yDecimals))
   const resultBaseTokensSpentDec = resultBaseTokensSpent.div(10**(WAD-yDecimals))
-  return [BigNumber.from(resultAmountDec.toHex()), BigNumber.from(resultBaseTokensSpentDec.toHex())]
+
+  return [BigNumber.from(resultAmountDec.round().toHex()), BigNumber.from(resultBaseTokensSpentDec.round().toHex())]
 }
 
 const memoizedRecursive = _.memoize(
