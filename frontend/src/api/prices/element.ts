@@ -1,6 +1,7 @@
 import { ELEMENT_SPECIFIC_TOKENS } from '@/constants/apy-mainnet-constants'
 import { BigNumber, ethers, getDefaultProvider } from "ethers";
 import { WAD } from "@/constants/static";
+import Decimal from 'decimal.js';
 
 export const isElementSpecificToken = (baseTokenNameLowercase: string) => (
   ELEMENT_SPECIFIC_TOKENS.includes(baseTokenNameLowercase)
@@ -12,7 +13,8 @@ export const getPriceValueFromContract = async (
 ): Promise<number> =>  {
   const valueOracleContract = new ethers.Contract(contractAddress, ['function value() public view returns (uint256 _value, bytes data)'], getDefaultProvider())
   const value: {_value: BigNumber, data: string} = await valueOracleContract.value()
-  const price = value._value.div(String(10 ** WAD)).toNumber()
+  const valueDecimals = new Decimal(value._value.toString())
+  const price = valueDecimals.div(10 ** WAD)
 
-  return price
+  return price.toNumber()
 }
